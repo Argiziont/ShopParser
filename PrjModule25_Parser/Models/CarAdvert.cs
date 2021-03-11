@@ -12,10 +12,11 @@ namespace PrjModule25_Parser.Models
         [Key]
         public int AdvertId { get; set; }
 
-        public string AdvertUrl { get; set; }
-        public string MakeAndModel { get; set; }
-        public uint Year { get; set; }
-        public char Fuel { get; set; }
-        public uint Price { get; set; }
+        public string Title { get; set; }
+        public string ScuCode { get; set; }
+        public string Presence { get; set; }
+        public string Description { get; set; }
+        public decimal Price { get; set; }
+        public string Currency { get; set; }
     }
 }

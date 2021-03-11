@@ -1,10 +1,14 @@
-﻿using AngleSharp;
+﻿using System;
+using AngleSharp;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using AngleSharp.Dom;
+using AngleSharp.Html.Dom;
+using PrjModule25_Parser.Models;
 
 namespace PrjModule25_Parser.Controllers
 {
@@ -12,11 +16,6 @@ namespace PrjModule25_Parser.Controllers
     [ApiController]
     public class WebScraperController : ControllerBase
     {
-        /**
-         * The website I'm scraping has data where the paths are relative
-         * so I need a base url set somewhere to build full url's
-         */
-        private readonly String websiteUrl = "<base url here>";
         private readonly ILogger<WebScraperController> _logger;
 
         // Constructor
@@ -25,82 +24,87 @@ namespace PrjModule25_Parser.Controllers
             _logger = logger;
         }
 
-        private async Task<List<dynamic>> GetPageData(string url, List<dynamic> results)
+        private async Task<IActionResult> GetPageData(string url)
         {
             var config = Configuration.Default.WithDefaultLoader();
             var context = BrowsingContext.New(config);
             var document = await context.OpenAsync(url);
 
             // Debug
-            //_logger.LogInformation(document.DocumentElement.OuterHtml);
-
-            var advertrows = document.QuerySelectorAll("tr.result-row");
-
-            foreach (var row in advertrows)
+            var linksToProducts = document.All.Where(m => m.LocalName == "a" && m.ClassList.Contains("productTile__tileLink--204An")).Select(m => ((IHtmlAnchorElement)m).Href).ToList();
+            //var elements = document.QuerySelectorAll("*[data-qaid='product-sku']");
+            var elements = new List<CarAdvert>();
+            foreach (var link in linksToProducts)
             {
-                // Create a container object
-                CarAdvert advert = new CarAdvert();
+                try
+                {
+                    var product = await context.OpenAsync(link);
 
-                // Use regex to get all the numbers from this string
-                var regxMatches = Regex.Matches(row.QuerySelector(".price").TextContent, @"\d+\.*\d+");
-                uint.TryParse(string.Join("", regxMatches), out var price);
-                advert.Price = price;
+                    var title = product.QuerySelector("*[data-qaid='product_name']")?.InnerHtml ?? "";
+                    var sku = product.QuerySelector("span[data-qaid='product-sku']")?.InnerHtml ?? "";
+                    var presence = product.QuerySelector("span[data-qaid='product_presence']")?.FirstElementChild?.InnerHtml ?? "";
+                    var descriptionChildren = product.QuerySelector("div[data-qaid='descriptions']")?.Children;
+                    var description = UnScrubDiv(descriptionChildren).Replace(@"&nbsp;","");
 
-                regxMatches = Regex.Matches(row.QuerySelector(".year").TextContent, @"\d+");
-                uint.TryParse(string.Join("", regxMatches), out var year);
-                advert.Year = year;
+                    var price = Convert.ToDecimal(product.All.Select(m => m.GetAttribute("data-qaprice"))?.First(m => m != null).Replace(".",",") ?? "0");
+                    var currency = product.All.Select(m => m.GetAttribute("data-qacurrency"))?.First(m => m != null) ?? "";
 
-                // Get the fuel type from the ad
-                advert.Fuel = row.QuerySelector(".fuel").TextContent[0];
-
-                // Make and model
-                advert.MakeAndModel = row.QuerySelector(".make_and_model > a").TextContent;
-
-                // Link to the advert
-                advert.AdvertUrl = websiteUrl + row.QuerySelector(".make_and_model > a").GetAttribute("Href");
-
-                results.Add(advert);
+                    elements.Add(new CarAdvert()
+                    {
+                        Currency = currency,
+                        Price = price,
+                        Description = description,
+                        Presence = presence,
+                        ScuCode = sku,
+                        Title = title
+                    });
+                }
+                catch
+                {
+                    // ignored
+                }
             }
+            return Ok();
 
-            // Check if a next page link is present
-            var nextPageUrl = "";
-            var nextPageLink = document.QuerySelector(".next-page > .item");
-            if (nextPageLink != null)
-            {
-                nextPageUrl = websiteUrl + nextPageLink.GetAttribute("Href");
-            }
-
-            // If next page link is present recursively call the function again with the new url
-            if (!string.IsNullOrEmpty(nextPageUrl))
-            {
-                return await GetPageData(nextPageUrl, results);
-            }
-
-            return results;
         }
 
-        private async void CheckForUpdates(string url, string mailTitle)
+        private string UnScrubDiv(IEnumerable<IElement> divElements)
         {
-            // We create the container for the data we want
-            var adverts = new List<dynamic>();
+            var unScrubText = "";
+            foreach (var div in divElements)
+            {
+                if (div.Children.Length > 0)
+                    unScrubText += UnScrubDiv(div.Children);
+                else
+                    unScrubText += "\n" + div.InnerHtml;
+            }
 
-            /*
-             * GetPageData will recursively fill the container with data
-             * and the await keyword guarantees that nothing else is done
-             * before that operation is complete.
-             */
-            await GetPageData(url, adverts);
-
-            // TODO: Diff the data
+            return unScrubText;
         }
 
+       //private async void CheckForUpdates(string url)
+       //{
+       //    // We create the container for the data we want
+       //    var adverts = new List<dynamic>();
+
+       //    /*
+       //     * GetPageData will recursively fill the container with data
+       //     * and the await keyword guarantees that nothing else is done
+       //     * before that operation is complete.
+       //     */
+       //    await GetPageData(url, adverts);
+
+       //    // TODO: Diff the data
+       //}
+
+       [Route("Get")]
         [HttpGet]
-        public string Get()
+        public async Task<IActionResult> Get(string url= "https://prom.ua/Sportivnye-kostyumy")
         {
-            CheckForUpdates("<url to website>", "Web-Scraper updates");
-            return "Hello";
+            await GetPageData(url);
+            return Ok();
         }
     }
 
 }
-//https://prom.ua/Kosmeticheskie-sredstva-po-uhodu-za-kozhej-litsa
+//https://prom.ua/Sportivnye-kostyumy
