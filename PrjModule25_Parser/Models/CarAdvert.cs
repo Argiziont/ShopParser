@@ -16,7 +16,11 @@ namespace PrjModule25_Parser.Models
         public string ScuCode { get; set; }
         public string Presence { get; set; }
         public string Description { get; set; }
-        public decimal Price { get; set; }
+        public string Price { get; set; }
+        public string FullPrice { get; set; }
+        public string OptPrice { get; set; }
         public string Currency { get; set; }
+        public string FullCurrency { get; set; }
+        public string OptCurrency { get; set; }
     }
 }

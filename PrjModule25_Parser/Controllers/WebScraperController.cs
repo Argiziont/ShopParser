@@ -1,14 +1,12 @@
-﻿using System;
-using AngleSharp;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
+using Microsoft.AspNetCore.Mvc;
 using PrjModule25_Parser.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PrjModule25_Parser.Controllers
 {
@@ -16,12 +14,9 @@ namespace PrjModule25_Parser.Controllers
     [ApiController]
     public class WebScraperController : ControllerBase
     {
-        private readonly ILogger<WebScraperController> _logger;
-
         // Constructor
-        public WebScraperController(ILogger<WebScraperController> logger)
+        public WebScraperController()
         {
-            _logger = logger;
         }
 
         private async Task<IActionResult> GetPageData(string url)
@@ -44,18 +39,33 @@ namespace PrjModule25_Parser.Controllers
                     var sku = product.QuerySelector("span[data-qaid='product-sku']")?.InnerHtml ?? "";
                     var presence = product.QuerySelector("span[data-qaid='product_presence']")?.FirstElementChild?.InnerHtml ?? "";
                     var descriptionChildren = product.QuerySelector("div[data-qaid='descriptions']")?.Children;
-                    var description = UnScrubDiv(descriptionChildren).Replace(@"&nbsp;","");
+                    var description = UnScrubDiv(descriptionChildren).Replace(@"&nbsp;", "");
 
-                    var price = Convert.ToDecimal(product.All.Select(m => m.GetAttribute("data-qaprice"))?.First(m => m != null).Replace(".",",") ?? "0");
-                    var currency = product.All.Select(m => m.GetAttribute("data-qacurrency"))?.First(m => m != null) ?? "";
+                    var priceSelector = (IHtmlSpanElement)product.QuerySelector("span[data-qaid='product_price']");
+                    var fullPriceSelector = (IHtmlSpanElement) product.QuerySelector("span[data-qaid='price_without_discount']");
+                    var optPriceSelector = (IHtmlSpanElement)product.QuerySelector("span[data-qaid='opt_price']");
+                    
+                        
+                    var price = priceSelector?.Dataset["qaprice"] ?? "";
+                    var currency = priceSelector?.Dataset["qacurrency"] ?? "";
+
+                    var fullPrice = fullPriceSelector?.Dataset["qaprice"]??"";
+                    var fullCurrency = fullPriceSelector?.Dataset["qacurrency"] ?? "";
+
+                    var optPrice = optPriceSelector?.Dataset["qaprice"] ?? "";
+                    var optCurrency = optPriceSelector?.Dataset["qacurrency"] ?? "";
 
                     elements.Add(new CarAdvert()
                     {
                         Currency = currency,
                         Price = price,
+                        FullCurrency = fullCurrency,
+                        FullPrice = fullPrice,
+                        OptCurrency = optCurrency,
+                        OptPrice = optPrice,
                         Description = description,
                         Presence = presence,
-                        ScuCode = sku,
+                        ScuCode = sku,  
                         Title = title
                     });
                 }
@@ -64,11 +74,11 @@ namespace PrjModule25_Parser.Controllers
                     // ignored
                 }
             }
-            return Ok();
+            return Ok(elements);
 
         }
 
-        private string UnScrubDiv(IEnumerable<IElement> divElements)
+        private static string UnScrubDiv(IEnumerable<IElement> divElements)
         {
             var unScrubText = "";
             foreach (var div in divElements)
@@ -82,29 +92,15 @@ namespace PrjModule25_Parser.Controllers
             return unScrubText;
         }
 
-       //private async void CheckForUpdates(string url)
-       //{
-       //    // We create the container for the data we want
-       //    var adverts = new List<dynamic>();
-
-       //    /*
-       //     * GetPageData will recursively fill the container with data
-       //     * and the await keyword guarantees that nothing else is done
-       //     * before that operation is complete.
-       //     */
-       //    await GetPageData(url, adverts);
-
-       //    // TODO: Diff the data
-       //}
-
-       [Route("Get")]
+        [Route("Get")]
         [HttpGet]
-        public async Task<IActionResult> Get(string url= "https://prom.ua/Sportivnye-kostyumy")
+        public async Task<IActionResult> Get(string url = "https://prom.ua/Sportivnye-kostyumy")
         {
-            await GetPageData(url);
-            return Ok();
+            return await GetPageData(url);
         }
     }
 
 }
 //https://prom.ua/Sportivnye-kostyumy
+//data-qaid="variation_block"
+//data-qaid="image_block"
