@@ -22,5 +22,6 @@ namespace PrjModule25_Parser.Models
         public string Currency { get; set; }
         public string FullCurrency { get; set; }
         public string OptCurrency { get; set; }
+        public List<string>  ImageUrls{ get; set; }
     }
 }

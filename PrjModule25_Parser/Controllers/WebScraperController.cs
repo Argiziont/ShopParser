@@ -3,7 +3,6 @@ using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using Microsoft.AspNetCore.Mvc;
 using PrjModule25_Parser.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,11 +13,6 @@ namespace PrjModule25_Parser.Controllers
     [ApiController]
     public class WebScraperController : ControllerBase
     {
-        // Constructor
-        public WebScraperController()
-        {
-        }
-
         private async Task<IActionResult> GetPageData(string url)
         {
             var config = Configuration.Default.WithDefaultLoader();
@@ -26,8 +20,12 @@ namespace PrjModule25_Parser.Controllers
             var document = await context.OpenAsync(url);
 
             // Debug
-            var linksToProducts = document.All.Where(m => m.LocalName == "a" && m.ClassList.Contains("productTile__tileLink--204An")).Select(m => ((IHtmlAnchorElement)m).Href).ToList();
-            //var elements = document.QuerySelectorAll("*[data-qaid='product-sku']");
+            var linksToProducts = document.All
+                .Where(m => m.LocalName == "a" && m.ClassList
+                .Contains("productTile__tileLink--204An"))
+                .Select(m => ((IHtmlAnchorElement)m).Href)
+                .ToList();
+
             var elements = new List<CarAdvert>();
             foreach (var link in linksToProducts)
             {
@@ -36,25 +34,41 @@ namespace PrjModule25_Parser.Controllers
                     var product = await context.OpenAsync(link);
 
                     var title = product.QuerySelector("*[data-qaid='product_name']")?.InnerHtml ?? "";
+
                     var sku = product.QuerySelector("span[data-qaid='product-sku']")?.InnerHtml ?? "";
+
                     var presence = product.QuerySelector("span[data-qaid='product_presence']")?.FirstElementChild?.InnerHtml ?? "";
+
                     var descriptionChildren = product.QuerySelector("div[data-qaid='descriptions']")?.Children;
                     var description = UnScrubDiv(descriptionChildren).Replace(@"&nbsp;", "");
 
                     var priceSelector = (IHtmlSpanElement)product.QuerySelector("span[data-qaid='product_price']");
-                    var fullPriceSelector = (IHtmlSpanElement) product.QuerySelector("span[data-qaid='price_without_discount']");
+                    var fullPriceSelector = (IHtmlSpanElement)product.QuerySelector("span[data-qaid='price_without_discount']");
                     var optPriceSelector = (IHtmlSpanElement)product.QuerySelector("span[data-qaid='opt_price']");
-                    
-                        
+
+
                     var price = priceSelector?.Dataset["qaprice"] ?? "";
                     var currency = priceSelector?.Dataset["qacurrency"] ?? "";
 
-                    var fullPrice = fullPriceSelector?.Dataset["qaprice"]??"";
+                    var fullPrice = fullPriceSelector?.Dataset["qaprice"] ?? "";
                     var fullCurrency = fullPriceSelector?.Dataset["qacurrency"] ?? "";
 
                     var optPrice = optPriceSelector?.Dataset["qaprice"] ?? "";
                     var optCurrency = optPriceSelector?.Dataset["qacurrency"] ?? "";
 
+                    
+                    //Picking image list
+                    var imageSrcList = product.QuerySelector("div[data-qaid='image_block']")//<Upper div>
+                        ?.Children//<Lower divs>
+                        ?.First(m => m.ClassList
+                            .Contains("ek-grid__item_width_expand") == false) //<Lower div with thumbnails>
+                        ?.Children//<Ul>
+                        ?.First()
+                        ?.Children//<Li>
+                        ?.Select(i => ((IHtmlImageElement)i//<Img>
+                            .QuerySelector("img[data-qaid='image_thumb']"))?.Source)//Src="Urls"
+                        .ToList();
+                    
                     elements.Add(new CarAdvert()
                     {
                         Currency = currency,
@@ -65,9 +79,11 @@ namespace PrjModule25_Parser.Controllers
                         OptPrice = optPrice,
                         Description = description,
                         Presence = presence,
-                        ScuCode = sku,  
-                        Title = title
+                        ScuCode = sku,
+                        Title = title,
+                        ImageUrls = imageSrcList
                     });
+                    
                 }
                 catch
                 {
