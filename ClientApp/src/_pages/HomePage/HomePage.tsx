@@ -2,9 +2,12 @@ import { Button, Grid, makeStyles, TextField } from "@material-ui/core";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import React from "react";
 
+import { ParseDataSegment } from "../../_components";
+
 const useStyles = makeStyles((theme) => ({
   rootBox: {
     marginTop: theme.spacing(5),
+    marginBottom: theme.spacing(15),
   },
   urlField: {
     margin: theme.spacing(5),
@@ -22,7 +25,6 @@ export const HomePage: React.FC = () => {
         className={classes.rootBox}
       >
         <Grid container xs={4}></Grid>
-
         <Grid
           container
           xs={4}
@@ -41,6 +43,7 @@ export const HomePage: React.FC = () => {
         </Grid>
         <Grid container xs={4}></Grid>
       </Grid>
+      <ParseDataSegment />
     </React.Fragment>
   );
 };

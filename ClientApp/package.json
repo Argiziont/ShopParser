@@ -9,10 +9,14 @@
         "@types/react-router-dom": "^5.1.7",
         "history": "^5.0.0",
         "react": "^17.0.1",
+        "react-awesome-slider": "^4.1.0",
         "react-dom": "^17.0.1",
         "react-hook-form": "^6.15.1",
+        "react-material-ui-carousel": "^2.2.1",
         "react-number-format": "^4.4.4",
-        "react-router-dom": "^5.2.0"
+        "react-responsive-carousel": "^3.2.14",
+        "react-router-dom": "^5.2.0",
+        "react-simple-image-slider": "^2.0.3"
     },
     "scripts": {
         "start": "webpack serve --open --mode development",
