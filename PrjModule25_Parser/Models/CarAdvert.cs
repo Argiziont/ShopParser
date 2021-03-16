@@ -10,7 +10,7 @@ namespace PrjModule25_Parser.Models
     {
         // [Key] defines a field as primary key
         [Key]
-        public int AdvertId { get; set; }
+        public string AdvertId { get; set; }
 
         public string Title { get; set; }
         public string ScuCode { get; set; }
@@ -22,6 +22,10 @@ namespace PrjModule25_Parser.Models
         public string Currency { get; set; }
         public string FullCurrency { get; set; }
         public string OptCurrency { get; set; }
+        public string CompanyName { get; set; }
+        public string PositivePercent { get; set; }
+        public string RatingsPerLastYear { get; set; }
+
         public List<string>  ImageUrls{ get; set; }
     }
 }

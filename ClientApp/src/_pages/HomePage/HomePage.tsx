@@ -1,8 +1,10 @@
 import { Button, Grid, makeStyles, TextField } from "@material-ui/core";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
-import React from "react";
+import React, { useState } from "react";
 
+import { WebApi } from "../../_services";
 import { ParseDataSegment } from "../../_components";
+import { ICarAdvert } from "../../_actions";
 
 const useStyles = makeStyles((theme) => ({
   rootBox: {
@@ -14,7 +16,49 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 export const HomePage: React.FC = () => {
+  const [requestUrl, setRequestUrl] = useState<string>(
+    "https://prom.ua/Sportivnye-kostyumy"
+  );
+  const [isLodaing, setIsLodaing] = useState<boolean>(false);
+  const [cartAdverts, setCartAdverts] = useState<ICarAdvert[]>();
+
   const classes = useStyles();
+
+  const handleRequestUrlChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRequestUrl(event.target.value);
+  };
+  const handleGetRequest = async () => {
+    try {
+      setIsLodaing(true);
+      const response = await WebApi().get(requestUrl);
+      setCartAdverts(response);
+      setIsLodaing(false);
+    } catch {}
+  };
+
+  const dataBlock = isLodaing ? (<div>{"Loading"}</div>) :
+    cartAdverts?.map((cartAdvert,i) => {
+    return <ParseDataSegment
+      advertId={cartAdvert.advertId}
+      companyName={cartAdvert.companyName}
+      currency={cartAdvert.currency}
+      description={cartAdvert.description}
+      fullCurrency={cartAdvert.fullCurrency}
+      fullPrice={cartAdvert.fullPrice}
+      imageUrls={cartAdvert.imageUrls}
+      key={i}
+      optCurrency={cartAdvert.optCurrency}
+      optPrice={cartAdvert.optPrice}
+      positivePercent={cartAdvert.positivePercent}
+      presence={cartAdvert.presence}
+      price={cartAdvert.price}
+      ratingsPerLastYear={cartAdvert.ratingsPerLastYear}
+      scuCode={cartAdvert.scuCode}
+      title={cartAdvert.title}
+    />;
+  });
   return (
     <React.Fragment>
       <Grid
@@ -33,17 +77,26 @@ export const HomePage: React.FC = () => {
           alignItems="flex-end"
         >
           <Grid item>
-            <TextField label="Site URL" variant="standard" />
+            <TextField
+              label="Site URL"
+              variant="standard"
+              value={requestUrl}
+              onChange={handleRequestUrlChange}
+            />
           </Grid>
           <Grid item>
-            <Button variant="contained" endIcon={<CloudUploadIcon />}>
+            <Button
+              variant="contained"
+              endIcon={<CloudUploadIcon />}
+              onClick={handleGetRequest}
+            >
               {"Submit"}
             </Button>
           </Grid>
         </Grid>
         <Grid container xs={4}></Grid>
       </Grid>
-      <ParseDataSegment />
+      {dataBlock}
     </React.Fragment>
   );
 };

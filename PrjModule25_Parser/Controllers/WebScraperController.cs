@@ -8,6 +8,7 @@ using PrjModule25_Parser.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace PrjModule25_Parser.Controllers
 {
@@ -15,29 +16,14 @@ namespace PrjModule25_Parser.Controllers
     [ApiController]
     public class WebScraperController : ControllerBase
     {
-        private async Task<IActionResult> GetPageData(string url)
-        {
-            var config = Configuration.Default.WithDefaultLoader();
-            var context = BrowsingContext.New(config);
-            var document = await context.OpenAsync(url);
-
-            // Debug
-            var linksToProducts = document.All
-                .Where(m => m.LocalName == "a" && m.ClassList
-                .Contains("productTile__tileLink--204An"))
-                .Select(m => ((IHtmlAnchorElement)m).Href)
-                .ToList();
-
-            var elements = ParallelParsing(context, linksToProducts);
-            
-            return Ok(elements);
-
-        }
         private static async Task<CarAdvert> FindDataInsideProductPageAsync(IBrowsingContext context,string subUrl)
         {
+            var id = Guid.NewGuid().ToString();
+
             var product = await context.OpenAsync(subUrl);
 
             var title = product.QuerySelector("*[data-qaid='product_name']")?.InnerHtml ?? "";
+            var companyName = product.QuerySelector("*[data-qaid='company_name']")?.InnerHtml ?? "";
 
             var sku = product.QuerySelector("span[data-qaid='product-sku']")?.InnerHtml ?? "";
 
@@ -49,6 +35,7 @@ namespace PrjModule25_Parser.Controllers
             var priceSelector = (IHtmlSpanElement)product.QuerySelector("span[data-qaid='product_price']");
             var fullPriceSelector = (IHtmlSpanElement)product.QuerySelector("span[data-qaid='price_without_discount']");
             var optPriceSelector = (IHtmlSpanElement)product.QuerySelector("span[data-qaid='opt_price']");
+            var shortCompanyRating = (IHtmlDivElement)product.QuerySelector("div[data-qaid='short_company_rating']");
 
 
             var price = priceSelector?.Dataset["qaprice"] ?? "";
@@ -59,6 +46,9 @@ namespace PrjModule25_Parser.Controllers
 
             var optPrice = optPriceSelector?.Dataset["qaprice"] ?? "";
             var optCurrency = optPriceSelector?.Dataset["qacurrency"] ?? "";
+
+            var posPercent = shortCompanyRating?.Dataset["qapositive"]+"%";
+            var lastYrReply = shortCompanyRating?.Dataset["qacount"] ?? "";
 
 
             //Picking image list
@@ -85,7 +75,11 @@ namespace PrjModule25_Parser.Controllers
                 Presence = presence,
                 ScuCode = sku,
                 Title = title,
-                ImageUrls = imageSrcList
+                CompanyName = companyName,
+                ImageUrls = imageSrcList,
+                PositivePercent = posPercent,
+                RatingsPerLastYear = lastYrReply,
+                AdvertId = id
             };
         }
 
@@ -126,9 +120,33 @@ namespace PrjModule25_Parser.Controllers
 
         [Route("Get")]
         [HttpGet]
+        [ProducesResponseType(typeof(List<CarAdvert>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
+        [ProducesDefaultResponseType]
         public async Task<IActionResult> Get(string url = "https://prom.ua/Sportivnye-kostyumy")
         {
-            return await GetPageData(url);
+            try
+            {
+                var config = Configuration.Default.WithDefaultLoader();
+                var context = BrowsingContext.New(config);
+                var document = await context.OpenAsync(url);
+
+                // Debug
+                var linksToProducts = document.All
+                    .Where(m => m.LocalName == "a" && m.ClassList
+                        .Contains("productTile__tileLink--204An"))
+                    .Select(m => ((IHtmlAnchorElement)m).Href)
+                    .ToList();
+
+                var elements = ParallelParsing(context, linksToProducts);
+
+                return Ok(elements);
+
+            }
+            catch (Exception e)
+            {
+                return  BadRequest(e);
+            }
         }
     }
 

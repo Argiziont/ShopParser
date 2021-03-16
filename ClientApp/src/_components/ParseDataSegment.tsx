@@ -10,6 +10,8 @@ import {
 import React from "react";
 import Carousel from "react-material-ui-carousel";
 
+import { ICarAdvert } from "../_actions";
+
 const useStyles = makeStyles((theme) => ({
   rootBox: {
     //marginBottom: theme.spacing(1),
@@ -19,6 +21,10 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: 16,
     color: theme.palette.primary.main,
     padding: "0 30px",
+  },
+  rootGrid: {
+    marginBottom: theme.spacing(4),
+
   },
   dataFields: {
     marginBottom: theme.spacing(2),
@@ -32,33 +38,33 @@ const useStyles = makeStyles((theme) => ({
   },
   media: {
     height: "100%",
-    paddingTop: "100%", // 16:9
+    padding: "200% 0px 0px 0px",
+  },
+  carouselCard: {
+    height: "100%",
+    width: "100%",
   },
 }));
 
-export const ParseDataSegment: React.FC = () => {
+export const ParseDataSegment: React.FC<ICarAdvert> = (
+  CartAdvert: ICarAdvert
+) => {
   const classes = useStyles();
-  const images = [
-    {
-      url:
-        "https://i.ytimg.com/an_webp/xGeorhZ3-yQ/mqdefault_6s.webp?du=3000&sqp=COCOvYIG&rs=AOn4CLAewUqSqnIc9M2jsOiAK4TNP7y43A",
-    },
-    {
-      url:
-        "https://i.ytimg.com/an_webp/xGeorhZ3-yQ/mqdefault_6s.webp?du=3000&sqp=COCOvYIG&rs=AOn4CLAewUqSqnIc9M2jsOiAK4TNP7y43A",
-    },
-    {
-      url:
-        "https://i.ytimg.com/an_webp/xGeorhZ3-yQ/mqdefault_6s.webp?du=3000&sqp=COCOvYIG&rs=AOn4CLAewUqSqnIc9M2jsOiAK4TNP7y43A",
-    },
-    {
-      url:
-        "https://i.ytimg.com/an_webp/xGeorhZ3-yQ/mqdefault_6s.webp?du=3000&sqp=COCOvYIG&rs=AOn4CLAewUqSqnIc9M2jsOiAK4TNP7y43A",
-    },
-  ];
+
+  const listImgs = CartAdvert.imageUrls?.map((imageUrl, i) => (
+    <Card key={i}>
+      <CardHeader title={CartAdvert.title} subheader={CartAdvert.scuCode} />
+      <CardMedia
+        className={classes.media}
+        image={imageUrl}
+        title={CartAdvert.title}
+      />
+    </Card>
+  ));
+
   return (
     <React.Fragment>
-      <Grid container spacing={2} direction="row" justify="center">
+      <Grid container spacing={2} direction="row" justify="center" className={classes.rootGrid}>
         <Grid
           item
           container
@@ -75,8 +81,44 @@ export const ParseDataSegment: React.FC = () => {
               readOnly: true,
               disabled: true,
             }}
+            label="CompanyName"
+            value={CartAdvert.companyName}
+            color="secondary"
+            variant="standard"
+          />
+          <TextField
+            className={classes.dataFields}
+            fullWidth
+            inputProps={{
+              readOnly: true,
+              disabled: true,
+            }}
+            label="PositivePercent"
+            value={CartAdvert.positivePercent}
+            color="secondary"
+            variant="standard"
+          />
+          <TextField
+            className={classes.dataFields}
+            fullWidth
+            inputProps={{
+              readOnly: true,
+              disabled: true,
+            }}
+            label="RatingsPerLastYear"
+            value={CartAdvert.ratingsPerLastYear}
+            color="secondary"
+            variant="standard"
+          />
+          <TextField
+            className={classes.dataFields}
+            fullWidth
+            inputProps={{
+              readOnly: true,
+              disabled: true,
+            }}
             label="Title"
-            value={"Something"}
+            value={CartAdvert.title}
             color="secondary"
             variant="standard"
           />
@@ -88,7 +130,7 @@ export const ParseDataSegment: React.FC = () => {
               disabled: true,
             }}
             label="ScuCode"
-            value={"Something"}
+            value={CartAdvert.scuCode}
             color="secondary"
             variant="standard"
           />
@@ -100,7 +142,7 @@ export const ParseDataSegment: React.FC = () => {
               disabled: true,
             }}
             label="Presence"
-            value={"Something"}
+            value={CartAdvert.presence}
             color="secondary"
             variant="standard"
           />
@@ -114,9 +156,7 @@ export const ParseDataSegment: React.FC = () => {
             label="Description"
             multiline
             rows={4}
-            value={
-              "Something\nSomething\nSomething\nSomething\nSomething\nSomething\n"
-            }
+            value={CartAdvert.description}
             color="secondary"
             variant="standard"
           />
@@ -128,7 +168,7 @@ export const ParseDataSegment: React.FC = () => {
               disabled: true,
             }}
             label="Price"
-            value={"Something"}
+            value={CartAdvert.price}
             color="secondary"
             variant="standard"
           />
@@ -140,7 +180,7 @@ export const ParseDataSegment: React.FC = () => {
               disabled: true,
             }}
             label="FullPrice"
-            value={"Something"}
+            value={CartAdvert.fullPrice}
             color="secondary"
             variant="standard"
           />
@@ -152,7 +192,7 @@ export const ParseDataSegment: React.FC = () => {
               disabled: true,
             }}
             label="OptPrice"
-            value={"Something"}
+            value={CartAdvert.optPrice}
             color="secondary"
             variant="standard"
           />
@@ -164,7 +204,7 @@ export const ParseDataSegment: React.FC = () => {
               disabled: true,
             }}
             label="Currency"
-            value={"Something"}
+            value={CartAdvert.currency}
             color="secondary"
             variant="standard"
           />
@@ -176,7 +216,7 @@ export const ParseDataSegment: React.FC = () => {
               disabled: true,
             }}
             label="FullCurrency"
-            value={"Something"}
+            value={CartAdvert.fullCurrency}
             color="secondary"
             variant="standard"
           />
@@ -188,7 +228,7 @@ export const ParseDataSegment: React.FC = () => {
               disabled: true,
             }}
             label="OptCurrency"
-            value={"Something"}
+            value={CartAdvert.optCurrency}
             color="secondary"
             variant="standard"
           />
@@ -206,39 +246,7 @@ export const ParseDataSegment: React.FC = () => {
             navButtonsAlwaysInvisible={false}
             navButtonsAlwaysVisible={false}
           >
-            <Card>
-              <CardHeader
-                title="Shrimp and Chorizo Paella"
-                subheader="September 14, 2016"
-              />
-              <CardMedia
-                className={classes.media}
-                image="http://placehold.it/350x150"
-                title="Paella dish"
-              />
-            </Card>
-            <Card>
-              <CardHeader
-                title="Shrimp and Chorizo Paella"
-                subheader="September 14, 2016"
-              />
-              <CardMedia
-                className={classes.media}
-                image="http://placehold.it/255x150"
-                title="Paella dish"
-              />
-            </Card>
-            <Card>
-              <CardHeader
-                title="Shrimp and Chorizo Paella"
-                subheader="September 14, 2016"
-              />
-              <CardMedia
-                className={classes.media}
-                image="http://placehold.it/310x150"
-                title="Paella dish"
-              />
-            </Card>
+            {listImgs}
           </Carousel>
         </Grid>
       </Grid>
