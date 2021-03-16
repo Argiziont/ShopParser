@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PrjModule25_Parser.Models
 {
-    public class CarAdvert
+    public class CartAdvert
     {
         // [Key] defines a field as primary key
         [Key]

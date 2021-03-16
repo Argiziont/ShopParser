@@ -16,7 +16,7 @@ namespace PrjModule25_Parser.Controllers
     [ApiController]
     public class WebScraperController : ControllerBase
     {
-        private static async Task<CarAdvert> FindDataInsideProductPageAsync(IBrowsingContext context,string subUrl)
+        private static async Task<CartAdvert> FindDataInsideProductPageAsync(IBrowsingContext context,string subUrl)
         {
             var id = Guid.NewGuid().ToString();
 
@@ -63,7 +63,7 @@ namespace PrjModule25_Parser.Controllers
                     .QuerySelector("img[data-qaid='image_thumb']"))?.Source)//Src="Urls"
                 .ToList();
 
-            return new CarAdvert()
+            return new CartAdvert()
             {
                 Currency = currency,
                 Price = price,
@@ -83,9 +83,9 @@ namespace PrjModule25_Parser.Controllers
             };
         }
 
-        private static IList<CarAdvert> ParallelParsing(IBrowsingContext context, IEnumerable<string> linksToProducts)
+        private static IList<CartAdvert> ParallelParsing(IBrowsingContext context, IEnumerable<string> linksToProducts)
         {
-            var parallelElements = new ConcurrentBag<CarAdvert>();
+            var parallelElements = new ConcurrentBag<CartAdvert>();
 
             Parallel.ForEach(linksToProducts, link =>
             {
@@ -117,13 +117,37 @@ namespace PrjModule25_Parser.Controllers
 
             return unScrubText;
         }
-
-        [Route("Get")]
+        [Route("GetSellers")]
         [HttpGet]
-        [ProducesResponseType(typeof(List<CarAdvert>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetSellers(string url = "https://prom.ua/Sportivnye-kostyumy")
+        {
+            try
+            {
+                url += ";K";
+                var config = Configuration.Default.WithDefaultLoader();
+                var context = BrowsingContext.New(config);
+                var document = await context.OpenAsync(url);
+
+                // Debugx
+                var linksToProducts = document.QuerySelectorAll("*[data-qaid='company_link']");
+
+
+                //var elements = ParallelParsing(context, linksToProducts);
+
+                return Ok();
+
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e);
+            }
+        }
+        [Route("GetProducts")]
+        [HttpGet]
+        [ProducesResponseType(typeof(List<CartAdvert>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
         [ProducesDefaultResponseType]
-        public async Task<IActionResult> Get(string url = "https://prom.ua/Sportivnye-kostyumy")
+        public async Task<IActionResult> GetProducts(string url = "https://prom.ua/Sportivnye-kostyumy")
         {
             try
             {
@@ -145,7 +169,7 @@ namespace PrjModule25_Parser.Controllers
             }
             catch (Exception e)
             {
-                return  BadRequest(e);
+                return BadRequest(e);
             }
         }
     }
