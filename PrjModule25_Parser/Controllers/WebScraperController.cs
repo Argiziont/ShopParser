@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Concurrent;
-using AngleSharp;
+﻿using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PrjModule25_Parser.Models;
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 
 namespace PrjModule25_Parser.Controllers
 {
@@ -16,7 +16,7 @@ namespace PrjModule25_Parser.Controllers
     [ApiController]
     public class WebScraperController : ControllerBase
     {
-        private static async Task<CartAdvert> FindDataInsideProductPageAsync(IBrowsingContext context,string subUrl)
+        private static async Task<CartAdvert> FindDataInsideProductPageAsync(IBrowsingContext context, string subUrl)
         {
             var id = Guid.NewGuid().ToString();
 
@@ -47,7 +47,7 @@ namespace PrjModule25_Parser.Controllers
             var optPrice = optPriceSelector?.Dataset["qaprice"] ?? "";
             var optCurrency = optPriceSelector?.Dataset["qacurrency"] ?? "";
 
-            var posPercent = shortCompanyRating?.Dataset["qapositive"]+"%";
+            var posPercent = shortCompanyRating?.Dataset["qapositive"] + "%";
             var lastYrReply = shortCompanyRating?.Dataset["qacount"] ?? "";
 
 
@@ -91,19 +91,19 @@ namespace PrjModule25_Parser.Controllers
             {
                 try
                 {
-                    var productInfo =FindDataInsideProductPageAsync(context, link).Result;
+                    var productInfo = FindDataInsideProductPageAsync(context, link).Result;
                     parallelElements.Add(productInfo);
-                    
+
                 }
                 catch
                 {
                     // ignored
                 }
             });
-           
+
             return parallelElements.ToList();
         }
-        
+
         private static string UnScrubDiv(IEnumerable<IElement> divElements)
         {
             var unScrubText = "";
@@ -119,17 +119,30 @@ namespace PrjModule25_Parser.Controllers
         }
         [Route("GetSellers")]
         [HttpGet]
-        public async Task<IActionResult> GetSellers(string url = "https://prom.ua/Sportivnye-kostyumy")
+        public async Task<IActionResult> GetSellers(string url = "https://prom.ua/Sportivnye-kostyumy;c2893027")
         {
             try
             {
-                url += ";K";
+
                 var config = Configuration.Default.WithDefaultLoader();
                 var context = BrowsingContext.New(config);
-                var document = await context.OpenAsync(url);
 
-                // Debugx
-                var linksToProducts = document.QuerySelectorAll("*[data-qaid='company_link']");
+                var count = 1;
+                var document = await context.OpenAsync(url + ";" + count);
+
+                do
+                {
+                    count++;
+                    document = await context.OpenAsync(url + ";" + count);
+                } while (document.Url != url);
+
+                count--;
+                //{
+                //    document = await context.OpenAsync(url + ";" + count);
+                //    count++;
+                //}
+                // Debug
+                var linksToProducts = document.QuerySelectorAll("div[data-qaid='pagination']");
 
 
                 //var elements = ParallelParsing(context, linksToProducts);
