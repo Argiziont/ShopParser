@@ -8,6 +8,8 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace PrjModule25_Parser.Controllers
@@ -117,9 +119,9 @@ namespace PrjModule25_Parser.Controllers
 
             return unScrubText;
         }
-        [Route("GetSellers")]
+        [Route("GetProductsFromSeller")]
         [HttpGet]
-        public async Task<IActionResult> GetSellers(string url = "https://prom.ua/Sportivnye-kostyumy;c2893027")
+        public async Task<IActionResult> GetProductsFromSeller(string url = "https://prom.ua/Muzhskie-dzhinsy;c1916220")
         {
             try
             {
@@ -127,27 +129,26 @@ namespace PrjModule25_Parser.Controllers
                 var config = Configuration.Default.WithDefaultLoader();
                 var context = BrowsingContext.New(config);
 
-                var count = 1;
-                var document = await context.OpenAsync(url + ";" + count);
+                var mainPage = await context.OpenAsync(url);
+                
 
-                do
+                //Number of pages   
+                var pageCount = mainPage.QuerySelectorAll("button[data-qaid='pages']")
+                    .Select(m => int.Parse(m.InnerHtml))
+                    .Max();
+
+                //Get all pages for current seller
+                var productsLinkList = new List<string>();
+                for (var i = 1; i <= pageCount; i++)
                 {
-                    count++;
-                    document = await context.OpenAsync(url + ";" + count);
-                } while (document.Url != url);
+                    var page=await context.OpenAsync(url + ";" + i);
+                    productsLinkList.AddRange(page.All
+                        .Where(m => m.LocalName == "a" && m.ClassList
+                            .Contains("productTile__tileLink--204An"))
+                        .Select(m => ((IHtmlAnchorElement)m).Href));
+                }
 
-                count--;
-                //{
-                //    document = await context.OpenAsync(url + ";" + count);
-                //    count++;
-                //}
-                // Debug
-                var linksToProducts = document.QuerySelectorAll("div[data-qaid='pagination']");
-
-
-                //var elements = ParallelParsing(context, linksToProducts);
-
-                return Ok();
+                return Ok(productsLinkList);
 
             }
             catch (Exception e)
@@ -167,8 +168,7 @@ namespace PrjModule25_Parser.Controllers
                 var config = Configuration.Default.WithDefaultLoader();
                 var context = BrowsingContext.New(config);
                 var document = await context.OpenAsync(url);
-
-                // Debug
+                
                 var linksToProducts = document.All
                     .Where(m => m.LocalName == "a" && m.ClassList
                         .Contains("productTile__tileLink--204An"))
