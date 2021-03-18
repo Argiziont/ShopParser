@@ -3,14 +3,16 @@ using PrjModule25_Parser.Models;
 
 namespace PrjModule25_Parser.Service
 {
-    public class ApplicationDb : DbContext
+    public sealed class ApplicationDb : DbContext
     {
-        public ApplicationDb() : base()
-        { }
+        public ApplicationDb(DbContextOptions<ApplicationDb> options)
+            : base(options)
+        {
+            Database.EnsureCreated();
+        }
 
         public DbSet<ProductData> Products { get; set; }
         public DbSet<ShopData> Shops { get; set; }
         public DbSet<ShopSource> Sources { get; set; }
-        
     }
 }

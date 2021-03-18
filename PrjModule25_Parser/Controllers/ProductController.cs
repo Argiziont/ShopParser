@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Schema.Generation;
 using PrjModule25_Parser.Models;
 using PrjModule25_Parser.Models.JSON_DTO;
+using PrjModule25_Parser.Service;
 
 namespace PrjModule25_Parser.Controllers
 {
@@ -19,38 +20,51 @@ namespace PrjModule25_Parser.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IBrowsingContext _context;
-        public ProductController()
+        private readonly ApplicationDb _dbContext;
+
+        public ProductController(ApplicationDb db)
         {
             var config = Configuration.Default.WithDefaultLoader();
             _context = BrowsingContext.New(config);
+            _dbContext = db;
         }
+
         [HttpGet]
         [Route("ParseProductPage")]
         [ProducesResponseType(typeof(ProductData), StatusCodes.Status200OK)]
         [ProducesDefaultResponseType]
         public async Task<IActionResult> FindDataInsideProductPageAsync(string productUrl)
         {
-            var product = await _context.OpenAsync(productUrl);
+            var productPage = await _context.OpenAsync(productUrl);
+            var externalId = productUrl
+                .Split("//")[1]
+                .Split('/')[1].Split('-').First();
 
-            var title = product.QuerySelector("*[data-qaid='product_name']")?.InnerHtml ?? "";
-            var companyName = product.QuerySelector("*[data-qaid='company_name']")?.InnerHtml ?? "";
+            if (_dbContext.Products.FirstOrDefault(s => s.ExternalId == externalId) != null)
+            {
+                return BadRequest("Database already contains this product");
+            }
 
-            var sku = product.QuerySelector("span[data-qaid='product-sku']")?.InnerHtml ?? "";
+            var title = productPage.QuerySelector("*[data-qaid='product_name']")?.InnerHtml ?? "";
+            var companyName = productPage.QuerySelector("*[data-qaid='company_name']")?.InnerHtml ?? "";
+            var shop = _dbContext.Shops.FirstOrDefault(s => s.Name == companyName);
 
-            var presence = product.QuerySelector("span[data-qaid='product_presence']")?.FirstElementChild?.InnerHtml ?? "";
+            var sku = productPage.QuerySelector("span[data-qaid='product-sku']")?.InnerHtml ?? "";
 
-            var externalId = productUrl.Split("//")[1].Split('/')[1].Split('-').First();
+            var presence = productPage.QuerySelector("span[data-qaid='product_presence']")?.FirstElementChild?.InnerHtml ??
+                           "";
 
-            var descriptionChildren = product.QuerySelector("div[data-qaid='descriptions']")?.Children;
+            var descriptionChildren = productPage.QuerySelector("div[data-qaid='descriptions']")?.Children;
             var description = UnScrubDiv(descriptionChildren).Replace(@"&nbsp;", "");
 
-            var priceSelector = (IHtmlSpanElement)product.QuerySelector("span[data-qaid='product_price']");
-            var fullPriceSelector = (IHtmlSpanElement)product.QuerySelector("span[data-qaid='price_without_discount']");
-            var optPriceSelector = (IHtmlSpanElement)product.QuerySelector("span[data-qaid='opt_price']");
-            var shortCompanyRating = (IHtmlDivElement)product.QuerySelector("div[data-qaid='short_company_rating']");
-            var breadcrumbsSeo = (IHtmlDivElement)product.QuerySelector("div[data-qaid='breadcrumbs_seo']");
+            var priceSelector = (IHtmlSpanElement) productPage.QuerySelector("span[data-qaid='product_price']");
+            var fullPriceSelector =
+                (IHtmlSpanElement) productPage.QuerySelector("span[data-qaid='price_without_discount']");
+            var optPriceSelector = (IHtmlSpanElement) productPage.QuerySelector("span[data-qaid='opt_price']");
+            var shortCompanyRating = (IHtmlDivElement) productPage.QuerySelector("div[data-qaid='short_company_rating']");
+            var breadcrumbsSeo = (IHtmlDivElement) productPage.QuerySelector("div[data-qaid='breadcrumbs_seo']");
 
-            var fullCategory =UnScrubCategory(breadcrumbsSeo);
+            var fullCategory = UnScrubCategory(breadcrumbsSeo);
             var price = priceSelector?.Dataset["qaprice"] ?? "";
             var currency = priceSelector?.Dataset["qacurrency"] ?? "";
 
@@ -65,15 +79,15 @@ namespace PrjModule25_Parser.Controllers
 
 
             //Picking image list
-            var imageSrcList = product.QuerySelector("div[data-qaid='image_block']")//<Upper div>
-                ?.Children//<Lower divs>
+            var imageSrcList = productPage.QuerySelector("div[data-qaid='image_block']") //<Upper div>
+                ?.Children //<Lower divs>
                 ?.First(m => m.ClassList
                     .Contains("ek-grid__item_width_expand") == false) //<Lower div with thumbnails>
-                ?.Children//<Ul>
+                ?.Children //<Ul>
                 ?.First()
-                ?.Children//<Li>
-                ?.Select(i => ((IHtmlImageElement)i//<Img>
-                    .QuerySelector("img[data-qaid='image_thumb']"))?.Source)//Src="Urls"
+                ?.Children //<Li>
+                ?.Select(i => ((IHtmlImageElement) i //<Img>
+                    .QuerySelector("img[data-qaid='image_thumb']"))?.Source) //Src="Urls"
                 .ToList();
 
             var generator = new JSchemaGenerator();
@@ -81,7 +95,7 @@ namespace PrjModule25_Parser.Controllers
             var fullCategorySchema = generator.Generate(typeof(Category)).ToString();
             var fullCategoryJson = JsonConvert.SerializeObject(fullCategory);
 
-            var jsonProductDat = new ProductJson()
+            var jsonProductDat = new ProductJson
             {
                 Currency = currency,
                 Price = price,
@@ -103,11 +117,10 @@ namespace PrjModule25_Parser.Controllers
                 JsonCategorySchema = fullCategorySchema,
                 ExternalId = externalId
             };
+
             var productSchema = generator.Generate(typeof(ProductJson)).ToString();
             var productJson = JsonConvert.SerializeObject(jsonProductDat);
-
-
-            return Ok(new ProductData()
+            var product = new ProductData
             {
                 SyncDate = jsonProductDat.SyncDate,
                 Url = jsonProductDat.Url,
@@ -116,42 +129,44 @@ namespace PrjModule25_Parser.Controllers
                 JsonData = productJson,
                 JsonDataSchema = productSchema,
                 Price = jsonProductDat.Price,
-                Title = jsonProductDat.Title
-            });
+                Title = jsonProductDat.Title,
+                Shop = shop
+            };
+
+            await _dbContext.Products.AddAsync(product);
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(product);
         }
+
         private static string UnScrubDiv(IEnumerable<IElement> divElements)
         {
             var unScrubText = "";
             foreach (var div in divElements)
-            {
                 if (div.Children.Length > 0)
                     unScrubText += UnScrubDiv(div.Children);
                 else
                     unScrubText += "\n" + div.InnerHtml;
-            }
 
             return unScrubText;
         }
+
         private static Category UnScrubCategory(IParentNode divElement)
         {
             var topLevelCategory = new Category();
             var currentCategory = topLevelCategory;
-            for (var i = 0; i < divElement.Children.Length-1; i++)
+            for (var i = 0; i < divElement.Children.Length - 1; i++)
             {
                 var childCategory = (IHtmlAnchorElement) divElement.Children[i].Children.First();
                 var subCategory = new Category();
 
-                currentCategory.Href=childCategory.Href;
+                currentCategory.Href = childCategory.Href;
                 currentCategory.Name = childCategory.Title;
                 currentCategory.SubCategory = subCategory;
                 if (i != divElement.Children.Length - 2)
-                {
                     currentCategory = subCategory;
-                }
                 else
-                {
                     currentCategory.SubCategory = null;
-                }
             }
 
             return topLevelCategory;

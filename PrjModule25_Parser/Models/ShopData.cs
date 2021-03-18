@@ -14,7 +14,7 @@ namespace PrjModule25_Parser.Models
         public string Name { get; set; }
         public string Url { get; set; }
         public DateTime SyncDate { get; set; }
-        
+
         //Json-serialized data
         public string JsonData { get; set; }
         public string JsonDataSchema { get; set; }
