@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using PrjModule25_Parser.Models.Helpers;
 
 namespace PrjModule25_Parser.Models
 {
@@ -13,6 +14,7 @@ namespace PrjModule25_Parser.Models
         //Internal data
         public string Name { get; set; }
         public string Url { get; set; }
+        public IEnumerable<UrlEntry> ProductUrls { get; set; }
         public DateTime SyncDate { get; set; }
 
         //Json-serialized data

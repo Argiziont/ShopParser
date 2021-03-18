@@ -33,7 +33,7 @@ namespace PrjModule25_Parser.Controllers
         [Route("ParseProductPage")]
         [ProducesResponseType(typeof(ProductData), StatusCodes.Status200OK)]
         [ProducesDefaultResponseType]
-        public async Task<IActionResult> FindDataInsideProductPageAsync(string productUrl)
+        public async Task<IActionResult> ParseDataInsideProductPageAsync(string productUrl)
         {
             var productPage = await _context.OpenAsync(productUrl);
             var externalId = productUrl
@@ -138,6 +138,35 @@ namespace PrjModule25_Parser.Controllers
 
             return Ok(product);
         }
+
+        [HttpGet]
+        [Route("ParseSellerPage")]
+        [ProducesResponseType(typeof(ProductData), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> ParseDataInsideSellerPageAsync(string shopName)
+        {
+            var seller = _dbContext.Shops.FirstOrDefault(s => s.Name == shopName);
+            if (seller == null)
+            {
+                return BadRequest("This shop doesn't exist in database");
+            }
+            if (seller.ProductUrls == null)
+            {
+                return BadRequest("Seller doesn't contains urls, you need to update products for this shop");
+            }
+
+            var products = new List<ProductData>();
+            foreach (var pageUrl in seller.ProductUrls)
+            {
+                var productOkObject =(await ParseDataInsideProductPageAsync(pageUrl.Url)) as OkObjectResult;
+                
+                products.Add((ProductData)productOkObject?.Value);
+            }
+            
+            return Ok(products);
+        }
+
 
         private static string UnScrubDiv(IEnumerable<IElement> divElements)
         {

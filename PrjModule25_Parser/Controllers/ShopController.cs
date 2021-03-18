@@ -1,16 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AngleSharp;
+﻿using AngleSharp;
 using AngleSharp.Html.Dom;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Schema.Generation;
 using PrjModule25_Parser.Models;
+using PrjModule25_Parser.Models.Helpers;
 using PrjModule25_Parser.Models.JSON_DTO;
 using PrjModule25_Parser.Service;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PrjModule25_Parser.Controllers
 {
@@ -34,10 +36,16 @@ namespace PrjModule25_Parser.Controllers
         [ProducesResponseType(typeof(List<string>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
         [ProducesDefaultResponseType]
-        public async Task<IActionResult> GetProductsListFromSellerAsync(string sellerName)
+        public async Task<IActionResult> AddProductsListFromSellerAsync(string sellerName)
         {
             try
             {
+                var shop = _dbContext.Shops.FirstOrDefault(s => s.Name == sellerName);
+                if (shop == null)
+                {
+                    return BadRequest("Database doesn't contains this seller");
+                }
+
                 var sellerUrl = _dbContext.Shops.FirstOrDefault(u => u.Name == sellerName)?.Url;
                 var sellerPage = await _context.OpenAsync(sellerUrl);
 
@@ -51,12 +59,35 @@ namespace PrjModule25_Parser.Controllers
                 var productsLinkList = new List<string>();
                 for (var i = 1; i <= pageCount; i++)
                 {
-                    var page = await _context.OpenAsync(sellerUrl + ";" + i);
-                    productsLinkList.AddRange(page.All
-                        .Where(m => m.LocalName == "a" && m.ClassList
-                            .Contains("productTile__tileLink--204An"))
-                        .Select(m => ((IHtmlAnchorElement) m).Href));
+                    var page = await _context.OpenAsync(sellerUrl?.Replace(".html", "") + ";" + i + ".html");
+                    productsLinkList.AddRange(
+                        page.QuerySelectorAll("*[data-qaid='product_link']").ToList().Cast<IHtmlAnchorElement>()
+                            .Select(u => u.Href));
                 }
+
+                var productsUrlsDto = productsLinkList.Select(url => new UrlEntry { Url = url, Shop = shop }).ToList();
+
+                shop.SyncDate = DateTime.Now;
+
+                var jsonSellerDat = new ShopJson
+                {
+                    ExternalId = shop.ExternalId,
+                    Url = shop.Url,
+                    SyncDate = shop.SyncDate,
+                    Name = shop.Name,
+                    ProductUrls = productsUrlsDto
+                };
+
+                var generator = new JSchemaGenerator();
+                var fullCategorySchema = generator.Generate(typeof(ShopJson)).ToString();
+                var fullCategoryJson = JsonConvert.SerializeObject(jsonSellerDat);
+
+                shop.JsonData = fullCategoryJson;
+                shop.JsonDataSchema = fullCategorySchema;
+
+                await _dbContext.UrlEntries.AddRangeAsync(productsUrlsDto);
+                _dbContext.Entry(shop).State = EntityState.Modified;
+                await _dbContext.SaveChangesAsync();
 
                 return Ok(productsLinkList);
             }
