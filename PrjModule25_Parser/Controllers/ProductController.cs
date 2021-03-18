@@ -1,28 +1,36 @@
-﻿using AngleSharp;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Schema.Generation;
 using PrjModule25_Parser.Models;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
+using PrjModule25_Parser.Models.JSON_DTO;
 
 namespace PrjModule25_Parser.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class WebScraperController : ControllerBase
+    public class ProductController : ControllerBase
     {
-        private static async Task<CartAdvert> FindDataInsideProductPageAsync(IBrowsingContext context, string subUrl)
+        private readonly IBrowsingContext _context;
+        public ProductController()
         {
-            var id = Guid.NewGuid().ToString();
-
-            var product = await context.OpenAsync(subUrl);
+            var config = Configuration.Default.WithDefaultLoader();
+            _context = BrowsingContext.New(config);
+        }
+        [HttpGet]
+        [Route("ParseProductPage")]
+        [ProducesResponseType(typeof(ProductData), StatusCodes.Status200OK)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> FindDataInsideProductPageAsync(string productUrl)
+        {
+            var product = await _context.OpenAsync(productUrl);
 
             var title = product.QuerySelector("*[data-qaid='product_name']")?.InnerHtml ?? "";
             var companyName = product.QuerySelector("*[data-qaid='company_name']")?.InnerHtml ?? "";
@@ -31,6 +39,8 @@ namespace PrjModule25_Parser.Controllers
 
             var presence = product.QuerySelector("span[data-qaid='product_presence']")?.FirstElementChild?.InnerHtml ?? "";
 
+            var externalId = productUrl.Split("//")[1].Split('/')[1].Split('-').First();
+
             var descriptionChildren = product.QuerySelector("div[data-qaid='descriptions']")?.Children;
             var description = UnScrubDiv(descriptionChildren).Replace(@"&nbsp;", "");
 
@@ -38,8 +48,9 @@ namespace PrjModule25_Parser.Controllers
             var fullPriceSelector = (IHtmlSpanElement)product.QuerySelector("span[data-qaid='price_without_discount']");
             var optPriceSelector = (IHtmlSpanElement)product.QuerySelector("span[data-qaid='opt_price']");
             var shortCompanyRating = (IHtmlDivElement)product.QuerySelector("div[data-qaid='short_company_rating']");
+            var breadcrumbsSeo = (IHtmlDivElement)product.QuerySelector("div[data-qaid='breadcrumbs_seo']");
 
-
+            var fullCategory =UnScrubCategory(breadcrumbsSeo);
             var price = priceSelector?.Dataset["qaprice"] ?? "";
             var currency = priceSelector?.Dataset["qacurrency"] ?? "";
 
@@ -65,7 +76,12 @@ namespace PrjModule25_Parser.Controllers
                     .QuerySelector("img[data-qaid='image_thumb']"))?.Source)//Src="Urls"
                 .ToList();
 
-            return new CartAdvert()
+            var generator = new JSchemaGenerator();
+
+            var fullCategorySchema = generator.Generate(typeof(Category)).ToString();
+            var fullCategoryJson = JsonConvert.SerializeObject(fullCategory);
+
+            var jsonProductDat = new ProductJson()
             {
                 Currency = currency,
                 Price = price,
@@ -81,31 +97,28 @@ namespace PrjModule25_Parser.Controllers
                 ImageUrls = imageSrcList,
                 PositivePercent = posPercent,
                 RatingsPerLastYear = lastYrReply,
-                AdvertId = id
+                Url = productUrl,
+                SyncDate = DateTime.Now,
+                JsonCategory = fullCategoryJson,
+                JsonCategorySchema = fullCategorySchema,
+                ExternalId = externalId
             };
-        }
+            var productSchema = generator.Generate(typeof(ProductJson)).ToString();
+            var productJson = JsonConvert.SerializeObject(jsonProductDat);
 
-        private static IList<CartAdvert> ParallelParsing(IBrowsingContext context, IEnumerable<string> linksToProducts)
-        {
-            var parallelElements = new ConcurrentBag<CartAdvert>();
 
-            Parallel.ForEach(linksToProducts, link =>
+            return Ok(new ProductData()
             {
-                try
-                {
-                    var productInfo = FindDataInsideProductPageAsync(context, link).Result;
-                    parallelElements.Add(productInfo);
-
-                }
-                catch
-                {
-                    // ignored
-                }
+                SyncDate = jsonProductDat.SyncDate,
+                Url = jsonProductDat.Url,
+                Description = jsonProductDat.Description,
+                ExternalId = jsonProductDat.ExternalId,
+                JsonData = productJson,
+                JsonDataSchema = productSchema,
+                Price = jsonProductDat.Price,
+                Title = jsonProductDat.Title
             });
-
-            return parallelElements.ToList();
         }
-
         private static string UnScrubDiv(IEnumerable<IElement> divElements)
         {
             var unScrubText = "";
@@ -119,75 +132,29 @@ namespace PrjModule25_Parser.Controllers
 
             return unScrubText;
         }
-        [Route("GetProductsFromSeller")]
-        [HttpGet]
-        public async Task<IActionResult> GetProductsFromSeller(string url = "https://prom.ua/Muzhskie-dzhinsy;c1916220")
+        private static Category UnScrubCategory(IParentNode divElement)
         {
-            try
+            var topLevelCategory = new Category();
+            var currentCategory = topLevelCategory;
+            for (var i = 0; i < divElement.Children.Length-1; i++)
             {
+                var childCategory = (IHtmlAnchorElement) divElement.Children[i].Children.First();
+                var subCategory = new Category();
 
-                var config = Configuration.Default.WithDefaultLoader();
-                var context = BrowsingContext.New(config);
-
-                var mainPage = await context.OpenAsync(url);
-                
-
-                //Number of pages   
-                var pageCount = mainPage.QuerySelectorAll("button[data-qaid='pages']")
-                    .Select(m => int.Parse(m.InnerHtml))
-                    .Max();
-
-                //Get all pages for current seller
-                var productsLinkList = new List<string>();
-                for (var i = 1; i <= pageCount; i++)
+                currentCategory.Href=childCategory.Href;
+                currentCategory.Name = childCategory.Title;
+                currentCategory.SubCategory = subCategory;
+                if (i != divElement.Children.Length - 2)
                 {
-                    var page=await context.OpenAsync(url + ";" + i);
-                    productsLinkList.AddRange(page.All
-                        .Where(m => m.LocalName == "a" && m.ClassList
-                            .Contains("productTile__tileLink--204An"))
-                        .Select(m => ((IHtmlAnchorElement)m).Href));
+                    currentCategory = subCategory;
                 }
-
-                return Ok(productsLinkList);
-
+                else
+                {
+                    currentCategory.SubCategory = null;
+                }
             }
-            catch (Exception e)
-            {
-                return BadRequest(e);
-            }
-        }
-        [Route("GetProducts")]
-        [HttpGet]
-        [ProducesResponseType(typeof(List<CartAdvert>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
-        [ProducesDefaultResponseType]
-        public async Task<IActionResult> GetProducts(string url = "https://prom.ua/Sportivnye-kostyumy")
-        {
-            try
-            {
-                var config = Configuration.Default.WithDefaultLoader();
-                var context = BrowsingContext.New(config);
-                var document = await context.OpenAsync(url);
-                
-                var linksToProducts = document.All
-                    .Where(m => m.LocalName == "a" && m.ClassList
-                        .Contains("productTile__tileLink--204An"))
-                    .Select(m => ((IHtmlAnchorElement)m).Href)
-                    .ToList();
 
-                var elements = ParallelParsing(context, linksToProducts);
-
-                return Ok(elements);
-
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e);
-            }
+            return topLevelCategory;
         }
     }
-
 }
-//https://prom.ua/Sportivnye-kostyumy
-//data-qaid="variation_block"
-//data-qaid="image_block"

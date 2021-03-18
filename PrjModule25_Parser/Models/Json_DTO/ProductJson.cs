@@ -1,22 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PrjModule25_Parser.Models
+namespace PrjModule25_Parser.Models.JSON_DTO
 {
-    public class CartAdvert
+    public class ProductJson
     {
-        // [Key] defines a field as primary key
-        [Key]
-        public string AdvertId { get; set; }
-
+        //Internal data
         public string Title { get; set; }
-        public string ScuCode { get; set; }
-        public string Presence { get; set; }
+        public string ExternalId { get; set; }
+        public string Url { get; set; }
+        public DateTime SyncDate { get; set; }
         public string Description { get; set; }
         public string Price { get; set; }
+        public string ScuCode { get; set; }
+        public string Presence { get; set; }
         public string FullPrice { get; set; }
         public string OptPrice { get; set; }
         public string Currency { get; set; }
@@ -25,7 +24,8 @@ namespace PrjModule25_Parser.Models
         public string CompanyName { get; set; }
         public string PositivePercent { get; set; }
         public string RatingsPerLastYear { get; set; }
-
-        public List<string>  ImageUrls{ get; set; }
+        public List<string> ImageUrls { get; set; }
+        public string JsonCategory { get; set; }
+        public string JsonCategorySchema { get; set; }
     }
 }

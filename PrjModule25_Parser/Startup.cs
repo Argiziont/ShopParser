@@ -1,16 +1,10 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using PrjModule25_Parser.Service;
 
 namespace PrjModule25_Parser
 {
@@ -27,6 +21,10 @@ namespace PrjModule25_Parser
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors();
+            //Data base connection
+            var connectionString = Configuration.GetConnectionString("UserDb");
+            services.AddDbContext<ApplicationDb>(options =>
+                options.UseSqlServer(connectionString));
             services.AddControllers();
             services.AddOpenApiDocument();
         }
