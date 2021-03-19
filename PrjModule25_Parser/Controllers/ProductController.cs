@@ -7,9 +7,8 @@ using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Schema.Generation;
+using NJsonSchema;
 using PrjModule25_Parser.Models;
 using PrjModule25_Parser.Models.Helpers;
 using PrjModule25_Parser.Models.JSON_DTO;
@@ -57,7 +56,8 @@ namespace PrjModule25_Parser.Controllers
                            "";
 
             var descriptionChildren = productPage.QuerySelector("div[data-qaid='descriptions']")?.Children;
-            var description = UnScrubDiv(descriptionChildren).Replace(@"&nbsp;", "");
+            
+            var description = descriptionChildren !=null? UnScrubDiv(descriptionChildren).Replace(@"&nbsp;", ""):"";
 
             var priceSelector = (IHtmlSpanElement) productPage.QuerySelector("span[data-qaid='product_price']");
             var fullPriceSelector =
@@ -91,10 +91,8 @@ namespace PrjModule25_Parser.Controllers
                 ?.Select(i => ((IHtmlImageElement) i //<Img>
                     .QuerySelector("img[data-qaid='image_thumb']"))?.Source) //Src="Urls"
                 .ToList();
-
-            var generator = new JSchemaGenerator();
-
-            var fullCategorySchema = generator.Generate(typeof(Category)).ToString();
+            
+            var fullCategorySchema = JsonSchema.FromType<Category>().ToJson();
             var fullCategoryJson = JsonConvert.SerializeObject(fullCategory);
 
             var jsonProductDat = new ProductJson
@@ -120,7 +118,8 @@ namespace PrjModule25_Parser.Controllers
                 ExternalId = externalId
             };
 
-            var productSchema = generator.Generate(typeof(ProductJson)).ToString();
+            
+            var productSchema = JsonSchema.FromType<ProductJson>().ToJson();
             var productJson = JsonConvert.SerializeObject(jsonProductDat);
             var product = new ProductData
             {
@@ -155,11 +154,16 @@ namespace PrjModule25_Parser.Controllers
             {
                 var productOkObject = (await ParseDataInsideProductPageAsync(productsList[i].Url)) as OkObjectResult;
                 var parsedProduct = (ProductData)productOkObject?.Value;
-                productsList[i] = parsedProduct;
-                productsList[i].ProductState = ProductState.Success;
-                _dbContext.Entry(productsList[i]).State = EntityState.Modified;
-            }
+                if (parsedProduct != null)
+                {
+                    parsedProduct.Id = productsList[i].Id;
+                    productsList[i] = parsedProduct;
+                }
 
+                productsList[i].ProductState = ProductState.Success;
+                //_dbContext.Entry(productsList[i]).State = EntityState.Modified;
+            }
+            
             await _dbContext.SaveChangesAsync();
             
             return Ok(productsList);
