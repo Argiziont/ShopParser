@@ -1,4 +1,5 @@
 ﻿using System;
+using PrjModule25_Parser.Models.Helpers;
 
 namespace PrjModule25_Parser.Models
 {
@@ -14,6 +15,8 @@ namespace PrjModule25_Parser.Models
         public string Title { get; set; }
         public string Url { get; set; }
         public DateTime SyncDate { get; set; }
+        public DateTime ExpirationDate { get; set; }
+        public ProductState ProductState { get; set; }
         public string Description { get; set; }
         public string Price { get; set; }
 

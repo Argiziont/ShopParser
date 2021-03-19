@@ -10,7 +10,6 @@ namespace PrjModule25_Parser.Models.JSON_DTO
         public string ExternalId { get; set; }
         public string Name { get; set; }
         public string Url { get; set; }
-        public IEnumerable<UrlEntry> ProductUrls { get; set; }
         public DateTime SyncDate { get; set; }
     }
 }

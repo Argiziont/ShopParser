@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Schema.Generation;
 using PrjModule25_Parser.Models;
-using PrjModule25_Parser.Models.Helpers;
 using PrjModule25_Parser.Models.JSON_DTO;
 using PrjModule25_Parser.Service;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PrjModule25_Parser.Models.Helpers;
 
 namespace PrjModule25_Parser.Controllers
 {
@@ -36,7 +36,7 @@ namespace PrjModule25_Parser.Controllers
         [ProducesResponseType(typeof(List<string>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
         [ProducesDefaultResponseType]
-        public async Task<IActionResult> AddProductsListFromSellerAsync(string sellerName)
+        public async Task<IActionResult> AddProductsListFromSellerAsync(string sellerName= "Інтернет-магазин Myjeans")
         {
             try
             {
@@ -65,7 +65,12 @@ namespace PrjModule25_Parser.Controllers
                             .Select(u => u.Href));
                 }
 
-                var productsUrlsDto = productsLinkList.Select(url => new UrlEntry { Url = url, Shop = shop }).ToList();
+                var emptyProducts = productsLinkList.Select(url => new ProductData
+                {
+                    Url = url,
+                    Shop = shop,
+                    ProductState = ProductState.Idle
+                }).ToList();
 
                 shop.SyncDate = DateTime.Now;
 
@@ -75,17 +80,17 @@ namespace PrjModule25_Parser.Controllers
                     Url = shop.Url,
                     SyncDate = shop.SyncDate,
                     Name = shop.Name,
-                    ProductUrls = productsUrlsDto
                 };
 
                 var generator = new JSchemaGenerator();
                 var fullCategorySchema = generator.Generate(typeof(ShopJson)).ToString();
                 var fullCategoryJson = JsonConvert.SerializeObject(jsonSellerDat);
 
+                shop.Products = emptyProducts;
                 shop.JsonData = fullCategoryJson;
                 shop.JsonDataSchema = fullCategorySchema;
 
-                await _dbContext.UrlEntries.AddRangeAsync(productsUrlsDto);
+                await _dbContext.Products.AddRangeAsync(emptyProducts);
                 _dbContext.Entry(shop).State = EntityState.Modified;
                 await _dbContext.SaveChangesAsync();
 

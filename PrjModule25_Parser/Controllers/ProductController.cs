@@ -7,9 +7,11 @@ using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Schema.Generation;
 using PrjModule25_Parser.Models;
+using PrjModule25_Parser.Models.Helpers;
 using PrjModule25_Parser.Models.JSON_DTO;
 using PrjModule25_Parser.Service;
 
@@ -132,10 +134,6 @@ namespace PrjModule25_Parser.Controllers
                 Title = jsonProductDat.Title,
                 Shop = shop
             };
-
-            await _dbContext.Products.AddAsync(product);
-            await _dbContext.SaveChangesAsync();
-
             return Ok(product);
         }
 
@@ -151,20 +149,20 @@ namespace PrjModule25_Parser.Controllers
             {
                 return BadRequest("This shop doesn't exist in database");
             }
-            if (seller.ProductUrls == null)
+            
+            var productsList = _dbContext.Products.Where(p=>p.Shop.Id== seller.Id).ToArray();
+            for (var i = 0; i < productsList.Length; i++)
             {
-                return BadRequest("Seller doesn't contains urls, you need to update products for this shop");
+                var productOkObject = (await ParseDataInsideProductPageAsync(productsList[i].Url)) as OkObjectResult;
+                var parsedProduct = (ProductData)productOkObject?.Value;
+                productsList[i] = parsedProduct;
+                productsList[i].ProductState = ProductState.Success;
+                _dbContext.Entry(productsList[i]).State = EntityState.Modified;
             }
 
-            var products = new List<ProductData>();
-            foreach (var pageUrl in seller.ProductUrls)
-            {
-                var productOkObject =(await ParseDataInsideProductPageAsync(pageUrl.Url)) as OkObjectResult;
-                
-                products.Add((ProductData)productOkObject?.Value);
-            }
+            await _dbContext.SaveChangesAsync();
             
-            return Ok(products);
+            return Ok(productsList);
         }
 
 
