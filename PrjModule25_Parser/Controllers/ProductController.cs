@@ -1,24 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using NJsonSchema;
+using PrjModule25_Parser.Controllers.Interfaces;
 using PrjModule25_Parser.Models;
 using PrjModule25_Parser.Models.Helpers;
 using PrjModule25_Parser.Models.JSON_DTO;
 using PrjModule25_Parser.Service;
+using PrjModule25_Parser.Service.Exceptions;
 
 namespace PrjModule25_Parser.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class ProductController : ControllerBase
+    public class ProductController : ControllerBase,IProductController
     {
         private readonly IBrowsingContext _context;
         private readonly ApplicationDb _dbContext;
@@ -37,14 +41,12 @@ namespace PrjModule25_Parser.Controllers
         public async Task<IActionResult> ParseDataInsideProductPageAsync(string productUrl)
         {
             var productPage = await _context.OpenAsync(productUrl);
+            if (productPage.StatusCode == HttpStatusCode.TooManyRequests)
+                throw new TooManyRequestsException();
+
             var externalId = productUrl
                 .Split("//")[1]
                 .Split('/')[1].Split('-').First();
-
-            if (_dbContext.Products.FirstOrDefault(s => s.ExternalId == externalId) != null)
-            {
-                return BadRequest("Database already contains this product");
-            }
 
             var title = productPage.QuerySelector("*[data-qaid='product_name']")?.InnerHtml ?? "";
             var companyName = productPage.QuerySelector("*[data-qaid='company_name']")?.InnerHtml ?? "";
@@ -56,9 +58,15 @@ namespace PrjModule25_Parser.Controllers
                            "";
 
             var descriptionChildren = productPage.QuerySelector("div[data-qaid='descriptions']")?.Children;
-            
-            var description = descriptionChildren !=null? UnScrubDiv(descriptionChildren).Replace(@"&nbsp;", ""):"";
-
+            string description;
+            if (descriptionChildren?.Length==1 && descriptionChildren[0].NodeName=="P")
+            {
+                description = descriptionChildren[0].InnerHtml;
+            }
+            else
+            {
+                description = UnScrubDiv(descriptionChildren).Replace(@"&nbsp;", "");
+            }
             var priceSelector = (IHtmlSpanElement) productPage.QuerySelector("span[data-qaid='product_price']");
             var fullPriceSelector =
                 (IHtmlSpanElement) productPage.QuerySelector("span[data-qaid='price_without_discount']");
@@ -131,17 +139,18 @@ namespace PrjModule25_Parser.Controllers
                 JsonDataSchema = productSchema,
                 Price = jsonProductDat.Price,
                 Title = jsonProductDat.Title,
-                Shop = shop
+                Shop = shop,
+                ProductState = ProductState.Success
             };
             return Ok(product);
         }
 
         [HttpGet]
-        [Route("ParseSellerPage")]
+        [Route("ParseAllProductUrlsInsideSellerPage")]
         [ProducesResponseType(typeof(ProductData), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesDefaultResponseType]
-        public async Task<IActionResult> ParseDataInsideSellerPageAsync(string shopName)
+        public async Task<IActionResult> ParseAllProductUrlsInsideSellerPageAsync(string shopName)
         {
             var seller = _dbContext.Shops.FirstOrDefault(s => s.Name == shopName);
             if (seller == null)
@@ -161,12 +170,52 @@ namespace PrjModule25_Parser.Controllers
                 }
 
                 productsList[i].ProductState = ProductState.Success;
-                //_dbContext.Entry(productsList[i]).State = EntityState.Modified;
             }
             
             await _dbContext.SaveChangesAsync();
             
             return Ok(productsList);
+        }
+        [HttpGet]
+        [Route("ParseSingleProductInsideSellerPage")]
+        [ProducesResponseType(typeof(ProductData), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status202Accepted)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> ParseSingleProductInsideSellerPageAsync(string productId)
+        {
+            var currentProduct = _dbContext.Products.FirstOrDefault(s => s.Id == Convert.ToInt32(productId));
+            if (currentProduct == null)
+                return BadRequest("This product doesn't exist in database");
+            if (currentProduct.ProductState==ProductState.Success)
+                return Accepted("This product already up to date");
+            try
+            {
+                var productOkObject = (await ParseDataInsideProductPageAsync(currentProduct.Url)) as OkObjectResult;
+                var parsedProduct = (ProductData)productOkObject?.Value;
+                if (parsedProduct != null)
+                {
+                    currentProduct.ProductState = parsedProduct.ProductState;
+                    currentProduct.Description = parsedProduct.Description;
+                    currentProduct.ExpirationDate = parsedProduct.ExpirationDate;
+                    currentProduct.JsonData = parsedProduct.JsonData;
+                    currentProduct.ExternalId = parsedProduct.ExternalId;
+                    currentProduct.JsonDataSchema = parsedProduct.JsonDataSchema;
+                    currentProduct.Price = parsedProduct.Price;
+                    currentProduct.SyncDate = parsedProduct.SyncDate;
+                    currentProduct.Title = parsedProduct.Title;
+                    currentProduct.Url = parsedProduct.Url;
+                }
+
+                await _dbContext.SaveChangesAsync();
+            }
+            catch(TooManyRequestsException)
+            {
+                currentProduct.ProductState = ProductState.Failed;
+                return BadRequest("Product couldn't be updated");
+            }
+
+            return Ok(currentProduct);
         }
 
 

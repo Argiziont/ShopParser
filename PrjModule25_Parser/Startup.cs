@@ -4,7 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using PrjModule25_Parser.Controllers;
+using PrjModule25_Parser.Controllers.Interfaces;
 using PrjModule25_Parser.Service;
+using PrjModule25_Parser.Service.TimedHostedServices;
 
 namespace PrjModule25_Parser
 {
@@ -25,6 +28,15 @@ namespace PrjModule25_Parser
             var connectionString = Configuration.GetConnectionString("UserDb");
             services.AddDbContext<ApplicationDb>(options =>
                 options.UseSqlServer(connectionString));
+
+            services.AddScoped<ProductController>();
+
+            //services.AddScoped<IProductController,ProductController>();
+            //services.AddScoped<IShopController, ShopController>();
+
+            //services.AddHostedService<BackgroundProductControllerWorker>();
+            //services.AddHostedService<BackgroundProductControllerWorker>();
+
             services.AddControllers();
             services.AddOpenApiDocument();
         }

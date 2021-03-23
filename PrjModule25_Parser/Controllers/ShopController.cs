@@ -12,13 +12,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PrjModule25_Parser.Controllers.Interfaces;
 using PrjModule25_Parser.Models.Helpers;
 
 namespace PrjModule25_Parser.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class ShopController : ControllerBase
+    public class ShopController : ControllerBase,IShopController
     {
         private readonly IBrowsingContext _context;
         private readonly ApplicationDb _dbContext;
@@ -36,7 +37,7 @@ namespace PrjModule25_Parser.Controllers
         [ProducesResponseType(typeof(List<string>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
         [ProducesDefaultResponseType]
-        public async Task<IActionResult> AddProductsListFromSellerAsync(string sellerName= "Інтернет-магазин Myjeans")
+        public async Task<IActionResult> AddProductsListFromSellerAsync(string sellerName= "DAIVVA UKRAINE")
         {
             try
             {
@@ -109,7 +110,7 @@ namespace PrjModule25_Parser.Controllers
         [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
         [ProducesDefaultResponseType]
         public async Task<IActionResult> FindDataInsideSellerPageAsync(
-            string sellerUrl = "https://prom.ua/c1916220-internet-magazin-myjeans.html")
+            string sellerUrl = "https://prom.ua/c3468819-daivva-ukraine.html")
         {
             try
             {
