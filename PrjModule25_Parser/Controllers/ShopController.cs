@@ -11,6 +11,7 @@ using PrjModule25_Parser.Service;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using PrjModule25_Parser.Controllers.Interfaces;
 using PrjModule25_Parser.Models.Helpers;
@@ -38,7 +39,7 @@ namespace PrjModule25_Parser.Controllers
         [ProducesResponseType(typeof(List<string>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
         [ProducesDefaultResponseType]
-        public async Task<IActionResult> AddProductsListFromSellerAsync(string sellerName= "DAIVVA UKRAINE")
+        public async Task<IActionResult> AddProductsListFromSellerAsync(string sellerName)
         {
             try
             {
@@ -65,6 +66,8 @@ namespace PrjModule25_Parser.Controllers
                     productsLinkList.AddRange(
                         page.QuerySelectorAll("*[data-qaid='product_link']").ToList().Cast<IHtmlAnchorElement>()
                             .Select(u => u.Href));
+                    
+                    Thread.Sleep(2000);
                 }
 
                 var emptyProducts = productsLinkList.Select(url => new ProductData

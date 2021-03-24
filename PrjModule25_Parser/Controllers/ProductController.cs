@@ -59,10 +59,6 @@ namespace PrjModule25_Parser.Controllers
             var presence = productPage.QuerySelector("span[data-qaid='product_presence']")?.FirstElementChild?.InnerHtml ??
                            "";
 
-            var fullAttributesButton =(IHtmlSpanElement) productPage.QuerySelector("span[data-qaid='all_attributes']");
-
-            fullAttributesButton.DoClick();
-
             var descriptionChildren = productPage.QuerySelector("div[data-qaid='descriptions']")?.Children;
 
             var description= descriptionChildren?.Aggregate("", (current, descriptionTag) => current + ("\n" + ExtractContentFromHtmlAsync(descriptionTag.Html())));
@@ -220,7 +216,7 @@ namespace PrjModule25_Parser.Controllers
         }
        
         [HttpPost]
-        [Route("GetPagesByShopId")]
+        [Route("GetProductsByShopId")]
         [ProducesResponseType(typeof(IEnumerable<ResponseProduct>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
         [ProducesDefaultResponseType]
@@ -228,7 +224,7 @@ namespace PrjModule25_Parser.Controllers
         {
             try
             {
-                var productList = await _dbContext.Products.Where(p => p.Id == id).ToListAsync();
+                var productList = await _dbContext.Products.Where(p => p.ShopId == id&&p.ProductState==ProductState.Success).ToListAsync();
                 return Ok(productList.Select(p => new ResponseProduct()
                 {
                     Description = p.Description,

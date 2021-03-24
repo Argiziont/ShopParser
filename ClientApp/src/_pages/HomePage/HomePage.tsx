@@ -29,42 +29,46 @@ export const HomePage: React.FC = () => {
   ) => {
     setRequestUrl(event.target.value);
   };
-  const handleGetRequest = async () => {
+  const handleGetShopsRequest = async () => {
     try {
       setIsLodaing(true);
       const response = await UserActions.GetAllShops();
-      if (UserActions != undefined) {
+      if (response != undefined) {
         setShopsList(response);
         console.log(response);
       }
-      
+
       setIsLodaing(false);
     } catch {}
   };
 
-  const dataBlock = isLodaing ? (<div>{"Loading"}</div>) : (<ParseDataSegment ShopList={shopsList}></ParseDataSegment>)
-    
-    // cartAdverts?.map((cartAdvert,i) => {
-    // return <ParseDataSegment
-    //   advertId={cartAdvert.advertId}
-    //   companyName={cartAdvert.companyName}
-    //   currency={cartAdvert.currency}
-    //   description={cartAdvert.description}
-    //   fullCurrency={cartAdvert.fullCurrency}
-    //   fullPrice={cartAdvert.fullPrice}
-    //   imageUrls={cartAdvert.imageUrls}
-    //   key={i}
-    //   optCurrency={cartAdvert.optCurrency}
-    //   optPrice={cartAdvert.optPrice}
-    //   positivePercent={cartAdvert.positivePercent}
-    //   presence={cartAdvert.presence}
-    //   price={cartAdvert.price}
-    //   ratingsPerLastYear={cartAdvert.ratingsPerLastYear}
-    //   scuCode={cartAdvert.scuCode}
-    //   title={cartAdvert.title}
-    // />;
-//}
- // );
+  const dataBlock = isLodaing ? (
+    <div>{"Loading"}</div>
+  ) : (
+    <ParseDataSegment ShopList={shopsList}></ParseDataSegment>
+  );
+
+  // cartAdverts?.map((cartAdvert,i) => {
+  // return <ParseDataSegment
+  //   advertId={cartAdvert.advertId}
+  //   companyName={cartAdvert.companyName}
+  //   currency={cartAdvert.currency}
+  //   description={cartAdvert.description}
+  //   fullCurrency={cartAdvert.fullCurrency}
+  //   fullPrice={cartAdvert.fullPrice}
+  //   imageUrls={cartAdvert.imageUrls}
+  //   key={i}
+  //   optCurrency={cartAdvert.optCurrency}
+  //   optPrice={cartAdvert.optPrice}
+  //   positivePercent={cartAdvert.positivePercent}
+  //   presence={cartAdvert.presence}
+  //   price={cartAdvert.price}
+  //   ratingsPerLastYear={cartAdvert.ratingsPerLastYear}
+  //   scuCode={cartAdvert.scuCode}
+  //   title={cartAdvert.title}
+  // />;
+  //}
+  // );
   return (
     <React.Fragment>
       <Grid
@@ -74,9 +78,10 @@ export const HomePage: React.FC = () => {
         justify="center"
         className={classes.rootBox}
       >
-        <Grid container xs={4}></Grid>
+        <Grid container item xs={4}></Grid>
         <Grid
           container
+          item
           xs={4}
           spacing={2}
           justify="center"
@@ -94,13 +99,13 @@ export const HomePage: React.FC = () => {
             <Button
               variant="contained"
               endIcon={<CloudUploadIcon />}
-              onClick={handleGetRequest}
+              onClick={handleGetShopsRequest}
             >
               {"Submit"}
             </Button>
           </Grid>
         </Grid>
-        <Grid container xs={4}></Grid>
+        <Grid item xs={4}></Grid>
       </Grid>
       {dataBlock}
     </React.Fragment>

@@ -1,25 +1,18 @@
-import {
-  Card,
-  CardMedia,
-  Grid,
-  makeStyles,
-  CardHeader,
-  TextField,
-  Typography,
-} from "@material-ui/core";
+import { Grid, makeStyles, Typography } from "@material-ui/core";
 
-import React from "react";
-import Carousel from "react-material-ui-carousel";
-import { IResponseShop } from "../_actions";
+import React, { useState } from "react";
+import { IResponseProduct, IResponseShop } from "../_actions";
+
+import { UserActions } from "../_actions";
 
 //import 'fontsource-roboto';
-
+//import Carousel from "react-material-ui-carousel";
 //import { ICarAdvert } from "../_actions";
 
 const useStyles = makeStyles((theme) => ({
   rootBox: {
     //marginBottom: theme.spacing(1),
-    margin: "0px 15px 0px 15px",
+    //margin: "0px 15px 0px 15px",
     background: "#D3D3D3",
     border: 0,
     borderRadius: 16,
@@ -27,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
     padding: "0 30px",
   },
   rootGrid: {
-    marginBottom: theme.spacing(4),
+    //marginBottom: theme.spacing(4),
   },
   dataFields: {
     marginBottom: theme.spacing(2),
@@ -48,18 +41,14 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
   },
   shopItem: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    margin: "0px 0px 15px 15px",
     background: "#D3D3D3",
     border: 0,
     borderRadius: 16,
     padding: "15px 15px",
-    cursor: "pointer",
-    minWidth: "250px"
+    minWidth: "250px",
   },
-  shodListContainer: {
-    padding:"15px 0px 15px 0px",
+  divPointer: {
+    cursor: "pointer",
   },
 }));
 
@@ -69,96 +58,136 @@ interface ParseDataSegmentProps {
 export const ParseDataSegment: React.FC<ParseDataSegmentProps> = (
   Shops: ParseDataSegmentProps
 ) => {
+  const [productList, setProductList] = useState<IResponseProduct[]>();
+  const [checedProduct, setChecedProduct] = useState<
+    IResponseProduct | undefined
+  >();
+
   const classes = useStyles();
 
-  // const listImgs = CartAdvert.imageUrls?.map((imageUrl, i) => (
-  //   <Card key={i}>
-  //     <CardHeader title={CartAdvert.title} subheader={CartAdvert.scuCode} />
-  //     <CardMedia
-  //       className={classes.media}
-  //       image={imageUrl}
-  //       title={CartAdvert.title}
-  //     />
-  //   </Card>
-  // ));
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
   const shopsBlocks = Shops.ShopList?.map((shop) => {
-    return<div key={shop.id} className={classes.shopItem} onClick={() => console.log(shop.externalId)}>
-      <Typography variant="h6" gutterBottom >
-        {shop.name}
-      </Typography>
-    </div>
+    return (
+      <Grid item key={shop.id}>
+        <div
+          className={`${classes.shopItem} ${classes.divPointer}`}
+          onClick={() => handleGetProductRequest(shop.id)}
+        >
+          <Typography variant="h6" gutterBottom>
+            {shop.name}
+          </Typography>
+          <Typography variant="body1" gutterBottom>
+            {"Shop Id: " + shop.externalId}
+          </Typography>
+        </div>
+      </Grid>
+    );
   });
+  const productsBlocks = productList?.map((product) => {
+    return (
+      <Grid item xs key={product.id} zeroMinWidth>
+        <div
+          className={`${classes.shopItem} ${classes.divPointer}`}
+          onClick={() => handleProductClick(product)}
+        >
+          <Typography variant="h6" gutterBottom noWrap>
+            {product.title}
+          </Typography>
+          <Typography variant="body1" gutterBottom>
+            {"Price: " + product.price}
+          </Typography>
+        </div>
+      </Grid>
+    );
+  });
+
+  const productBlocks =
+    checedProduct == undefined ? (
+      <div></div>
+    ) : (
+      <Grid item xs zeroMinWidth>
+        <div className={classes.shopItem}>
+          <Typography variant="h5" gutterBottom>
+            {checedProduct.title}
+          </Typography>
+          <Typography variant="h6" gutterBottom>
+            {"Price: " + checedProduct.price}
+          </Typography>
+          <Typography variant="body1" gutterBottom>
+            {checedProduct.description}
+          </Typography>
+          <Typography variant="body2" gutterBottom>
+            {"Id: " + checedProduct.externalId}
+          </Typography>
+          <Typography variant="body2" gutterBottom>
+            {"Sync date: " + checedProduct.syncDate}
+          </Typography>
+        </div>
+      </Grid>
+    );
+
+  const handleGetProductRequest = async (id: number | undefined) => {
+    try {
+      if (id != undefined) {
+        const response = await UserActions.GetAllProductInShop(id);
+
+        if (response != undefined) {
+          setProductList(response);
+          console.log(response);
+        }
+      }
+    } catch {}
+  };
+  const handleProductClick = (product: IResponseProduct) => {
+    setChecedProduct(product);
+    scrollToTop();
+  };
   return (
     <React.Fragment>
       <Grid
         container
-        spacing={2}
+        spacing={3}
         direction="row"
         justify="center"
         className={classes.rootGrid}
       >
         <Grid
-          item
           container
+          item
           xs={3}
-          justify="center"
+          spacing={3}
+          justify="flex-start"
           direction="column"
-          alignItems="center"
-          className={classes.shodListContainer}
+          alignItems="flex-start"
         >
           {shopsBlocks}
         </Grid>
         <Grid
-          item
           container
+          item
           xs={3}
-          justify="center"
+          spacing={3}
+          justify="flex-start"
           direction="column"
-          alignItems="center"
-          className={classes.rootBox}
+          alignItems="flex-start"
         >
-          <TextField
-            className={classes.dataFields}
-            fullWidth
-            inputProps={{
-              readOnly: true,
-              disabled: true,
-            }}
-            label="CompanyName"
-            //value={CartAdvert.companyName}
-            color="secondary"
-            variant="standard"
-          />
-          <TextField
-            className={classes.dataMultiline}
-            fullWidth
-            inputProps={{
-              readOnly: true,
-              disabled: true,
-            }}
-            label="Description"
-            multiline
-            rows={4}
-            //value={CartAdvert.description}
-            color="secondary"
-            variant="standard"
-          />
+          {productsBlocks}
         </Grid>
         <Grid
-          item
           container
+          item
           xs={3}
-          justify="center"
+          spacing={3}
+          justify="flex-start"
           direction="column"
-          alignItems="center"
-          className={classes.rootBox}
+          alignItems="flex-end"
         >
-          <Carousel
-            navButtonsAlwaysInvisible={false}
-            navButtonsAlwaysVisible={false}
-          >
-            {/* {listImgs} */}
-          </Carousel>
+          {productBlocks}
         </Grid>
       </Grid>
     </React.Fragment>
