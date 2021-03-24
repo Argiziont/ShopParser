@@ -202,6 +202,53 @@ export class ProductClient {
             });
         }
     }
+
+    getFullProductsById(id: number | undefined): Promise<ProductJson> {
+        let url_ = this.baseUrl + "/Product/GetFullProductsById?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ = <RequestInit>{
+            method: "POST",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetFullProductsById(_response);
+        });
+    }
+
+    protected processGetFullProductsById(response: Response): Promise<ProductJson> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProductJson.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status === 500) {
+            return response.text().then((_responseText) => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = Exception.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
+            });
+        } else {
+            return response.text().then((_responseText) => {
+            let resultdefault: any = null;
+            let resultDatadefault = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            resultdefault = ProblemDetails.fromJS(resultDatadefault);
+            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
+            });
+        }
+    }
 }
 
 export class ShopClient {
@@ -783,6 +830,126 @@ export interface IException {
     message?: string;
     innerException?: Exception | undefined;
     source?: string | undefined;
+}
+
+export class ProductJson implements IProductJson {
+    title?: string | undefined;
+    externalId?: string | undefined;
+    url?: string | undefined;
+    syncDate?: Date;
+    expirationDate?: Date;
+    description?: string | undefined;
+    price?: string | undefined;
+    scuCode?: string | undefined;
+    presence?: string | undefined;
+    fullPrice?: string | undefined;
+    optPrice?: string | undefined;
+    currency?: string | undefined;
+    fullCurrency?: string | undefined;
+    optCurrency?: string | undefined;
+    companyName?: string | undefined;
+    positivePercent?: string | undefined;
+    ratingsPerLastYear?: string | undefined;
+    imageUrls?: string[] | undefined;
+    jsonCategory?: string | undefined;
+    jsonCategorySchema?: string | undefined;
+
+    constructor(data?: IProductJson) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.title = _data["title"];
+            this.externalId = _data["externalId"];
+            this.url = _data["url"];
+            this.syncDate = _data["syncDate"] ? new Date(_data["syncDate"].toString()) : <any>undefined;
+            this.expirationDate = _data["expirationDate"] ? new Date(_data["expirationDate"].toString()) : <any>undefined;
+            this.description = _data["description"];
+            this.price = _data["price"];
+            this.scuCode = _data["scuCode"];
+            this.presence = _data["presence"];
+            this.fullPrice = _data["fullPrice"];
+            this.optPrice = _data["optPrice"];
+            this.currency = _data["currency"];
+            this.fullCurrency = _data["fullCurrency"];
+            this.optCurrency = _data["optCurrency"];
+            this.companyName = _data["companyName"];
+            this.positivePercent = _data["positivePercent"];
+            this.ratingsPerLastYear = _data["ratingsPerLastYear"];
+            if (Array.isArray(_data["imageUrls"])) {
+                this.imageUrls = [] as any;
+                for (let item of _data["imageUrls"])
+                    this.imageUrls!.push(item);
+            }
+            this.jsonCategory = _data["jsonCategory"];
+            this.jsonCategorySchema = _data["jsonCategorySchema"];
+        }
+    }
+
+    static fromJS(data: any): ProductJson {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductJson();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["title"] = this.title;
+        data["externalId"] = this.externalId;
+        data["url"] = this.url;
+        data["syncDate"] = this.syncDate ? this.syncDate.toISOString() : <any>undefined;
+        data["expirationDate"] = this.expirationDate ? this.expirationDate.toISOString() : <any>undefined;
+        data["description"] = this.description;
+        data["price"] = this.price;
+        data["scuCode"] = this.scuCode;
+        data["presence"] = this.presence;
+        data["fullPrice"] = this.fullPrice;
+        data["optPrice"] = this.optPrice;
+        data["currency"] = this.currency;
+        data["fullCurrency"] = this.fullCurrency;
+        data["optCurrency"] = this.optCurrency;
+        data["companyName"] = this.companyName;
+        data["positivePercent"] = this.positivePercent;
+        data["ratingsPerLastYear"] = this.ratingsPerLastYear;
+        if (Array.isArray(this.imageUrls)) {
+            data["imageUrls"] = [];
+            for (let item of this.imageUrls)
+                data["imageUrls"].push(item);
+        }
+        data["jsonCategory"] = this.jsonCategory;
+        data["jsonCategorySchema"] = this.jsonCategorySchema;
+        return data; 
+    }
+}
+
+export interface IProductJson {
+    title?: string | undefined;
+    externalId?: string | undefined;
+    url?: string | undefined;
+    syncDate?: Date;
+    expirationDate?: Date;
+    description?: string | undefined;
+    price?: string | undefined;
+    scuCode?: string | undefined;
+    presence?: string | undefined;
+    fullPrice?: string | undefined;
+    optPrice?: string | undefined;
+    currency?: string | undefined;
+    fullCurrency?: string | undefined;
+    optCurrency?: string | undefined;
+    companyName?: string | undefined;
+    positivePercent?: string | undefined;
+    ratingsPerLastYear?: string | undefined;
+    imageUrls?: string[] | undefined;
+    jsonCategory?: string | undefined;
+    jsonCategorySchema?: string | undefined;
 }
 
 export class ShopJson implements IShopJson {

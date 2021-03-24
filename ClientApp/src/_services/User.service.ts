@@ -1,5 +1,5 @@
 import {
-  ApiException, ResponseProduct, ResponseShop,
+  ApiException, ProductJson, ResponseProduct, ResponseShop,
 } from "../_actions";
 import {
   ShopApi
@@ -7,13 +7,13 @@ import {
 import { ProductApi } from "./Helpers/WebApis";
 export const UserService = {
   GetAllShops,
-  GetAllProductInShop
+  GetAllProductInShop,
+  GetProductById
 };
 
 async function GetAllShops(): Promise<ResponseShop[]> {
 
   return ShopApi().getShops().then((shopResponse) => {
-    console.log("Shops imported successgully");
     return shopResponse;
     //Ok
   }, async (error) => {
@@ -24,8 +24,17 @@ async function GetAllShops(): Promise<ResponseShop[]> {
 async function GetAllProductInShop(id:number): Promise<ResponseProduct[]> {
 
   return ProductApi().getProductsByShopId(id).then((shopResponse) => {
-    console.log("Products imported successgully");
     return shopResponse;
+    //Ok
+  }, async (error) => {
+    const handledException = await handleExeption(error);
+    return Promise.reject(handledException);
+  });
+}
+async function GetProductById(id:number): Promise<ProductJson> {
+
+  return ProductApi().getFullProductsById(id).then((productResponse) => {
+    return productResponse;
     //Ok
   }, async (error) => {
     const handledException = await handleExeption(error);

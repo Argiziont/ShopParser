@@ -1,7 +1,14 @@
-import { Grid, makeStyles, Typography } from "@material-ui/core";
-
-import React, { useState } from "react";
-import { IResponseProduct, IResponseShop } from "../_actions";
+import {
+  Grid,
+  makeStyles,
+  Typography,
+  Link,
+  Button,
+  TextField,
+} from "@material-ui/core";
+import CloudUploadIcon from "@material-ui/icons/CloudUpload";
+import React, { useEffect, useState } from "react";
+import { IProductJson, IResponseProduct, IResponseShop } from "../_actions";
 
 import { UserActions } from "../_actions";
 
@@ -52,18 +59,33 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-interface ParseDataSegmentProps {
-  ShopList: IResponseShop[] | undefined;
-}
-export const ParseDataSegment: React.FC<ParseDataSegmentProps> = (
-  Shops: ParseDataSegmentProps
-) => {
+export const ParseDataSegment: React.FC = () => {
   const [productList, setProductList] = useState<IResponseProduct[]>();
-  const [checedProduct, setChecedProduct] = useState<
-    IResponseProduct | undefined
+  const [shopList, setShopList] = useState<IResponseShop[]>();
+  const [isLodaing, setIsLodaing] = useState<boolean>(false);
+  const [checkedProduct, setCheckedProduct] = useState<
+    IProductJson | undefined
   >();
 
   const classes = useStyles();
+
+  useEffect(() => {
+    let isMounted = true;
+    setIsLodaing(true);
+
+    UserActions.GetAllShops().then((shopList) => {
+      if (isMounted) {
+        setShopList(shopList);
+        setIsLodaing(false);
+      }
+    });
+    return () => {
+      isMounted = false;
+    }; // use effect cleanup to set flag false, if unmounted
+  }, []);
+
+  const preventDefault = (event: React.SyntheticEvent) =>
+    event.preventDefault();
 
   const scrollToTop = () => {
     window.scrollTo({
@@ -71,29 +93,35 @@ export const ParseDataSegment: React.FC<ParseDataSegmentProps> = (
       behavior: "smooth",
     });
   };
-  const shopsBlocks = Shops.ShopList?.map((shop) => {
-    return (
-      <Grid item key={shop.id}>
-        <div
-          className={`${classes.shopItem} ${classes.divPointer}`}
-          onClick={() => handleGetProductRequest(shop.id)}
-        >
-          <Typography variant="h6" gutterBottom>
-            {shop.name}
-          </Typography>
-          <Typography variant="body1" gutterBottom>
-            {"Shop Id: " + shop.externalId}
-          </Typography>
-        </div>
-      </Grid>
-    );
-  });
+
+  const shopsBlocks = isLodaing ? (
+    <div></div>
+  ) : (
+    shopList?.map((shop) => {
+      return (
+        <Grid item key={shop.id}>
+          <div
+            className={`${classes.shopItem} ${classes.divPointer}`}
+            onClick={() => handleGetProductRequest(shop.id)}
+          >
+            <Typography variant="h6" gutterBottom>
+              {shop.name}
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              {"Shop Id: " + shop.externalId}
+            </Typography>
+          </div>
+        </Grid>
+      );
+    })
+  );
+
   const productsBlocks = productList?.map((product) => {
     return (
       <Grid item xs key={product.id} zeroMinWidth>
         <div
           className={`${classes.shopItem} ${classes.divPointer}`}
-          onClick={() => handleProductClick(product)}
+          onClick={() => handleProductClick(product.id)}
         >
           <Typography variant="h6" gutterBottom noWrap>
             {product.title}
@@ -107,25 +135,49 @@ export const ParseDataSegment: React.FC<ParseDataSegmentProps> = (
   });
 
   const productBlocks =
-    checedProduct == undefined ? (
+    checkedProduct == undefined ? (
       <div></div>
     ) : (
       <Grid item xs zeroMinWidth>
         <div className={classes.shopItem}>
           <Typography variant="h5" gutterBottom>
-            {checedProduct.title}
+            {checkedProduct.title}
           </Typography>
           <Typography variant="h6" gutterBottom>
-            {"Price: " + checedProduct.price}
+            {checkedProduct.companyName}
+          </Typography>
+          <Typography variant="body2" gutterBottom>
+            {checkedProduct.presence}
+          </Typography>
+          <Typography variant="body2" gutterBottom>
+            {checkedProduct.scuCode}
+          </Typography>
+          <Typography variant="h6" gutterBottom>
+            {checkedProduct.price + " " + checkedProduct.currency}
           </Typography>
           <Typography variant="body1" gutterBottom>
-            {checedProduct.description}
+            {checkedProduct.description}
+          </Typography>
+          <Typography variant="h6" gutterBottom>
+            {"ImageUrls"}
+          </Typography>
+          {checkedProduct.imageUrls?.map((imgUrl, i) => (
+            <Link
+              key={i}
+              href={imgUrl}
+              onClick={preventDefault}
+              color="inherit"
+            >
+              <Typography variant="body2" gutterBottom>
+                {imgUrl}
+              </Typography>
+            </Link>
+          ))}
+          <Typography variant="body2" gutterBottom>
+            {"Id: " + checkedProduct.externalId}
           </Typography>
           <Typography variant="body2" gutterBottom>
-            {"Id: " + checedProduct.externalId}
-          </Typography>
-          <Typography variant="body2" gutterBottom>
-            {"Sync date: " + checedProduct.syncDate}
+            {"Sync date: " + checkedProduct.syncDate}
           </Typography>
         </div>
       </Grid>
@@ -138,15 +190,22 @@ export const ParseDataSegment: React.FC<ParseDataSegmentProps> = (
 
         if (response != undefined) {
           setProductList(response);
-          console.log(response);
         }
       }
     } catch {}
   };
-  const handleProductClick = (product: IResponseProduct) => {
-    setChecedProduct(product);
-    scrollToTop();
+
+  const handleProductClick = async (id: number | undefined) => {
+    if (id != undefined) {
+      const response = await UserActions.GetProductById(id);
+
+      if (response != undefined) {
+        setCheckedProduct(response);
+        scrollToTop();
+      }
+    }
   };
+
   return (
     <React.Fragment>
       <Grid
@@ -166,6 +225,20 @@ export const ParseDataSegment: React.FC<ParseDataSegmentProps> = (
           alignItems="flex-start"
         >
           {shopsBlocks}
+
+          <Grid item key={-1}>
+            <div className={classes.shopItem}>
+              <TextField label="Shop URL" variant="standard" value={"Null"} />
+
+              <Button
+                variant="contained"
+                endIcon={<CloudUploadIcon />}
+                //onClick={handleGetShopsRequest}
+              >
+                {"Submit"}
+              </Button>
+            </div>
+          </Grid>
         </Grid>
         <Grid
           container

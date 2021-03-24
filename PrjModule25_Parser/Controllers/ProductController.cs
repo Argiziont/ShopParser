@@ -241,6 +241,28 @@ namespace PrjModule25_Parser.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, e);
             }
         }
+
+        [HttpPost]
+        [Route("GetFullProductsById")]
+        [ProducesResponseType(typeof(ProductJson), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
+        [ProducesDefaultResponseType]
+        public IActionResult GetFullProductsById(int id)
+        {
+            try
+            {
+                var jsonData = _dbContext.Products.FirstOrDefault(p => p.Id == id )?.JsonData;
+                var deserializeJson= JsonConvert.DeserializeObject<ProductJson>(jsonData ?? throw new InvalidOperationException());
+                
+                return Ok(deserializeJson);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e);
+            }
+        }
+
+        
         private static string UnScrubDiv(IEnumerable<IElement> divElements)
         {
             var unScrubText = "";
