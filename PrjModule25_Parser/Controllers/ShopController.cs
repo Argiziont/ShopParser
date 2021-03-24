@@ -164,7 +164,7 @@ namespace PrjModule25_Parser.Controllers
         [ProducesResponseType(typeof(ResponseShop), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
         [ProducesDefaultResponseType]
-        public IActionResult GetProductsByShopId(int id)
+        public IActionResult GetShopById(int id)
         {
             try
             {
@@ -179,6 +179,33 @@ namespace PrjModule25_Parser.Controllers
                         SyncDate = shop.SyncDate,
                         Name = shop.Name
                     });
+                return NotFound();
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e);
+            }
+        }
+        [HttpPost]
+        [Route("GetShops")]
+        [ProducesResponseType(typeof(IEnumerable<ResponseShop>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
+        [ProducesDefaultResponseType]
+        public IActionResult GetShops()
+        {
+            try
+            {
+                var shop = _dbContext.Shops.ToList();
+                if (shop.Count>0)
+                    return Ok(shop.Select(s=> new ResponseShop()
+                    {
+                        ExternalId = s.ExternalId,
+                        Id = s.Id,
+                        Url = s.Url,
+                        SyncDate = s.SyncDate,
+                        Name = s.Name
+                    }) );
+
                 return NotFound();
             }
             catch (Exception e)

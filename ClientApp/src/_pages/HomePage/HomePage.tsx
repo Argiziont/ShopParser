@@ -2,7 +2,7 @@ import { Button, Grid, makeStyles, TextField } from "@material-ui/core";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import React, { useState } from "react";
 
-import { WebApi } from "../../_services";
+import { UserActions } from "../../_actions";
 import { ParseDataSegment } from "../../_components";
 import { IResponseShop } from "../../_actions";
 
@@ -32,13 +32,17 @@ export const HomePage: React.FC = () => {
   const handleGetRequest = async () => {
     try {
       setIsLodaing(true);
-     // const response = await WebApi().get(requestUrl);
-      //setCartAdverts(response);
+      const response = await UserActions.GetAllShops();
+      if (UserActions != undefined) {
+        setShopsList(response);
+        console.log(response);
+      }
+      
       setIsLodaing(false);
     } catch {}
   };
 
-  const dataBlock = isLodaing ? (<div>{"Loading"}</div>) :(<div>{"Loading"}</div>)
+  const dataBlock = isLodaing ? (<div>{"Loading"}</div>) : (<ParseDataSegment ShopList={shopsList}></ParseDataSegment>)
     
     // cartAdverts?.map((cartAdvert,i) => {
     // return <ParseDataSegment
