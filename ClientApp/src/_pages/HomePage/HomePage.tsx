@@ -4,7 +4,7 @@ import React, { useState } from "react";
 
 import { WebApi } from "../../_services";
 import { ParseDataSegment } from "../../_components";
-import { ICarAdvert } from "../../_actions";
+import { IResponseShop } from "../../_actions";
 
 const useStyles = makeStyles((theme) => ({
   rootBox: {
@@ -20,7 +20,7 @@ export const HomePage: React.FC = () => {
     "https://prom.ua/Sportivnye-kostyumy"
   );
   const [isLodaing, setIsLodaing] = useState<boolean>(false);
-  const [cartAdverts, setCartAdverts] = useState<ICarAdvert[]>();
+  const [shopsList, setShopsList] = useState<IResponseShop[]>();
 
   const classes = useStyles();
 
@@ -32,33 +32,35 @@ export const HomePage: React.FC = () => {
   const handleGetRequest = async () => {
     try {
       setIsLodaing(true);
-      const response = await WebApi().get(requestUrl);
-      setCartAdverts(response);
+     // const response = await WebApi().get(requestUrl);
+      //setCartAdverts(response);
       setIsLodaing(false);
     } catch {}
   };
 
-  const dataBlock = isLodaing ? (<div>{"Loading"}</div>) :
-    cartAdverts?.map((cartAdvert,i) => {
-    return <ParseDataSegment
-      advertId={cartAdvert.advertId}
-      companyName={cartAdvert.companyName}
-      currency={cartAdvert.currency}
-      description={cartAdvert.description}
-      fullCurrency={cartAdvert.fullCurrency}
-      fullPrice={cartAdvert.fullPrice}
-      imageUrls={cartAdvert.imageUrls}
-      key={i}
-      optCurrency={cartAdvert.optCurrency}
-      optPrice={cartAdvert.optPrice}
-      positivePercent={cartAdvert.positivePercent}
-      presence={cartAdvert.presence}
-      price={cartAdvert.price}
-      ratingsPerLastYear={cartAdvert.ratingsPerLastYear}
-      scuCode={cartAdvert.scuCode}
-      title={cartAdvert.title}
-    />;
-  });
+  const dataBlock = isLodaing ? (<div>{"Loading"}</div>) :(<div>{"Loading"}</div>)
+    
+    // cartAdverts?.map((cartAdvert,i) => {
+    // return <ParseDataSegment
+    //   advertId={cartAdvert.advertId}
+    //   companyName={cartAdvert.companyName}
+    //   currency={cartAdvert.currency}
+    //   description={cartAdvert.description}
+    //   fullCurrency={cartAdvert.fullCurrency}
+    //   fullPrice={cartAdvert.fullPrice}
+    //   imageUrls={cartAdvert.imageUrls}
+    //   key={i}
+    //   optCurrency={cartAdvert.optCurrency}
+    //   optPrice={cartAdvert.optPrice}
+    //   positivePercent={cartAdvert.positivePercent}
+    //   presence={cartAdvert.presence}
+    //   price={cartAdvert.price}
+    //   ratingsPerLastYear={cartAdvert.ratingsPerLastYear}
+    //   scuCode={cartAdvert.scuCode}
+    //   title={cartAdvert.title}
+    // />;
+//}
+ // );
   return (
     <React.Fragment>
       <Grid

@@ -14,6 +14,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using PrjModule25_Parser.Controllers.Interfaces;
 using PrjModule25_Parser.Models.Helpers;
+using PrjModule25_Parser.Models.ResponseModels;
 
 namespace PrjModule25_Parser.Controllers
 {
@@ -157,5 +158,33 @@ namespace PrjModule25_Parser.Controllers
             }
         }
 
+
+        [HttpPost]
+        [Route("GetShopById")]
+        [ProducesResponseType(typeof(ResponseShop), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
+        [ProducesDefaultResponseType]
+        public IActionResult GetProductsByShopId(int id)
+        {
+            try
+            {
+                var shop = _dbContext.Shops.FirstOrDefault(s => s.Id == id);
+
+                if (shop != null)
+                    return Ok(new ResponseShop()
+                    {
+                        ExternalId = shop.ExternalId,
+                        Id = shop.Id,
+                        Url = shop.Url,
+                        SyncDate = shop.SyncDate,
+                        Name = shop.Name
+                    });
+                return NotFound();
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e);
+            }
+        }
     }
 }

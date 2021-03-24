@@ -1,11 +1,11 @@
 import {
-  WebScraperClient,
+  ShopClient
 } from "../../_actions";
 
 import {
   ApiUrl,
 } from "..";
 
-export const WebApi = (): WebScraperClient => {
-  return new WebScraperClient(ApiUrl);
+export const WebApi = (): ShopClient => {
+  return new ShopClient(ApiUrl);
 };

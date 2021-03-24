@@ -9,8 +9,9 @@ import {
 
 import React from "react";
 import Carousel from "react-material-ui-carousel";
+import { IResponseShop } from "../_actions";
 
-import { ICarAdvert } from "../_actions";
+//import { ICarAdvert } from "../_actions";
 
 const useStyles = makeStyles((theme) => ({
   rootBox: {
@@ -46,21 +47,21 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const ParseDataSegment: React.FC<ICarAdvert> = (
-  CartAdvert: ICarAdvert
+export const ParseDataSegment: React.FC<IResponseShop> = (
+  CartAdvert: IResponseShop
 ) => {
   const classes = useStyles();
 
-  const listImgs = CartAdvert.imageUrls?.map((imageUrl, i) => (
-    <Card key={i}>
-      <CardHeader title={CartAdvert.title} subheader={CartAdvert.scuCode} />
-      <CardMedia
-        className={classes.media}
-        image={imageUrl}
-        title={CartAdvert.title}
-      />
-    </Card>
-  ));
+  // const listImgs = CartAdvert.imageUrls?.map((imageUrl, i) => (
+  //   <Card key={i}>
+  //     <CardHeader title={CartAdvert.title} subheader={CartAdvert.scuCode} />
+  //     <CardMedia
+  //       className={classes.media}
+  //       image={imageUrl}
+  //       title={CartAdvert.title}
+  //     />
+  //   </Card>
+  // ));
 
   return (
     <React.Fragment>
@@ -82,67 +83,7 @@ export const ParseDataSegment: React.FC<ICarAdvert> = (
               disabled: true,
             }}
             label="CompanyName"
-            value={CartAdvert.companyName}
-            color="secondary"
-            variant="standard"
-          />
-          <TextField
-            className={classes.dataFields}
-            fullWidth
-            inputProps={{
-              readOnly: true,
-              disabled: true,
-            }}
-            label="PositivePercent"
-            value={CartAdvert.positivePercent}
-            color="secondary"
-            variant="standard"
-          />
-          <TextField
-            className={classes.dataFields}
-            fullWidth
-            inputProps={{
-              readOnly: true,
-              disabled: true,
-            }}
-            label="RatingsPerLastYear"
-            value={CartAdvert.ratingsPerLastYear}
-            color="secondary"
-            variant="standard"
-          />
-          <TextField
-            className={classes.dataFields}
-            fullWidth
-            inputProps={{
-              readOnly: true,
-              disabled: true,
-            }}
-            label="Title"
-            value={CartAdvert.title}
-            color="secondary"
-            variant="standard"
-          />
-          <TextField
-            className={classes.dataFields}
-            fullWidth
-            inputProps={{
-              readOnly: true,
-              disabled: true,
-            }}
-            label="ScuCode"
-            value={CartAdvert.scuCode}
-            color="secondary"
-            variant="standard"
-          />
-          <TextField
-            className={classes.dataFields}
-            fullWidth
-            inputProps={{
-              readOnly: true,
-              disabled: true,
-            }}
-            label="Presence"
-            value={CartAdvert.presence}
+            //value={CartAdvert.companyName}
             color="secondary"
             variant="standard"
           />
@@ -156,79 +97,7 @@ export const ParseDataSegment: React.FC<ICarAdvert> = (
             label="Description"
             multiline
             rows={4}
-            value={CartAdvert.description}
-            color="secondary"
-            variant="standard"
-          />
-          <TextField
-            className={classes.dataFields}
-            fullWidth
-            inputProps={{
-              readOnly: true,
-              disabled: true,
-            }}
-            label="Price"
-            value={CartAdvert.price}
-            color="secondary"
-            variant="standard"
-          />
-          <TextField
-            className={classes.dataFields}
-            fullWidth
-            inputProps={{
-              readOnly: true,
-              disabled: true,
-            }}
-            label="FullPrice"
-            value={CartAdvert.fullPrice}
-            color="secondary"
-            variant="standard"
-          />
-          <TextField
-            className={classes.dataFields}
-            fullWidth
-            inputProps={{
-              readOnly: true,
-              disabled: true,
-            }}
-            label="OptPrice"
-            value={CartAdvert.optPrice}
-            color="secondary"
-            variant="standard"
-          />
-          <TextField
-            className={classes.dataFields}
-            fullWidth
-            inputProps={{
-              readOnly: true,
-              disabled: true,
-            }}
-            label="Currency"
-            value={CartAdvert.currency}
-            color="secondary"
-            variant="standard"
-          />
-          <TextField
-            className={classes.dataFields}
-            fullWidth
-            inputProps={{
-              readOnly: true,
-              disabled: true,
-            }}
-            label="FullCurrency"
-            value={CartAdvert.fullCurrency}
-            color="secondary"
-            variant="standard"
-          />
-          <TextField
-            className={classes.dataFields}
-            fullWidth
-            inputProps={{
-              readOnly: true,
-              disabled: true,
-            }}
-            label="OptCurrency"
-            value={CartAdvert.optCurrency}
+            //value={CartAdvert.description}
             color="secondary"
             variant="standard"
           />
@@ -246,7 +115,7 @@ export const ParseDataSegment: React.FC<ICarAdvert> = (
             navButtonsAlwaysInvisible={false}
             navButtonsAlwaysVisible={false}
           >
-            {listImgs}
+            {/* {listImgs} */}
           </Carousel>
         </Grid>
       </Grid>

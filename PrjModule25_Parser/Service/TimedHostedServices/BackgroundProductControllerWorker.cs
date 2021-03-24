@@ -81,8 +81,6 @@ namespace PrjModule25_Parser.Service.TimedHostedServices
                     throw;
                 }
             }
-           
-
         }
 
         public Task StopAsync(CancellationToken stoppingToken)
