@@ -103,7 +103,7 @@ export const ParseDataSegment: React.FC = () => {
 
   const handleSetPage = async (pageNumber: number, rowsCount = rowsPerPage) => {
     setPage(pageNumber);
-    handleGetProductRequest(currentShopId,pageNumber,rowsCount)
+    handleGetProductRequest(currentShopId, pageNumber, rowsCount);
   };
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -185,7 +185,9 @@ export const ParseDataSegment: React.FC = () => {
           >
             <div
               className={`${classes.shopItem} ${classes.divPointer}`}
-              onClick={() => handleGetProductRequest(shop.id,page,rowsPerPage)}
+              onClick={() =>
+                handleGetProductRequest(shop.id, page, rowsPerPage)
+              }
             >
               <Typography variant="h6" gutterBottom>
                 {shop.name}
@@ -205,14 +207,14 @@ export const ParseDataSegment: React.FC = () => {
       <div></div>
     ) : (
       <Grid item xs>
-        <div className={classes.shopItem} style={{width: "100%"}}>
+        <div className={classes.shopItem} style={{ width: "100%" }}>
           <TablePagination
             component="div"
             count={500}
             page={page}
             onChangePage={handleChangePage}
             rowsPerPage={rowsPerPage}
-            rowsPerPageOptions={[10,25, 50, 75, 100]}
+            rowsPerPageOptions={[10, 25, 50, 75, 100]}
             onChangeRowsPerPage={handleChangeRowsPerPage}
           />
         </div>
@@ -341,8 +343,8 @@ export const ParseDataSegment: React.FC = () => {
           direction="column"
           alignItems="flex-start"
         >
-          {productsBlocks}
           {productBlockPagination}
+          {productsBlocks}
         </Grid>
         <Grid
           container
