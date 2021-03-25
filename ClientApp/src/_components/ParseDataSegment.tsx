@@ -57,7 +57,6 @@ const useStyles = makeStyles((theme) => ({
     minWidth: "250px",
   },
   shopOuterItem: {
-    background: "#9ede73",
     border: 0,
     borderRadius: 16,
     minWidth: "250px",
@@ -72,8 +71,10 @@ export const ParseDataSegment: React.FC = () => {
   const [productList, setProductList] = useState<IResponseProduct[]>();
   const [shopList, setShopList] = useState<IResponseShop[]>();
   const [currentShopId, setCurrentShopId] = useState<number>();
+  const [isDivHover, setIsDivHover] = useState<boolean>();
   const [isShopsLodaing, setIsShopsLodaing] = useState<boolean>(false);
-  const [isDivExtended, setIsDivExtended] = useState<number>(-1);
+  const [isShopDivExtended, setIsShopDivExtended] = useState<number>(-1);
+  const [isProductDivExtended, setIsProductDivExtended] = useState<number>(-1);
   const [isProductsLodaing, setIsProductsLodaing] = useState<boolean>(false);
   const [shopUrl, setShopUrl] = useState<string>("");
   const [checkedProduct, setCheckedProduct] = useState<
@@ -180,23 +181,32 @@ export const ParseDataSegment: React.FC = () => {
       return (
         <Grid item key={shop.id}>
           <div
-            className={classes.shopOuterItem}
-            onMouseEnter={() => setIsDivExtended(i)}
-            onMouseLeave={() => setIsDivExtended(-1)}
+            className={`${classes.shopOuterItem} ${classes.divPointer}`}
+            onMouseEnter={() => setIsShopDivExtended(i)}
+            onMouseLeave={() => setIsShopDivExtended(-1)}
+            onClick={() => {
+              if (!isDivHover) {
+                console.log("Click");
+              }
+            }}
             style={
-              isDivExtended == i
+              isShopDivExtended == i
                 ? {
-                    padding: "0px 30px 0px 0px",
-                    transition: "padding 0.15s ease-in",
+                    padding: "0px 15px 0px 0px",
+                    background: "#be0000",
+                    transition: "padding 0.15s ease-in, background 0s",
                   }
                 : {
                     padding: "0px 0px 0px 0px",
-                    transition: "padding 0.15s ease-in",
+                    background: "#ffff",
+                    transition: "padding 0.2s ease-in, background 1s",
                   }
             }
           >
             <div
               className={`${classes.shopItem} ${classes.divPointer}`}
+              onMouseEnter={() => setIsDivHover(true)}
+              onMouseLeave={() => setIsDivHover(false)}
               onClick={() =>
                 handleGetProductRequest(shop.id, page, rowsPerPage)
               }
@@ -235,19 +245,45 @@ export const ParseDataSegment: React.FC = () => {
   const productsBlocks = isProductsLodaing ? (
     <CircularProgress color="inherit" />
   ) : (
-    productList?.map((product) => {
+    productList?.map((product, i) => {
       return (
         <Grid item xs key={product.id} zeroMinWidth>
           <div
-            className={`${classes.shopItem} ${classes.divPointer}`}
-            onClick={() => handleProductClick(product.id)}
+            className={`${classes.shopOuterItem} ${classes.divPointer}`}
+            onMouseEnter={() => setIsProductDivExtended(i)}
+            onMouseLeave={() => setIsProductDivExtended(-1)}
+            onClick={() => {
+              if (!isDivHover) {
+                console.log("Click");
+              }
+            }}
+            style={
+              isProductDivExtended == i
+                ? {
+                    padding: "0px 15px 0px 0px",
+                    background: "#be0000",
+                    transition: "padding 0.15s ease-in, background 0s",
+                  }
+                : {
+                    padding: "0px 0px 0px 0px",
+                    background: "#ffff",
+                    transition: "padding 0.2s ease-in, background 1s",
+                  }
+            }
           >
-            <Typography variant="h6" gutterBottom noWrap>
-              {product.title}
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-              {"Price: " + product.price}
-            </Typography>
+            <div
+              className={`${classes.shopItem} ${classes.divPointer}`}
+              onClick={() => handleProductClick(product.id)}
+              onMouseEnter={() => setIsDivHover(true)}
+              onMouseLeave={() => setIsDivHover(false)}
+            >
+              <Typography variant="h6" gutterBottom noWrap>
+                {product.title}
+              </Typography>
+              <Typography variant="body1" gutterBottom>
+                {"Price: " + product.price}
+              </Typography>
+            </div>
           </div>
         </Grid>
       );
@@ -293,7 +329,7 @@ export const ParseDataSegment: React.FC = () => {
               onClick={preventDefault}
               color="inherit"
             >
-              <Typography variant="body2" gutterBottom>
+              <Typography variant="body2" gutterBottom noWrap>
                 {imgUrl}
               </Typography>
             </Link>
