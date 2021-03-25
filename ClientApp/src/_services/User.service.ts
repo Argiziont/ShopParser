@@ -9,7 +9,8 @@ export const UserService = {
   GetAllShops,
   GetAllProductInShop,
   GetProductById,
-  AddShopByUrl
+  AddShopByUrl,
+  GetProductByIdAndPage
 };
 
 async function GetAllShops(): Promise<ResponseShop[]> {
@@ -35,6 +36,16 @@ async function GetAllProductInShop(id:number): Promise<ResponseProduct[]> {
 async function GetProductById(id:number): Promise<ProductJson> {
 
   return ProductApi().getFullProductsById(id).then((productResponse) => {
+    return productResponse;
+    //Ok
+  }, async (error) => {
+    const handledException = await handleExeption(error);
+    return Promise.reject(handledException);
+  });
+}
+async function GetProductByIdAndPage(id:number,page:number,rows:number): Promise<ResponseProduct[]> {
+
+  return ProductApi().getPagedProductsByShopId(id,page,rows).then((productResponse) => {
     return productResponse;
     //Ok
   }, async (error) => {

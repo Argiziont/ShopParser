@@ -10,7 +10,6 @@ import {
 } from "@material-ui/core";
 
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
-import { Pagination } from "@material-ui/lab";
 import React, { useEffect, useState } from "react";
 import { IProductJson, IResponseProduct, IResponseShop } from "../_actions";
 
@@ -72,14 +71,15 @@ const useStyles = makeStyles((theme) => ({
 export const ParseDataSegment: React.FC = () => {
   const [productList, setProductList] = useState<IResponseProduct[]>();
   const [shopList, setShopList] = useState<IResponseShop[]>();
+  const [currentShopId, setCurrentShopId] = useState<number>();
   const [isShopsLodaing, setIsShopsLodaing] = useState<boolean>(false);
   const [isProductsLodaing, setIsProductsLodaing] = useState<boolean>(false);
   const [shopUrl, setShopUrl] = useState<string>("");
   const [checkedProduct, setCheckedProduct] = useState<
     IProductJson | undefined
   >();
-  const [page, setPage] = React.useState(2);
-  const [rowsPerPage, setRowsPerPage] = React.useState(25);
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
   const classes = useStyles();
 
@@ -101,23 +101,26 @@ export const ParseDataSegment: React.FC = () => {
   const preventDefault = (event: React.SyntheticEvent) =>
     event.preventDefault();
 
+  const handleSetPage = async (pageNumber: number, rowsCount = rowsPerPage) => {
+    setPage(pageNumber);
+    handleGetProductRequest(currentShopId,pageNumber,rowsCount)
+  };
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number
   ) => {
-    setPage(newPage);
+    handleSetPage(newPage);
   };
-
   const handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+    const rowsPerPageParsed: number = parseInt(event.target.value, 10);
+    setRowsPerPage(rowsPerPageParsed);
+    handleSetPage(0, rowsPerPageParsed);
   };
   const handleShopUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setShopUrl(event.target.value);
   };
-
   const handleShopUrlUploadClick = async () => {
     try {
       if (shopUrl != undefined) {
@@ -131,11 +134,20 @@ export const ParseDataSegment: React.FC = () => {
       }
     } catch {}
   };
-  const handleGetProductRequest = async (id: number | undefined) => {
+  const handleGetProductRequest = async (
+    id: number | undefined,
+    page: number | undefined,
+    rowsCount: number | undefined
+  ) => {
     try {
-      if (id != undefined) {
+      if (id != undefined && page != undefined && rowsCount != undefined) {
+        setCurrentShopId(id);
         setIsProductsLodaing(true);
-        const response = await UserActions.GetAllProductInShop(id);
+        const response = await UserActions.GetProductByIdAndPage(
+          id,
+          page,
+          rowsCount
+        );
         setIsProductsLodaing(false);
 
         if (response != undefined) {
@@ -173,7 +185,7 @@ export const ParseDataSegment: React.FC = () => {
           >
             <div
               className={`${classes.shopItem} ${classes.divPointer}`}
-              onClick={() => handleGetProductRequest(shop.id)}
+              onClick={() => handleGetProductRequest(shop.id,page,rowsPerPage)}
             >
               <Typography variant="h6" gutterBottom>
                 {shop.name}
@@ -193,14 +205,14 @@ export const ParseDataSegment: React.FC = () => {
       <div></div>
     ) : (
       <Grid item xs>
-        <div className={classes.shopItem}>
+        <div className={classes.shopItem} style={{width: "100%"}}>
           <TablePagination
             component="div"
             count={500}
             page={page}
             onChangePage={handleChangePage}
             rowsPerPage={rowsPerPage}
-            rowsPerPageOptions={[25, 50, 75, 100]}
+            rowsPerPageOptions={[10,25, 50, 75, 100]}
             onChangeRowsPerPage={handleChangeRowsPerPage}
           />
         </div>

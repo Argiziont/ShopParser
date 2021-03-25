@@ -215,7 +215,7 @@ namespace PrjModule25_Parser.Controllers
             return Ok(currentProduct);
         }
        
-        [HttpPost]
+        [HttpGet]
         [Route("GetProductsByShopId")]
         [ProducesResponseType(typeof(IEnumerable<ResponseProduct>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
@@ -242,7 +242,7 @@ namespace PrjModule25_Parser.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("GetFullProductsById")]
         [ProducesResponseType(typeof(ProductJson), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
@@ -261,8 +261,37 @@ namespace PrjModule25_Parser.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, e);
             }
         }
-
         
+        [HttpGet]
+        [Route("GetPagedProductsByShopId")]
+        [ProducesResponseType(typeof(IEnumerable<ProductData>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> GetPagedProductsByShopId(int id,int page,int rowsPerPage)
+        {
+            try
+            {
+                var productSource  = await _dbContext.Products.Where(p => p.ShopId == id && p.ProductState == ProductState.Success)
+                    .Skip(page * rowsPerPage).Take(rowsPerPage).ToListAsync();
+
+                return Ok(productSource.Select(p => new ResponseProduct()
+                {
+                    Description = p.Description,
+                    ExternalId = p.ExternalId,
+                    Id = p.Id,
+                    Url = p.Url,
+                    SyncDate = p.SyncDate,
+                    Price = p.Price,
+                    Title = p.Title
+                }));
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e);
+            }
+        }
+
+
         private static string UnScrubDiv(IEnumerable<IElement> divElements)
         {
             var unScrubText = "";
