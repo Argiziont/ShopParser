@@ -5,14 +5,17 @@ import {
   Link,
   Button,
   TextField,
+  CircularProgress,
+  TablePagination,
 } from "@material-ui/core";
+
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
+import { Pagination } from "@material-ui/lab";
 import React, { useEffect, useState } from "react";
 import { IProductJson, IResponseProduct, IResponseShop } from "../_actions";
 
 import { UserActions } from "../_actions";
-
-//import 'fontsource-roboto';
+//require('fontsource-roboto')
 //import Carousel from "react-material-ui-carousel";
 //import { ICarAdvert } from "../_actions";
 
@@ -54,6 +57,13 @@ const useStyles = makeStyles((theme) => ({
     padding: "15px 15px",
     minWidth: "250px",
   },
+  shopOuterItem: {
+    border: 0,
+    borderRadius: 16,
+    padding: "0px 30px 0px 0px",
+    minWidth: "250px",
+    maxWidth: "350px",
+  },
   divPointer: {
     cursor: "pointer",
   },
@@ -62,21 +72,25 @@ const useStyles = makeStyles((theme) => ({
 export const ParseDataSegment: React.FC = () => {
   const [productList, setProductList] = useState<IResponseProduct[]>();
   const [shopList, setShopList] = useState<IResponseShop[]>();
-  const [isLodaing, setIsLodaing] = useState<boolean>(false);
+  const [isShopsLodaing, setIsShopsLodaing] = useState<boolean>(false);
+  const [isProductsLodaing, setIsProductsLodaing] = useState<boolean>(false);
+  const [shopUrl, setShopUrl] = useState<string>("");
   const [checkedProduct, setCheckedProduct] = useState<
     IProductJson | undefined
   >();
+  const [page, setPage] = React.useState(2);
+  const [rowsPerPage, setRowsPerPage] = React.useState(25);
 
   const classes = useStyles();
 
   useEffect(() => {
     let isMounted = true;
-    setIsLodaing(true);
+    setIsShopsLodaing(true);
 
     UserActions.GetAllShops().then((shopList) => {
       if (isMounted) {
         setShopList(shopList);
-        setIsLodaing(false);
+        setIsShopsLodaing(false);
       }
     });
     return () => {
@@ -87,6 +101,59 @@ export const ParseDataSegment: React.FC = () => {
   const preventDefault = (event: React.SyntheticEvent) =>
     event.preventDefault();
 
+  const handleChangePage = (
+    event: React.MouseEvent<HTMLButtonElement> | null,
+    newPage: number
+  ) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+  const handleShopUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setShopUrl(event.target.value);
+  };
+
+  const handleShopUrlUploadClick = async () => {
+    try {
+      if (shopUrl != undefined) {
+        const response = await UserActions.AddShopByUrl(shopUrl);
+
+        if (response != undefined) {
+          UserActions.GetAllShops().then((shopList) => {
+            setShopList(shopList);
+          });
+        }
+      }
+    } catch {}
+  };
+  const handleGetProductRequest = async (id: number | undefined) => {
+    try {
+      if (id != undefined) {
+        setIsProductsLodaing(true);
+        const response = await UserActions.GetAllProductInShop(id);
+        setIsProductsLodaing(false);
+
+        if (response != undefined) {
+          setProductList(response);
+        }
+      }
+    } catch {}
+  };
+  const handleProductClick = async (id: number | undefined) => {
+    if (id != undefined) {
+      const response = await UserActions.GetProductById(id);
+
+      if (response != undefined) {
+        setCheckedProduct(response);
+        scrollToTop();
+      }
+    }
+  };
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -94,45 +161,72 @@ export const ParseDataSegment: React.FC = () => {
     });
   };
 
-  const shopsBlocks = isLodaing ? (
-    <div></div>
+  const shopsBlocks = isShopsLodaing ? (
+    <CircularProgress color="inherit" />
   ) : (
     shopList?.map((shop) => {
       return (
         <Grid item key={shop.id}>
           <div
-            className={`${classes.shopItem} ${classes.divPointer}`}
-            onClick={() => handleGetProductRequest(shop.id)}
+            className={classes.shopOuterItem}
+            style={{ background: "#9ede73" }}
           >
-            <Typography variant="h6" gutterBottom>
-              {shop.name}
+            <div
+              className={`${classes.shopItem} ${classes.divPointer}`}
+              onClick={() => handleGetProductRequest(shop.id)}
+            >
+              <Typography variant="h6" gutterBottom>
+                {shop.name}
+              </Typography>
+              <Typography variant="body1" gutterBottom>
+                {"Shop Id: " + shop.externalId}
+              </Typography>
+            </div>
+          </div>
+        </Grid>
+      );
+    })
+  );
+  //
+  const productBlockPagination =
+    isProductsLodaing || productList == undefined || productList.length == 0 ? (
+      <div></div>
+    ) : (
+      <Grid item xs>
+        <div className={classes.shopItem}>
+          <TablePagination
+            component="div"
+            count={500}
+            page={page}
+            onChangePage={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            rowsPerPageOptions={[25, 50, 75, 100]}
+            onChangeRowsPerPage={handleChangeRowsPerPage}
+          />
+        </div>
+      </Grid>
+    );
+  const productsBlocks = isProductsLodaing ? (
+    <CircularProgress color="inherit" />
+  ) : (
+    productList?.map((product) => {
+      return (
+        <Grid item xs key={product.id} zeroMinWidth>
+          <div
+            className={`${classes.shopItem} ${classes.divPointer}`}
+            onClick={() => handleProductClick(product.id)}
+          >
+            <Typography variant="h6" gutterBottom noWrap>
+              {product.title}
             </Typography>
             <Typography variant="body1" gutterBottom>
-              {"Shop Id: " + shop.externalId}
+              {"Price: " + product.price}
             </Typography>
           </div>
         </Grid>
       );
     })
   );
-
-  const productsBlocks = productList?.map((product) => {
-    return (
-      <Grid item xs key={product.id} zeroMinWidth>
-        <div
-          className={`${classes.shopItem} ${classes.divPointer}`}
-          onClick={() => handleProductClick(product.id)}
-        >
-          <Typography variant="h6" gutterBottom noWrap>
-            {product.title}
-          </Typography>
-          <Typography variant="body1" gutterBottom>
-            {"Price: " + product.price}
-          </Typography>
-        </div>
-      </Grid>
-    );
-  });
 
   const productBlocks =
     checkedProduct == undefined ? (
@@ -158,9 +252,14 @@ export const ParseDataSegment: React.FC = () => {
           <Typography variant="body1" gutterBottom>
             {checkedProduct.description}
           </Typography>
-          <Typography variant="h6" gutterBottom>
-            {"ImageUrls"}
-          </Typography>
+          {checkedProduct.imageUrls?.length == 0 ? (
+            <div></div>
+          ) : (
+            <Typography variant="h6" gutterBottom>
+              {"ImageUrls"}
+            </Typography>
+          )}
+
           {checkedProduct.imageUrls?.map((imgUrl, i) => (
             <Link
               key={i}
@@ -183,29 +282,6 @@ export const ParseDataSegment: React.FC = () => {
       </Grid>
     );
 
-  const handleGetProductRequest = async (id: number | undefined) => {
-    try {
-      if (id != undefined) {
-        const response = await UserActions.GetAllProductInShop(id);
-
-        if (response != undefined) {
-          setProductList(response);
-        }
-      }
-    } catch {}
-  };
-
-  const handleProductClick = async (id: number | undefined) => {
-    if (id != undefined) {
-      const response = await UserActions.GetProductById(id);
-
-      if (response != undefined) {
-        setCheckedProduct(response);
-        scrollToTop();
-      }
-    }
-  };
-
   return (
     <React.Fragment>
       <Grid
@@ -224,21 +300,25 @@ export const ParseDataSegment: React.FC = () => {
           direction="column"
           alignItems="flex-start"
         >
-          {shopsBlocks}
-
           <Grid item key={-1}>
             <div className={classes.shopItem}>
-              <TextField label="Shop URL" variant="standard" value={"Null"} />
+              <TextField
+                label="Shop URL"
+                variant="standard"
+                value={shopUrl}
+                onChange={handleShopUrlChange}
+              />
 
               <Button
                 variant="contained"
                 endIcon={<CloudUploadIcon />}
-                //onClick={handleGetShopsRequest}
+                onClick={handleShopUrlUploadClick}
               >
                 {"Submit"}
               </Button>
             </div>
           </Grid>
+          {shopsBlocks}
         </Grid>
         <Grid
           container
@@ -250,6 +330,7 @@ export const ParseDataSegment: React.FC = () => {
           alignItems="flex-start"
         >
           {productsBlocks}
+          {productBlockPagination}
         </Grid>
         <Grid
           container
