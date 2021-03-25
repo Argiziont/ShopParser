@@ -50,7 +50,6 @@ namespace PrjModule25_Parser.Service.TimedHostedServices
                 {
                     if (context != null && context.Products.Count(p => p.ProductState == ProductState.Idle) == 0)
                     {
-                        _logger.LogInformation("All products are up to date");
                         return;
                     }
                     //first product with idle

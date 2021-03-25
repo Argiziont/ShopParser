@@ -8,7 +8,8 @@ import { ProductApi } from "./Helpers/WebApis";
 export const UserService = {
   GetAllShops,
   GetAllProductInShop,
-  GetProductById
+  GetProductById,
+  AddShopByUrl
 };
 
 async function GetAllShops(): Promise<ResponseShop[]> {
@@ -35,6 +36,16 @@ async function GetProductById(id:number): Promise<ProductJson> {
 
   return ProductApi().getFullProductsById(id).then((productResponse) => {
     return productResponse;
+    //Ok
+  }, async (error) => {
+    const handledException = await handleExeption(error);
+    return Promise.reject(handledException);
+  });
+}
+async function AddShopByUrl(url:string): Promise<ResponseShop> {
+
+  return ShopApi().addShopByUrl(url).then((shopResponse) => {
+    return shopResponse;
     //Ok
   }, async (error) => {
     const handledException = await handleExeption(error);

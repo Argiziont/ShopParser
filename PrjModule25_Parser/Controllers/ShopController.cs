@@ -108,13 +108,13 @@ namespace PrjModule25_Parser.Controllers
         }
 
         [HttpGet]
-        [Route("ParseSellerPage")]
+        [Route("AddShopByUrl")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ShopJson), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseShop), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
         [ProducesDefaultResponseType]
-        public async Task<IActionResult> FindDataInsideSellerPageAsync(
-            string sellerUrl = "https://prom.ua/c3468819-daivva-ukraine.html")
+        public async Task<IActionResult> AddShopByUrl(
+            string sellerUrl)
         {
             try
             {
@@ -153,7 +153,14 @@ namespace PrjModule25_Parser.Controllers
                 await _dbContext.Shops.AddAsync(seller);
                 await _dbContext.SaveChangesAsync();
 
-                return Ok(seller);
+                return Ok(new ResponseShop
+                {
+                    ExternalId = seller.ExternalId,
+                    Id = seller.Id,
+                    Url = seller.Url,
+                    SyncDate = seller.SyncDate,
+                    Name = seller.Name
+                });
             }
             catch (Exception e)
             {

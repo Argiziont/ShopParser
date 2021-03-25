@@ -30,11 +30,13 @@ namespace PrjModule25_Parser
                 options.UseSqlServer(connectionString));
 
             services.AddScoped<ProductController>();
+            services.AddScoped<ShopController>();
 
             //services.AddScoped<IProductController,ProductController>();
             //services.AddScoped<IShopController, ShopController>();
 
-            //services.AddHostedService<BackgroundProductControllerWorker>();
+            services.AddHostedService<BackgroundProductControllerWorker>();
+            services.AddHostedService<BackgroundShopControllerWorker>();
 
             services.AddControllers();
             services.AddOpenApiDocument();

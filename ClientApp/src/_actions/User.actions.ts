@@ -1,14 +1,15 @@
 import {
   UserService
 } from "../_services";
-import { ProductJson, ResponseShop } from "./ClientActions";
+import { IResponseShop, IProductJson } from "./ClientActions";
 
 export const UserActions = {
   GetAllShops,
   GetAllProductInShop,
-  GetProductById
+  GetProductById,
+  AddShopByUrl
 };
-async function GetAllShops(): Promise<ResponseShop[]|undefined> {
+async function GetAllShops(): Promise<IResponseShop[]|undefined> {
   try {
     const response = await  UserService.GetAllShops();
     return response;
@@ -17,7 +18,7 @@ async function GetAllShops(): Promise<ResponseShop[]|undefined> {
     console.error(error);
   }
 }
-async function GetAllProductInShop(id:number): Promise<ResponseShop[]|undefined> {
+async function GetAllProductInShop(id:number): Promise<IResponseShop[]|undefined> {
   try {
     const response = await  UserService.GetAllProductInShop(id);
     return response;
@@ -26,9 +27,18 @@ async function GetAllProductInShop(id:number): Promise<ResponseShop[]|undefined>
     console.error(error);
   }
 }
-async function GetProductById(id:number): Promise<ProductJson|undefined> {
+async function GetProductById(id:number): Promise<IProductJson|undefined> {
   try {
     const response = await  UserService.GetProductById(id);
+    return response;
+  } 
+  catch(error) {
+    console.error(error);
+  }
+}
+async function AddShopByUrl(url: string): Promise<IResponseShop | undefined> {
+  try {
+    const response = await  UserService.AddShopByUrl(url);
     return response;
   } 
   catch(error) {

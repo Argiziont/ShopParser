@@ -6,6 +6,6 @@ namespace PrjModule25_Parser.Controllers.Interfaces
     public interface IShopController
     {
         public Task<IActionResult> AddProductsListFromSellerAsync(string sellerName);
-        public Task<IActionResult> FindDataInsideSellerPageAsync(string sellerUrl);
+        public Task<IActionResult> AddShopByUrl(string sellerUrl);
     }
 }
