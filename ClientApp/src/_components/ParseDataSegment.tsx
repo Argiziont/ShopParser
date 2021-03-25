@@ -57,9 +57,9 @@ const useStyles = makeStyles((theme) => ({
     minWidth: "250px",
   },
   shopOuterItem: {
+    background: "#9ede73",
     border: 0,
     borderRadius: 16,
-    padding: "0px 30px 0px 0px",
     minWidth: "250px",
     maxWidth: "350px",
   },
@@ -73,6 +73,7 @@ export const ParseDataSegment: React.FC = () => {
   const [shopList, setShopList] = useState<IResponseShop[]>();
   const [currentShopId, setCurrentShopId] = useState<number>();
   const [isShopsLodaing, setIsShopsLodaing] = useState<boolean>(false);
+  const [isDivExtended, setIsDivExtended] = useState<number>(-1);
   const [isProductsLodaing, setIsProductsLodaing] = useState<boolean>(false);
   const [shopUrl, setShopUrl] = useState<string>("");
   const [checkedProduct, setCheckedProduct] = useState<
@@ -100,7 +101,6 @@ export const ParseDataSegment: React.FC = () => {
 
   const preventDefault = (event: React.SyntheticEvent) =>
     event.preventDefault();
-
   const handleSetPage = async (pageNumber: number, rowsCount = rowsPerPage) => {
     setPage(pageNumber);
     handleGetProductRequest(currentShopId, pageNumber, rowsCount);
@@ -176,12 +176,24 @@ export const ParseDataSegment: React.FC = () => {
   const shopsBlocks = isShopsLodaing ? (
     <CircularProgress color="inherit" />
   ) : (
-    shopList?.map((shop) => {
+    shopList?.map((shop, i) => {
       return (
         <Grid item key={shop.id}>
           <div
             className={classes.shopOuterItem}
-            style={{ background: "#9ede73" }}
+            onMouseEnter={() => setIsDivExtended(i)}
+            onMouseLeave={() => setIsDivExtended(-1)}
+            style={
+              isDivExtended == i
+                ? {
+                    padding: "0px 30px 0px 0px",
+                    transition: "padding 0.15s ease-in",
+                  }
+                : {
+                    padding: "0px 0px 0px 0px",
+                    transition: "padding 0.15s ease-in",
+                  }
+            }
           >
             <div
               className={`${classes.shopItem} ${classes.divPointer}`}
@@ -207,7 +219,7 @@ export const ParseDataSegment: React.FC = () => {
       <div></div>
     ) : (
       <Grid item xs>
-        <div className={classes.shopItem} style={{ width: "100%" }}>
+        <div className={classes.shopItem} style={{ width: "95%" }}>
           <TablePagination
             component="div"
             count={500}
