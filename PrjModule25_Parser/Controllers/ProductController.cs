@@ -17,7 +17,10 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AngleSharp.Html.Parser;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using PrjModule25_Parser.Models.Hubs;
+using PrjModule25_Parser.Models.Hubs.Clients;
 using PrjModule25_Parser.Models.ResponseModels;
 
 namespace PrjModule25_Parser.Controllers
@@ -28,12 +31,14 @@ namespace PrjModule25_Parser.Controllers
     {
         private readonly IBrowsingContext _context;
         private readonly ApplicationDb _dbContext;
-
-        public ProductController(ApplicationDb db)
+        private readonly IHubContext<ApiHub, IApiClient> _productsHub;
+        
+        public ProductController(ApplicationDb db, IHubContext<ApiHub, IApiClient> productsHub)
         {
             var config = Configuration.Default.WithDefaultLoader();
             _context = BrowsingContext.New(config);
             _dbContext = db;
+            _productsHub = productsHub;
         }
 
         [HttpGet]
@@ -212,6 +217,7 @@ namespace PrjModule25_Parser.Controllers
                 return BadRequest("Product couldn't be updated");
             }
 
+            await _productsHub.Clients.All.ReceiveMessage($"Product with name id: {currentProduct.ExternalId} was parsed successfully");
             return Ok(currentProduct);
         }
        

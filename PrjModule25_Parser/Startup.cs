@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PrjModule25_Parser.Controllers;
 using PrjModule25_Parser.Controllers.Interfaces;
+using PrjModule25_Parser.Models.Hubs;
 using PrjModule25_Parser.Service;
 using PrjModule25_Parser.Service.TimedHostedServices;
 
@@ -23,11 +24,16 @@ namespace PrjModule25_Parser
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //Cors policy
             services.AddCors();
+            
             //Data base connection
             var connectionString = Configuration.GetConnectionString("UserDb");
             services.AddDbContext<ApplicationDb>(options =>
                 options.UseSqlServer(connectionString));
+
+            //SignalR connection
+            services.AddSignalR();
 
             services.AddScoped<ProductController>();
             services.AddScoped<ShopController>();
@@ -35,7 +41,7 @@ namespace PrjModule25_Parser
             //services.AddScoped<IProductController,ProductController>();
             //services.AddScoped<IShopController, ShopController>();
 
-            //services.AddHostedService<BackgroundProductControllerWorker>();
+            services.AddHostedService<BackgroundProductControllerWorker>();
             //services.AddHostedService<BackgroundShopControllerWorker>();
 
             services.AddControllers();
@@ -67,7 +73,11 @@ namespace PrjModule25_Parser
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+                endpoints.MapHub<ApiHub>("/hubs/DataFetchHub");
+            });
         }
     }
 }

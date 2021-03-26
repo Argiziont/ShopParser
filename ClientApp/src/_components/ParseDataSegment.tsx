@@ -8,15 +8,17 @@ import {
   CircularProgress,
   TablePagination,
 } from "@material-ui/core";
-
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import React, { useEffect, useState } from "react";
-import { IProductJson, IResponseProduct, IResponseShop } from "../_actions";
+import { HubConnectionBuilder } from "@microsoft/signalr";
 
-import { UserActions } from "../_actions";
-//require('fontsource-roboto')
-//import Carousel from "react-material-ui-carousel";
-//import { ICarAdvert } from "../_actions";
+import {
+  IProductJson,
+  IResponseProduct,
+  IResponseShop,
+  UserActions,
+} from "../_actions";
+import { ApiUrl } from "../_services";
 
 const useStyles = makeStyles((theme) => ({
   rootBox: {
@@ -89,6 +91,22 @@ export const ParseDataSegment: React.FC = () => {
     let isMounted = true;
     setIsShopsLodaing(true);
 
+    const connection = new HubConnectionBuilder()
+      .withUrl(ApiUrl + "/hubs/DataFetchHub")
+      .withAutomaticReconnect()
+      .build();
+
+    connection
+      .start()
+      .then(() => {
+        console.log("Connected!");
+
+        connection.on("ReceiveMessage", (message) => {
+          console.log(message);
+        });
+      })
+
+      .catch((e) => console.log("Connection failed: ", e));
     UserActions.GetAllShops().then((shopList) => {
       if (isMounted) {
         setShopList(shopList);
