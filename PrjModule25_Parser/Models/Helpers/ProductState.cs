@@ -2,8 +2,8 @@
 {
     public enum ProductState
     {
-        Idle=0,
-        Success=1,
-        Failed=2,
+        Idle = 0,
+        Success = 1,
+        Failed = 2
     }
 }

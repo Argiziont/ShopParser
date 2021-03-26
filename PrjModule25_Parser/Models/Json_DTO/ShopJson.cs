@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using PrjModule25_Parser.Models.Helpers;
 
 namespace PrjModule25_Parser.Models.JSON_DTO
 {

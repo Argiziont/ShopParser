@@ -1,27 +1,27 @@
-﻿using AngleSharp;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
+using AngleSharp.Html.Parser;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using NJsonSchema;
 using PrjModule25_Parser.Controllers.Interfaces;
 using PrjModule25_Parser.Models;
 using PrjModule25_Parser.Models.Helpers;
-using PrjModule25_Parser.Models.JSON_DTO;
-using PrjModule25_Parser.Service;
-using PrjModule25_Parser.Service.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using AngleSharp.Html.Parser;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
 using PrjModule25_Parser.Models.Hubs;
 using PrjModule25_Parser.Models.Hubs.Clients;
+using PrjModule25_Parser.Models.JSON_DTO;
 using PrjModule25_Parser.Models.ResponseModels;
+using PrjModule25_Parser.Service;
+using PrjModule25_Parser.Service.Exceptions;
 
 namespace PrjModule25_Parser.Controllers
 {
@@ -32,7 +32,7 @@ namespace PrjModule25_Parser.Controllers
         private readonly IBrowsingContext _context;
         private readonly ApplicationDb _dbContext;
         private readonly IHubContext<ApiHub, IApiClient> _productsHub;
-        
+
         public ProductController(ApplicationDb db, IHubContext<ApiHub, IApiClient> productsHub)
         {
             var config = Configuration.Default.WithDefaultLoader();
@@ -50,7 +50,7 @@ namespace PrjModule25_Parser.Controllers
             var productPage = await _context.OpenAsync(productUrl);
             if (productPage.StatusCode == HttpStatusCode.TooManyRequests)
                 throw new TooManyRequestsException();
-            
+
             var externalId = productUrl
                 .Split("//")[1]
                 .Split('/')[1].Split('-').First();
@@ -61,20 +61,23 @@ namespace PrjModule25_Parser.Controllers
 
             var sku = productPage.QuerySelector("span[data-qaid='product-sku']")?.InnerHtml ?? "";
 
-            var presence = productPage.QuerySelector("span[data-qaid='product_presence']")?.FirstElementChild?.InnerHtml ??
-                           "";
+            var presence =
+                productPage.QuerySelector("span[data-qaid='product_presence']")?.FirstElementChild?.InnerHtml ??
+                "";
 
             var descriptionChildren = productPage.QuerySelector("div[data-qaid='descriptions']")?.Children;
 
-            var description= descriptionChildren?.Aggregate("", (current, descriptionTag) => current + ("\n" + ExtractContentFromHtmlAsync(descriptionTag.Html())));
+            var description = descriptionChildren?.Aggregate("",
+                (current, descriptionTag) => current + "\n" + ExtractContentFromHtmlAsync(descriptionTag.Html()));
 
 
-            var priceSelector = (IHtmlSpanElement)productPage.QuerySelector("span[data-qaid='product_price']");
+            var priceSelector = (IHtmlSpanElement) productPage.QuerySelector("span[data-qaid='product_price']");
             var fullPriceSelector =
-                (IHtmlSpanElement)productPage.QuerySelector("span[data-qaid='price_without_discount']");
-            var optPriceSelector = (IHtmlSpanElement)productPage.QuerySelector("span[data-qaid='opt_price']");
-            var shortCompanyRating = (IHtmlDivElement)productPage.QuerySelector("div[data-qaid='short_company_rating']");
-            var breadcrumbsSeo = (IHtmlDivElement)productPage.QuerySelector("div[data-qaid='breadcrumbs_seo']");
+                (IHtmlSpanElement) productPage.QuerySelector("span[data-qaid='price_without_discount']");
+            var optPriceSelector = (IHtmlSpanElement) productPage.QuerySelector("span[data-qaid='opt_price']");
+            var shortCompanyRating =
+                (IHtmlDivElement) productPage.QuerySelector("div[data-qaid='short_company_rating']");
+            var breadcrumbsSeo = (IHtmlDivElement) productPage.QuerySelector("div[data-qaid='breadcrumbs_seo']");
 
             var fullCategory = UnScrubCategory(breadcrumbsSeo);
             var price = priceSelector?.Dataset["qaprice"] ?? "";
@@ -98,7 +101,7 @@ namespace PrjModule25_Parser.Controllers
                 ?.Children //<Ul>
                 ?.First()
                 ?.Children //<Li>
-                ?.Select(i => ((IHtmlImageElement)i //<Img>
+                ?.Select(i => ((IHtmlImageElement) i //<Img>
                     .QuerySelector("img[data-qaid='image_thumb']"))?.Source) //Src="Urls"
                 .ToList();
 
@@ -155,16 +158,13 @@ namespace PrjModule25_Parser.Controllers
         public async Task<IActionResult> ParseAllProductUrlsInsideSellerPageAsync(string shopName)
         {
             var seller = _dbContext.Shops.FirstOrDefault(s => s.Name == shopName);
-            if (seller == null)
-            {
-                return BadRequest("This shop doesn't exist in database");
-            }
+            if (seller == null) return BadRequest("This shop doesn't exist in database");
 
             var productsList = _dbContext.Products.Where(p => p.Shop.Id == seller.Id).ToArray();
             for (var i = 0; i < productsList.Length; i++)
             {
-                var productOkObject = (await ParseDataInsideProductPageAsync(productsList[i].Url)) as OkObjectResult;
-                var parsedProduct = (ProductData)productOkObject?.Value;
+                var productOkObject = await ParseDataInsideProductPageAsync(productsList[i].Url) as OkObjectResult;
+                var parsedProduct = (ProductData) productOkObject?.Value;
                 if (parsedProduct != null)
                 {
                     parsedProduct.Id = productsList[i].Id;
@@ -178,6 +178,7 @@ namespace PrjModule25_Parser.Controllers
 
             return Ok(productsList);
         }
+
         [HttpPost]
         [Route("ParseSingleProductInsideSellerPage")]
         [ProducesResponseType(typeof(ProductData), StatusCodes.Status200OK)]
@@ -193,8 +194,8 @@ namespace PrjModule25_Parser.Controllers
                 return Accepted("This product already up to date");
             try
             {
-                var productOkObject = (await ParseDataInsideProductPageAsync(currentProduct.Url)) as OkObjectResult;
-                var parsedProduct = (ProductData)productOkObject?.Value;
+                var productOkObject = await ParseDataInsideProductPageAsync(currentProduct.Url) as OkObjectResult;
+                var parsedProduct = (ProductData) productOkObject?.Value;
                 if (parsedProduct != null)
                 {
                     currentProduct.ProductState = parsedProduct.ProductState;
@@ -217,10 +218,11 @@ namespace PrjModule25_Parser.Controllers
                 return BadRequest("Product couldn't be updated");
             }
 
-            await _productsHub.Clients.All.ReceiveMessage($"Product with name id: {currentProduct.ExternalId} was updated successfully");
+            await _productsHub.Clients.All.ReceiveMessage(
+                $"Product with name id: {currentProduct.ExternalId} was updated successfully");
             return Ok(currentProduct);
         }
-       
+
         [HttpGet]
         [Route("GetProductsByShopId")]
         [ProducesResponseType(typeof(IEnumerable<ResponseProduct>), StatusCodes.Status200OK)]
@@ -230,8 +232,9 @@ namespace PrjModule25_Parser.Controllers
         {
             try
             {
-                var productList = await _dbContext.Products.Where(p => p.ShopId == id&&p.ProductState==ProductState.Success).ToListAsync();
-                return Ok(productList.Select(p => new ResponseProduct()
+                var productList = await _dbContext.Products
+                    .Where(p => p.ShopId == id && p.ProductState == ProductState.Success).ToListAsync();
+                return Ok(productList.Select(p => new ResponseProduct
                 {
                     Description = p.Description,
                     ExternalId = p.ExternalId,
@@ -257,9 +260,10 @@ namespace PrjModule25_Parser.Controllers
         {
             try
             {
-                var jsonData = _dbContext.Products.FirstOrDefault(p => p.Id == id )?.JsonData;
-                var deserializeJson= JsonConvert.DeserializeObject<ProductJson>(jsonData ?? throw new InvalidOperationException());
-                
+                var jsonData = _dbContext.Products.FirstOrDefault(p => p.Id == id)?.JsonData;
+                var deserializeJson =
+                    JsonConvert.DeserializeObject<ProductJson>(jsonData ?? throw new InvalidOperationException());
+
                 return Ok(deserializeJson);
             }
             catch (Exception e)
@@ -267,20 +271,21 @@ namespace PrjModule25_Parser.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, e);
             }
         }
-        
+
         [HttpGet]
         [Route("GetPagedProductsByShopId")]
         [ProducesResponseType(typeof(IEnumerable<ProductData>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
         [ProducesDefaultResponseType]
-        public async Task<IActionResult> GetPagedProductsByShopId(int id,int page,int rowsPerPage)
+        public async Task<IActionResult> GetPagedProductsByShopId(int id, int page, int rowsPerPage)
         {
             try
             {
-                var productSource  = await _dbContext.Products.Where(p => p.ShopId == id && p.ProductState == ProductState.Success)
+                var productSource = await _dbContext.Products
+                    .Where(p => p.ShopId == id && p.ProductState == ProductState.Success)
                     .Skip(page * rowsPerPage).Take(rowsPerPage).ToListAsync();
 
-                return Ok(productSource.Select(p => new ResponseProduct()
+                return Ok(productSource.Select(p => new ResponseProduct
                 {
                     Description = p.Description,
                     ExternalId = p.ExternalId,
@@ -316,7 +321,7 @@ namespace PrjModule25_Parser.Controllers
             var currentCategory = topLevelCategory;
             for (var i = 0; i < divElement.Children.Length - 1; i++)
             {
-                var childCategory = (IHtmlAnchorElement)divElement.Children[i].Children.First();
+                var childCategory = (IHtmlAnchorElement) divElement.Children[i].Children.First();
                 var subCategory = new Category();
 
                 currentCategory.Href = childCategory.Href;
@@ -333,11 +338,10 @@ namespace PrjModule25_Parser.Controllers
 
         private static string ExtractContentFromHtmlAsync(string input)
         {
-
             var config = Configuration.Default.WithDefaultLoader();
 
             var hp = new HtmlParser();
-            var hpResult = hp.ParseFragment(input,null);
+            var hpResult = hp.ParseFragment(input, null);
             return string.Concat(hpResult.Select(x => x.Text()));
         }
     }

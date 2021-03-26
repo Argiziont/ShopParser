@@ -12,6 +12,7 @@ import {
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import React, { useEffect, useState } from "react";
 import { HubConnectionBuilder } from "@microsoft/signalr";
+import MuiAlert, { AlertProps, Color } from "@material-ui/lab/Alert";
 
 import {
   IProductJson,
@@ -20,7 +21,6 @@ import {
   UserActions,
 } from "../_actions";
 import { ApiUrl, SnackbarMessage } from "../_services";
-import MuiAlert, { AlertProps, Color } from "@material-ui/lab/Alert";
 
 const useStyles = makeStyles((theme) => ({
   rootBox: {
@@ -76,23 +76,30 @@ function Alert(props: AlertProps) {
 }
 
 export const ParseDataSegment: React.FC = () => {
+  //Procucts states
   const [productList, setProductList] = useState<IResponseProduct[]>();
-  const [shopList, setShopList] = useState<IResponseShop[]>();
-  const [currentShopId, setCurrentShopId] = useState<number>();
-  const [isDivHover, setIsDivHover] = useState<boolean>();
+  const [isProductDivExtended, setIsProductDivExtended] = useState<number>(-1);
+  const [isProductsLodaing, setIsProductsLodaing] = useState<boolean>(false);
   const [numberOfProductsInShop, setNumberOfProductsInShop] = useState<number>(
     0
   );
-  const [isShopsLodaing, setIsShopsLodaing] = useState<boolean>(false);
-  const [isShopDivExtended, setIsShopDivExtended] = useState<number>(-1);
-  const [isProductDivExtended, setIsProductDivExtended] = useState<number>(-1);
-  const [isProductsLodaing, setIsProductsLodaing] = useState<boolean>(false);
-  const [shopUrl, setShopUrl] = useState<string>("");
   const [checkedProduct, setCheckedProduct] = useState<
     IProductJson | undefined
   >();
+
+  //Shop states
+  const [shopList, setShopList] = useState<IResponseShop[]>();
+  const [currentShopId, setCurrentShopId] = useState<number>();
+  const [isDivHover, setIsDivHover] = useState<boolean>();
+  const [isShopsLodaing, setIsShopsLodaing] = useState<boolean>(false);
+  const [isShopDivExtended, setIsShopDivExtended] = useState<number>(-1);
+  const [shopUrl, setShopUrl] = useState<string>("");
+
+  //Pagination states
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
+
+  //Snack states
   const [openSnack, setOpenSnack] = React.useState<boolean>(false);
   const [snackPack, setSnackPack] = React.useState<SnackbarMessage[]>([]);
   const [messageInfo, setMessageInfo] = React.useState<
@@ -101,6 +108,7 @@ export const ParseDataSegment: React.FC = () => {
 
   const classes = useStyles();
 
+  //SignalR and page loading effect
   useEffect(() => {
     let isMounted = true;
     setIsShopsLodaing(true);
@@ -129,6 +137,8 @@ export const ParseDataSegment: React.FC = () => {
       isMounted = false;
     }; // use effect cleanup to set flag false, if unmounted
   }, []);
+
+  //SnackBar effect with snack dependency array
   useEffect(() => {
     if (snackPack.length && !messageInfo) {
       // Set a new snack when we don't have an active one
@@ -219,17 +229,19 @@ export const ParseDataSegment: React.FC = () => {
   const handleSnackExited = () => {
     setMessageInfo(undefined);
   };
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
   const handleSnackOpen = (message: string, type: Color) => () => {
     setSnackPack((prev) => [
       ...prev,
       { message, key: new Date().getTime(), type },
     ]);
+  };
+
+  //smooth scroll to the top of page on product click
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
 
   const snackBarContainter = (
@@ -252,6 +264,7 @@ export const ParseDataSegment: React.FC = () => {
       </Alert>
     </Snackbar>
   );
+
   const shopsBlocks = isShopsLodaing ? (
     <CircularProgress color="inherit" />
   ) : (
@@ -372,7 +385,6 @@ export const ParseDataSegment: React.FC = () => {
       );
     })
   );
-
   const productBlocks =
     checkedProduct == undefined ? (
       <div></div>

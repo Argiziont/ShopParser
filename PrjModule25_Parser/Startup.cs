@@ -5,7 +5,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PrjModule25_Parser.Controllers;
-using PrjModule25_Parser.Controllers.Interfaces;
 using PrjModule25_Parser.Models.Hubs;
 using PrjModule25_Parser.Service;
 using PrjModule25_Parser.Service.TimedHostedServices;
@@ -19,14 +18,14 @@ namespace PrjModule25_Parser
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             //Cors policy
             services.AddCors();
-            
+
             //Data base connection
             var connectionString = Configuration.GetConnectionString("UserDb");
             services.AddDbContext<ApplicationDb>(options =>
@@ -38,11 +37,8 @@ namespace PrjModule25_Parser
             services.AddScoped<ProductController>();
             services.AddScoped<ShopController>();
 
-            //services.AddScoped<IProductController,ProductController>();
-            //services.AddScoped<IShopController, ShopController>();
-
             services.AddHostedService<BackgroundProductControllerWorker>();
-            //services.AddHostedService<BackgroundShopControllerWorker>();
+            services.AddHostedService<BackgroundShopControllerWorker>();
 
             services.AddControllers();
             services.AddOpenApiDocument();

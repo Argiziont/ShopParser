@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using PrjModule25_Parser.Models;
 
 namespace PrjModule25_Parser.Controllers.Interfaces
 {

@@ -1,27 +1,27 @@
-﻿using AngleSharp;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using AngleSharp;
 using AngleSharp.Html.Dom;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Schema.Generation;
-using PrjModule25_Parser.Models;
-using PrjModule25_Parser.Models.JSON_DTO;
-using PrjModule25_Parser.Service;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using PrjModule25_Parser.Controllers.Interfaces;
+using PrjModule25_Parser.Models;
 using PrjModule25_Parser.Models.Helpers;
+using PrjModule25_Parser.Models.JSON_DTO;
 using PrjModule25_Parser.Models.ResponseModels;
+using PrjModule25_Parser.Service;
 
 namespace PrjModule25_Parser.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class ShopController : ControllerBase,IShopController
+    public class ShopController : ControllerBase, IShopController
     {
         private readonly IBrowsingContext _context;
         private readonly ApplicationDb _dbContext;
@@ -44,10 +44,7 @@ namespace PrjModule25_Parser.Controllers
             try
             {
                 var shop = _dbContext.Shops.FirstOrDefault(s => s.Name == sellerName);
-                if (shop == null)
-                {
-                    return BadRequest("Database doesn't contains this seller");
-                }
+                if (shop == null) return BadRequest("Database doesn't contains this seller");
 
                 var sellerUrl = _dbContext.Shops.FirstOrDefault(u => u.Name == sellerName)?.Url;
                 var sellerPage = await _context.OpenAsync(sellerUrl);
@@ -66,7 +63,7 @@ namespace PrjModule25_Parser.Controllers
                     productsLinkList.AddRange(
                         page.QuerySelectorAll("*[data-qaid='product_link']").ToList().Cast<IHtmlAnchorElement>()
                             .Select(u => u.Href));
-                    
+
                     Thread.Sleep(2000);
                 }
 
@@ -84,7 +81,7 @@ namespace PrjModule25_Parser.Controllers
                     ExternalId = shop.ExternalId,
                     Url = shop.Url,
                     SyncDate = shop.SyncDate,
-                    Name = shop.Name,
+                    Name = shop.Name
                 };
 
                 var generator = new JSchemaGenerator();
@@ -125,9 +122,7 @@ namespace PrjModule25_Parser.Controllers
                 var sellerName = sellerPage.QuerySelector("span[data-qaid='company_name']")?.InnerHtml ?? "";
 
                 if (_dbContext.Shops.FirstOrDefault(s => s.ExternalId == externalId) != null)
-                {
                     return BadRequest("Database already contains this seller");
-                }
 
                 var jsonSellerDat = new ShopJson
                 {
@@ -181,14 +176,15 @@ namespace PrjModule25_Parser.Controllers
                 var shop = _dbContext.Shops.FirstOrDefault(s => s.Id == id);
 
                 if (shop != null)
-                    return Ok(new ResponseShop()
+                    return Ok(new ResponseShop
                     {
                         ExternalId = shop.ExternalId,
                         Id = shop.Id,
                         Url = shop.Url,
                         SyncDate = shop.SyncDate,
                         Name = shop.Name,
-                        ProductCount = _dbContext.Products.Count(p => p.ShopId == shop.Id && p.ProductState == ProductState.Success)
+                        ProductCount = _dbContext.Products.Count(p =>
+                            p.ShopId == shop.Id && p.ProductState == ProductState.Success)
                     });
                 return NotFound();
             }
@@ -197,6 +193,7 @@ namespace PrjModule25_Parser.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, e);
             }
         }
+
         [HttpPost]
         [Route("GetShops")]
         [ProducesResponseType(typeof(IEnumerable<ResponseShop>), StatusCodes.Status200OK)]
@@ -207,16 +204,17 @@ namespace PrjModule25_Parser.Controllers
             try
             {
                 var shop = _dbContext.Shops.ToList();
-                if (shop.Count>0)
-                    return Ok(shop.Select(s=> new ResponseShop()
+                if (shop.Count > 0)
+                    return Ok(shop.Select(s => new ResponseShop
                     {
                         ExternalId = s.ExternalId,
                         Id = s.Id,
                         Url = s.Url,
                         SyncDate = s.SyncDate,
                         Name = s.Name,
-                        ProductCount = _dbContext.Products.Count(p => p.ShopId== s.Id&&p.ProductState==ProductState.Success)
-                    }) );
+                        ProductCount = _dbContext.Products.Count(p =>
+                            p.ShopId == s.Id && p.ProductState == ProductState.Success)
+                    }));
 
                 return NotFound();
             }
