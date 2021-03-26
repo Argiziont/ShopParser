@@ -217,7 +217,7 @@ namespace PrjModule25_Parser.Controllers
                 return BadRequest("Product couldn't be updated");
             }
 
-            await _productsHub.Clients.All.ReceiveMessage($"Product with name id: {currentProduct.ExternalId} was parsed successfully");
+            await _productsHub.Clients.All.ReceiveMessage($"Product with name id: {currentProduct.ExternalId} was updated successfully");
             return Ok(currentProduct);
         }
        

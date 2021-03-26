@@ -187,7 +187,8 @@ namespace PrjModule25_Parser.Controllers
                         Id = shop.Id,
                         Url = shop.Url,
                         SyncDate = shop.SyncDate,
-                        Name = shop.Name
+                        Name = shop.Name,
+                        ProductCount = _dbContext.Products.Count(p => p.ShopId == shop.Id && p.ProductState == ProductState.Success)
                     });
                 return NotFound();
             }
@@ -213,7 +214,8 @@ namespace PrjModule25_Parser.Controllers
                         Id = s.Id,
                         Url = s.Url,
                         SyncDate = s.SyncDate,
-                        Name = s.Name
+                        Name = s.Name,
+                        ProductCount = _dbContext.Products.Count(p => p.ShopId== s.Id&&p.ProductState==ProductState.Success)
                     }) );
 
                 return NotFound();

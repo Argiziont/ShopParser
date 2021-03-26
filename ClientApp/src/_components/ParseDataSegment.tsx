@@ -7,6 +7,7 @@ import {
   TextField,
   CircularProgress,
   TablePagination,
+  Snackbar,
 } from "@material-ui/core";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import React, { useEffect, useState } from "react";
@@ -18,7 +19,8 @@ import {
   IResponseShop,
   UserActions,
 } from "../_actions";
-import { ApiUrl } from "../_services";
+import { ApiUrl, SnackbarMessage } from "../_services";
+import MuiAlert, { AlertProps, Color } from "@material-ui/lab/Alert";
 
 const useStyles = makeStyles((theme) => ({
   rootBox: {
@@ -69,11 +71,18 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+function Alert(props: AlertProps) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
 export const ParseDataSegment: React.FC = () => {
   const [productList, setProductList] = useState<IResponseProduct[]>();
   const [shopList, setShopList] = useState<IResponseShop[]>();
   const [currentShopId, setCurrentShopId] = useState<number>();
   const [isDivHover, setIsDivHover] = useState<boolean>();
+  const [numberOfProductsInShop, setNumberOfProductsInShop] = useState<number>(
+    0
+  );
   const [isShopsLodaing, setIsShopsLodaing] = useState<boolean>(false);
   const [isShopDivExtended, setIsShopDivExtended] = useState<number>(-1);
   const [isProductDivExtended, setIsProductDivExtended] = useState<number>(-1);
@@ -84,6 +93,11 @@ export const ParseDataSegment: React.FC = () => {
   >();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [openSnack, setOpenSnack] = React.useState<boolean>(false);
+  const [snackPack, setSnackPack] = React.useState<SnackbarMessage[]>([]);
+  const [messageInfo, setMessageInfo] = React.useState<
+    SnackbarMessage | undefined
+  >(undefined);
 
   const classes = useStyles();
 
@@ -99,10 +113,8 @@ export const ParseDataSegment: React.FC = () => {
     connection
       .start()
       .then(() => {
-        console.log("Connected!");
-
         connection.on("ReceiveMessage", (message) => {
-          console.log(message);
+          handleSnackOpen(message, "info")();
         });
       })
 
@@ -117,9 +129,21 @@ export const ParseDataSegment: React.FC = () => {
       isMounted = false;
     }; // use effect cleanup to set flag false, if unmounted
   }, []);
+  useEffect(() => {
+    if (snackPack.length && !messageInfo) {
+      // Set a new snack when we don't have an active one
+      setMessageInfo({ ...snackPack[0] });
+      setSnackPack((prev) => prev.slice(1));
+      setOpenSnack(true);
+    } else if (snackPack.length && messageInfo && open) {
+      // Close an active snack when a new one is added
+      setOpenSnack(false);
+    }
+  }, [snackPack, messageInfo, openSnack]);
 
-  const preventDefault = (event: React.SyntheticEvent) =>
-    event.preventDefault();
+  const preventDefault = (event: React.SyntheticEvent) => {
+    return event.preventDefault();
+  };
   const handleSetPage = async (pageNumber: number, rowsCount = rowsPerPage) => {
     setPage(pageNumber);
     handleGetProductRequest(currentShopId, pageNumber, rowsCount);
@@ -185,13 +209,49 @@ export const ParseDataSegment: React.FC = () => {
       }
     }
   };
+  const handleSnackClose = (event?: React.SyntheticEvent, reason?: string) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpenSnack(false);
+  };
+  const handleSnackExited = () => {
+    setMessageInfo(undefined);
+  };
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
       behavior: "smooth",
     });
   };
+  const handleSnackOpen = (message: string, type: Color) => () => {
+    setSnackPack((prev) => [
+      ...prev,
+      { message, key: new Date().getTime(), type },
+    ]);
+  };
 
+  const snackBarContainter = (
+    <Snackbar
+      key={messageInfo ? messageInfo.key : undefined}
+      anchorOrigin={{
+        vertical: "top",
+        horizontal: "right",
+      }}
+      open={openSnack}
+      autoHideDuration={4000}
+      onClose={handleSnackClose}
+      onExited={handleSnackExited}
+    >
+      <Alert
+        onClose={handleSnackClose}
+        severity={messageInfo ? messageInfo.type : undefined}
+      >
+        {messageInfo ? messageInfo.message : undefined}
+      </Alert>
+    </Snackbar>
+  );
   const shopsBlocks = isShopsLodaing ? (
     <CircularProgress color="inherit" />
   ) : (
@@ -225,9 +285,12 @@ export const ParseDataSegment: React.FC = () => {
               className={`${classes.shopItem} ${classes.divPointer}`}
               onMouseEnter={() => setIsDivHover(true)}
               onMouseLeave={() => setIsDivHover(false)}
-              onClick={() =>
-                handleGetProductRequest(shop.id, page, rowsPerPage)
-              }
+              onClick={() => {
+                handleGetProductRequest(shop.id, page, rowsPerPage);
+                setNumberOfProductsInShop(
+                  shop.productCount != undefined ? shop.productCount : 0
+                );
+              }}
             >
               <Typography variant="h6" gutterBottom>
                 {shop.name}
@@ -235,13 +298,15 @@ export const ParseDataSegment: React.FC = () => {
               <Typography variant="body1" gutterBottom>
                 {"Shop Id: " + shop.externalId}
               </Typography>
+              <Typography variant="body2" gutterBottom>
+                {"Products updated: " + shop.productCount}
+              </Typography>
             </div>
           </div>
         </Grid>
       );
     })
   );
-  //
   const productBlockPagination =
     isProductsLodaing || productList == undefined || productList.length == 0 ? (
       <div></div>
@@ -250,7 +315,7 @@ export const ParseDataSegment: React.FC = () => {
         <div className={classes.shopItem} style={{ width: "95%" }}>
           <TablePagination
             component="div"
-            count={500}
+            count={numberOfProductsInShop}
             page={page}
             onChangePage={handleChangePage}
             rowsPerPage={rowsPerPage}
@@ -422,6 +487,7 @@ export const ParseDataSegment: React.FC = () => {
           alignItems="flex-end"
         >
           {productBlocks}
+          {snackBarContainter}
         </Grid>
       </Grid>
     </React.Fragment>
