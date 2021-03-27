@@ -21,7 +21,7 @@ namespace PrjModule25_Parser.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class ShopController : ControllerBase, IShopController
+    public class ShopController : ControllerBase
     {
         private readonly IBrowsingContext _context;
         private readonly ApplicationDb _dbContext;
@@ -110,7 +110,7 @@ namespace PrjModule25_Parser.Controllers
         [ProducesResponseType(typeof(ResponseShop), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
         [ProducesDefaultResponseType]
-        public async Task<IActionResult> AddShopByUrl(
+        public async Task<IActionResult> AddShopByUrlAsync(
             string sellerUrl)
         {
             try

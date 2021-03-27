@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using PrjModule25_Parser.Controllers;
-using PrjModule25_Parser.Controllers.Interfaces;
 using PrjModule25_Parser.Models;
 using PrjModule25_Parser.Models.Helpers;
 
@@ -17,7 +16,7 @@ namespace PrjModule25_Parser.Service.TimedHostedServices
     {
         private readonly object _lockerObject = new();
         private readonly ILogger<BackgroundProductControllerWorker> _logger;
-        private readonly IProductController _productController;
+        private readonly ProductController _productController;
         private readonly IServiceProvider _serviceProvider;
         private Timer _timer;
 
@@ -76,13 +75,13 @@ namespace PrjModule25_Parser.Service.TimedHostedServices
                             case OkObjectResult okObject:
                             {
                                 var okProduct = (ProductData) okObject.Value;
-                                _logger.LogInformation($"Successfully parsed product with id \"{okProduct.Id}\"");
+                                //_logger.LogInformation($"Successfully parsed product with id \"{okProduct.Id}\"");
                                 return;
                             }
                             case BadRequestObjectResult badRequestObject:
                             {
                                 var badRequestProduct = (string) badRequestObject.Value;
-                                _logger.LogInformation($"Parse returned error with text \"{badRequestProduct}\"");
+                                _logger.LogError($"Parse returned error with text \"{badRequestProduct}\"");
                                 return;
                             }
                         }
@@ -90,7 +89,7 @@ namespace PrjModule25_Parser.Service.TimedHostedServices
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
+                    _logger.LogError(e.Message);
                     throw;
                 }
             }

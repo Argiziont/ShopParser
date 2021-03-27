@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using PrjModule25_Parser.Controllers;
-using PrjModule25_Parser.Controllers.Interfaces;
 using PrjModule25_Parser.Models.Helpers;
 
 namespace PrjModule25_Parser.Service.TimedHostedServices
@@ -16,7 +15,7 @@ namespace PrjModule25_Parser.Service.TimedHostedServices
         private readonly object _lockerObject = new();
         private readonly ILogger<BackgroundProductControllerWorker> _logger;
         private readonly IServiceProvider _serviceProvider;
-        private readonly IShopController _shopController;
+        private readonly ShopController _shopController;
         private Timer _timer;
 
         public BackgroundShopControllerWorker(ILogger<BackgroundProductControllerWorker> logger,
@@ -67,7 +66,7 @@ namespace PrjModule25_Parser.Service.TimedHostedServices
                     if (shop == null) return;
                     var parsedUrls = _shopController.AddProductsListFromSellerAsync(shop.Name).Result;
 
-                    _logger.LogInformation($"Urls in shop with id {shop.Id} successfully parsed");
+                    //_logger.LogInformation($"Urls in shop with id {shop.Id} successfully parsed");
                 }
                 catch (Exception e)
                 {

@@ -27,7 +27,7 @@ namespace PrjModule25_Parser.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class ProductController : ControllerBase, IProductController
+    public class ProductController : ControllerBase
     {
         private readonly IBrowsingContext _context;
         private readonly ApplicationDb _dbContext;
@@ -68,7 +68,7 @@ namespace PrjModule25_Parser.Controllers
             var descriptionChildren = productPage.QuerySelector("div[data-qaid='descriptions']")?.Children;
 
             var description = descriptionChildren?.Aggregate("",
-                (current, descriptionTag) => current + "\n" + ExtractContentFromHtmlAsync(descriptionTag.Html()));
+                (current, descriptionTag) => current + "\n" + ExtractContentFromHtml(descriptionTag.Html()));
 
 
             var priceSelector = (IHtmlSpanElement) productPage.QuerySelector("span[data-qaid='product_price']");
@@ -228,7 +228,7 @@ namespace PrjModule25_Parser.Controllers
         [ProducesResponseType(typeof(IEnumerable<ResponseProduct>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
         [ProducesDefaultResponseType]
-        public async Task<IActionResult> GetProductsByShopId(int id)
+        public async Task<IActionResult> GetProductsByShopIdAsync(int id)
         {
             try
             {
@@ -277,7 +277,7 @@ namespace PrjModule25_Parser.Controllers
         [ProducesResponseType(typeof(IEnumerable<ProductData>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
         [ProducesDefaultResponseType]
-        public async Task<IActionResult> GetPagedProductsByShopId(int id, int page, int rowsPerPage)
+        public async Task<IActionResult> GetPagedProductsByShopIdAsync(int id, int page, int rowsPerPage)
         {
             try
             {
@@ -336,7 +336,7 @@ namespace PrjModule25_Parser.Controllers
             return topLevelCategory;
         }
 
-        private static string ExtractContentFromHtmlAsync(string input)
+        private static string ExtractContentFromHtml(string input)
         {
             var config = Configuration.Default.WithDefaultLoader();
 
