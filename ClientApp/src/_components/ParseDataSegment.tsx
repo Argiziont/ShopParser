@@ -30,34 +30,11 @@ import { ApiUrl, SnackbarMessage } from "../_services";
 
 const useStyles = makeStyles((theme) => ({
   rootBox: {
-    //marginBottom: theme.spacing(1),
-    //margin: "0px 15px 0px 15px",
     background: "#D3D3D3",
     border: 0,
     borderRadius: 16,
     color: theme.palette.primary.main,
     padding: "0 30px",
-  },
-  rootGrid: {
-    //marginBottom: theme.spacing(4),
-  },
-  dataFields: {
-    marginBottom: theme.spacing(2),
-  },
-  dataMultiline: {
-    marginBottom: theme.spacing(2),
-  },
-  dataImage: {
-    maxWidthth: "100px",
-    maxHeightht: "100px",
-  },
-  media: {
-    height: "100%",
-    padding: "200% 0px 0px 0px",
-  },
-  carouselCard: {
-    height: "100%",
-    width: "100%",
   },
   shopItem: {
     background: "#D3D3D3",
@@ -502,7 +479,6 @@ export const ParseDataSegment: React.FC = () => {
         spacing={3}
         direction="row"
         justify="center"
-        className={classes.rootGrid}
       >
         <Grid
           container
