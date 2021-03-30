@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using NJsonSchema;
-using PrjModule25_Parser.Controllers.Interfaces;
 using PrjModule25_Parser.Models;
 using PrjModule25_Parser.Models.Helpers;
 using PrjModule25_Parser.Models.Hubs;
@@ -301,20 +300,6 @@ namespace PrjModule25_Parser.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, e);
             }
         }
-
-
-        private static string UnScrubDiv(IEnumerable<IElement> divElements)
-        {
-            var unScrubText = "";
-            foreach (var div in divElements)
-                if (div.Children.Length > 0)
-                    unScrubText += UnScrubDiv(div.Children);
-                else
-                    unScrubText += "\n" + div.InnerHtml;
-
-            return unScrubText;
-        }
-
         private static Category UnScrubCategory(IParentNode divElement)
         {
             var topLevelCategory = new Category();
@@ -338,9 +323,7 @@ namespace PrjModule25_Parser.Controllers
 
         private static string ExtractContentFromHtml(string input)
         {
-            var config = Configuration.Default.WithDefaultLoader();
-
-            var hp = new HtmlParser();
+           var hp = new HtmlParser();
             var hpResult = hp.ParseFragment(input, null);
             return string.Concat(hpResult.Select(x => x.Text()));
         }

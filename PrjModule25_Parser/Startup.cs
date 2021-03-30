@@ -34,9 +34,11 @@ namespace PrjModule25_Parser
             //SignalR connection
             services.AddSignalR();
 
+            //Make services from controllers
             services.AddScoped<ProductController>();
             services.AddScoped<ShopController>();
 
+            //Background workers for parsing data
             services.AddHostedService<BackgroundProductControllerWorker>();
             services.AddHostedService<BackgroundShopControllerWorker>();
 

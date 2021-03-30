@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Schema.Generation;
-using PrjModule25_Parser.Controllers.Interfaces;
 using PrjModule25_Parser.Models;
 using PrjModule25_Parser.Models.Helpers;
 using PrjModule25_Parser.Models.JSON_DTO;
