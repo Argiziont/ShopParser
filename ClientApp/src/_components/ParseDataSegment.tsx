@@ -383,7 +383,7 @@ export const ParseDataSegment: React.FC = () => {
         </div>
       </Grid>
     );
-  
+
   //Product list component
   const productsBlocks = isProductsLodaing ? (
     <CircularProgress color="inherit" />
@@ -447,8 +447,8 @@ export const ParseDataSegment: React.FC = () => {
           </Typography>
           <Typography variant="h6" gutterBottom>
             {checkedProduct.companyName}
-            </Typography>
-            <Typography variant="body1" gutterBottom>
+          </Typography>
+          <Typography variant="body1" gutterBottom>
             {checkedProduct.stringCategory}
           </Typography>
           <Typography variant="body2" gutterBottom>
@@ -470,20 +470,21 @@ export const ParseDataSegment: React.FC = () => {
               {"ImageUrls"}
             </Typography>
           )}
-
-          {checkedProduct.imageUrls?.map((imgUrl, i) => (
-            <Link
-              key={i}
-              href={imgUrl}
-              rel="noreferrer"
-              onClick={preventDefault}
-              color="inherit"
-            >
-              <Typography variant="body2" gutterBottom noWrap>
-                {imgUrl}
-              </Typography>
-            </Link>
-          ))}
+          <>
+            {checkedProduct.imageUrls?.map((imgUrl, i) => (
+              <Link
+                key={i}
+                href={imgUrl}
+                rel="noreferrer"
+                onClick={preventDefault}
+                color="inherit"
+              >
+                <Typography variant="body2" gutterBottom noWrap>
+                  {imgUrl}
+                </Typography>
+              </Link>
+            ))}
+          </>
           <Typography variant="body2" gutterBottom>
             {"Id: " + checkedProduct.externalId}
           </Typography>
