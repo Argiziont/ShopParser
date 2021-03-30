@@ -16,8 +16,8 @@ import {
   IconButton,
 } from "@material-ui/core";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
-import CloseIcon from '@material-ui/icons/Close';
-import MuiAlert, {Color } from "@material-ui/lab/Alert";
+import CloseIcon from "@material-ui/icons/Close";
+import MuiAlert, { Color } from "@material-ui/lab/Alert";
 
 //Self project imports
 import {
@@ -76,7 +76,6 @@ const useStyles = makeStyles((theme) => ({
     cursor: "pointer",
   },
 }));
-
 
 export const ParseDataSegment: React.FC = () => {
   //Procucts states
@@ -215,12 +214,12 @@ export const ParseDataSegment: React.FC = () => {
   //Shop Actions
   const handleShopsUpdate = () => {
     setIsShopsLodaing(true);
-          UserActions.GetAllShops().then((shopList) => {
-            setShopList(shopList);
-            setIsShopsLodaing(false);
-            setCheckedProduct(undefined);
-            setProductList(undefined);
-          });
+    UserActions.GetAllShops().then((shopList) => {
+      setShopList(shopList);
+      setIsShopsLodaing(false);
+      setCheckedProduct(undefined);
+      setProductList(undefined);
+    });
   };
   const handleShopUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setShopUrl(event.target.value);
@@ -276,18 +275,33 @@ export const ParseDataSegment: React.FC = () => {
       onClose={handleSnackClose}
       onExited={handleSnackExited}
     >
-      <MuiAlert action={
-    <React.Fragment>
-          <Button size="small" aria-label="close" color="inherit" onClick={handleShopsUpdate}>
-            Update
-          </Button>
-          <IconButton size="small" aria-label="close" color="inherit" onClick={handleSnackClose}>
-            <CloseIcon fontSize="small" />
-          </IconButton>
-        </React.Fragment>
-  } elevation={6} variant="filled"   severity={messageInfo ? messageInfo.type : undefined} >
-          {messageInfo ? messageInfo.message : undefined}
-  </MuiAlert>
+      <MuiAlert
+        action={
+          <React.Fragment>
+            <Button
+              size="small"
+              aria-label="close"
+              color="inherit"
+              onClick={handleShopsUpdate}
+            >
+              Update
+            </Button>
+            <IconButton
+              size="small"
+              aria-label="close"
+              color="inherit"
+              onClick={handleSnackClose}
+            >
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </React.Fragment>
+        }
+        elevation={6}
+        variant="filled"
+        severity={messageInfo ? messageInfo.type : undefined}
+      >
+        {messageInfo ? messageInfo.message : undefined}
+      </MuiAlert>
     </Snackbar>
   );
 
@@ -310,11 +324,13 @@ export const ParseDataSegment: React.FC = () => {
             style={
               isShopDivExtended == i
                 ? {
-                    padding: "0px 15px 0px 0px",
+                    borderRadius: 18,
+                    padding: "0px 10px 0px 0px",
                     background: "#be0000",
                     transition: "padding 0.15s ease-in, background 0s",
                   }
                 : {
+                    borderRadius: 18,
                     padding: "0px 0px 0px 0px",
                     background: "#ffff",
                     transition: "padding 0.2s ease-in, background 1s",
@@ -346,8 +362,8 @@ export const ParseDataSegment: React.FC = () => {
         </Grid>
       );
     })
-  ); 
-  
+  );
+
   //Product list component pagintaion
   const productBlockPagination =
     isProductsLodaing || productList == undefined || productList.length == 0 ? (
@@ -385,11 +401,13 @@ export const ParseDataSegment: React.FC = () => {
             style={
               isProductDivExtended == i
                 ? {
-                    padding: "0px 15px 0px 0px",
+                    borderRadius: 18,
+                    padding: "0px 10px 0px 0px",
                     background: "#be0000",
                     transition: "padding 0.15s ease-in, background 0s",
                   }
                 : {
+                    borderRadius: 18,
                     padding: "0px 0px 0px 0px",
                     background: "#ffff",
                     transition: "padding 0.2s ease-in, background 1s",
