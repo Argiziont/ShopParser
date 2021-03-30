@@ -1,3 +1,8 @@
+//Important react and microsoft import
+import React, { useEffect, useState } from "react";
+import { HubConnectionBuilder } from "@microsoft/signalr";
+
+//Material UI imports
 import {
   Grid,
   makeStyles,
@@ -8,12 +13,13 @@ import {
   CircularProgress,
   TablePagination,
   Snackbar,
+  IconButton,
 } from "@material-ui/core";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
-import React, { useEffect, useState } from "react";
-import { HubConnectionBuilder } from "@microsoft/signalr";
-import MuiAlert, { AlertProps, Color } from "@material-ui/lab/Alert";
+import CloseIcon from '@material-ui/icons/Close';
+import MuiAlert, {Color } from "@material-ui/lab/Alert";
 
+//Self project imports
 import {
   IProductJson,
   IResponseProduct,
@@ -71,9 +77,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Alert(props: AlertProps) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
 
 export const ParseDataSegment: React.FC = () => {
   //Procucts states
@@ -151,11 +154,15 @@ export const ParseDataSegment: React.FC = () => {
     }
   }, [snackPack, messageInfo, openSnack]);
 
+  //Prevent default for a button click
   const preventDefault = (event: React.SyntheticEvent) => {
     return event.preventDefault();
   };
+
+  //Product actions (product click/products page change/etc)
   const handleSetPage = async (pageNumber: number, rowsCount = rowsPerPage) => {
     setPage(pageNumber);
+    setCheckedProduct(undefined);
     handleGetProductRequest(currentShopId, pageNumber, rowsCount);
   };
   const handleChangePage = (
@@ -171,22 +178,6 @@ export const ParseDataSegment: React.FC = () => {
     setRowsPerPage(rowsPerPageParsed);
     handleSetPage(0, rowsPerPageParsed);
   };
-  const handleShopUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setShopUrl(event.target.value);
-  };
-  const handleShopUrlUploadClick = async () => {
-    try {
-      if (shopUrl != undefined) {
-        const response = await UserActions.AddShopByUrl(shopUrl);
-
-        if (response != undefined) {
-          UserActions.GetAllShops().then((shopList) => {
-            setShopList(shopList);
-          });
-        }
-      }
-    } catch {}
-  };
   const handleGetProductRequest = async (
     id: number | undefined,
     page: number | undefined,
@@ -195,6 +186,7 @@ export const ParseDataSegment: React.FC = () => {
     try {
       if (id != undefined && page != undefined && rowsCount != undefined) {
         setCurrentShopId(id);
+        setCheckedProduct(undefined);
         setIsProductsLodaing(true);
         const response = await UserActions.GetProductByIdAndPage(
           id,
@@ -219,6 +211,33 @@ export const ParseDataSegment: React.FC = () => {
       }
     }
   };
+
+  //Shop Actions
+  const handleShopsUpdate = () => {
+    setIsShopsLodaing(true);
+          UserActions.GetAllShops().then((shopList) => {
+            setShopList(shopList);
+            setIsShopsLodaing(false);
+            setCheckedProduct(undefined);
+            setProductList(undefined);
+          });
+  };
+  const handleShopUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setShopUrl(event.target.value);
+  };
+  const handleShopUrlUploadClick = async () => {
+    try {
+      if (shopUrl != undefined) {
+        const response = await UserActions.AddShopByUrl(shopUrl);
+
+        if (response != undefined) {
+          handleShopsUpdate();
+        }
+      }
+    } catch {}
+  };
+
+  //Actions for Snackbar proper work
   const handleSnackClose = (event?: React.SyntheticEvent, reason?: string) => {
     if (reason === "clickaway") {
       return;
@@ -236,7 +255,7 @@ export const ParseDataSegment: React.FC = () => {
     ]);
   };
 
-  //smooth scroll to the top of page on product click
+  //Smooth scroll to the top of page on product click
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -244,6 +263,7 @@ export const ParseDataSegment: React.FC = () => {
     });
   };
 
+  //Material UI snackbar notifications component
   const snackBarContainter = (
     <Snackbar
       key={messageInfo ? messageInfo.key : undefined}
@@ -256,15 +276,22 @@ export const ParseDataSegment: React.FC = () => {
       onClose={handleSnackClose}
       onExited={handleSnackExited}
     >
-      <Alert
-        onClose={handleSnackClose}
-        severity={messageInfo ? messageInfo.type : undefined}
-      >
-        {messageInfo ? messageInfo.message : undefined}
-      </Alert>
+      <MuiAlert action={
+    <React.Fragment>
+          <Button size="small" aria-label="close" color="inherit" onClick={handleShopsUpdate}>
+            Update
+          </Button>
+          <IconButton size="small" aria-label="close" color="inherit" onClick={handleSnackClose}>
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        </React.Fragment>
+  } elevation={6} variant="filled"   severity={messageInfo ? messageInfo.type : undefined} >
+          {messageInfo ? messageInfo.message : undefined}
+  </MuiAlert>
     </Snackbar>
   );
 
+  //Shop list component
   const shopsBlocks = isShopsLodaing ? (
     <CircularProgress color="inherit" />
   ) : (
@@ -319,7 +346,9 @@ export const ParseDataSegment: React.FC = () => {
         </Grid>
       );
     })
-  );
+  ); 
+  
+  //Product list component pagintaion
   const productBlockPagination =
     isProductsLodaing || productList == undefined || productList.length == 0 ? (
       <div></div>
@@ -385,6 +414,8 @@ export const ParseDataSegment: React.FC = () => {
       );
     })
   );
+
+  //Product list component
   const productBlocks =
     checkedProduct == undefined ? (
       <div></div>
