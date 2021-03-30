@@ -18,7 +18,7 @@ export class ProductClient {
     }
 
     parseDataInsideProductPage(productUrl: string | null | undefined): Promise<ProductData> {
-        let url_ = this.baseUrl + "/Product/ParseProductPage?";
+        let url_ = this.baseUrl + "/Product/GetParsedProductPage?";
         if (productUrl !== undefined && productUrl !== null)
             url_ += "productUrl=" + encodeURIComponent("" + productUrl) + "&";
         url_ = url_.replace(/[?&]$/, "");
@@ -327,7 +327,7 @@ export class ShopClient {
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ = <RequestInit>{
-            method: "GET",
+            method: "POST",
             headers: {
                 "Accept": "application/json"
             }
@@ -376,7 +376,7 @@ export class ShopClient {
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ = <RequestInit>{
-            method: "GET",
+            method: "POST",
             headers: {
                 "Accept": "application/json"
             }
@@ -423,7 +423,7 @@ export class ShopClient {
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ = <RequestInit>{
-            method: "POST",
+            method: "GET",
             headers: {
                 "Accept": "application/json"
             }
@@ -466,7 +466,7 @@ export class ShopClient {
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ = <RequestInit>{
-            method: "POST",
+            method: "GET",
             headers: {
                 "Accept": "application/json"
             }
