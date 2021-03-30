@@ -50,23 +50,22 @@ namespace PrjModule25_Parser.Controllers
             if (productPage.StatusCode == HttpStatusCode.TooManyRequests)
                 throw new TooManyRequestsException();
 
+            //External id from url
             var externalId = productUrl
                 .Split("//")[1]
                 .Split('/')[1].Split('-').First();
 
-            var title = productPage.QuerySelector("*[data-qaid='product_name']")?.InnerHtml ?? "";
+            
             var companyName = productPage.QuerySelector("*[data-qaid='company_name']")?.InnerHtml ?? "";
             var shop = _dbContext.Shops.FirstOrDefault(s => s.Name == companyName);
-
+            var title = productPage.QuerySelector("*[data-qaid='product_name']")?.InnerHtml ?? "";
             var sku = productPage.QuerySelector("span[data-qaid='product-sku']")?.InnerHtml ?? "";
-
             var presence =
                 productPage.QuerySelector("span[data-qaid='product_presence']")?.FirstElementChild?.InnerHtml ??
                 "";
 
-            var descriptionChildren = productPage.QuerySelector("div[data-qaid='descriptions']")?.Children;
-
-            var description = descriptionChildren?.Aggregate("",
+            //Parsing description 
+            var description = productPage.QuerySelector("div[data-qaid='descriptions']")?.Children?.Aggregate("",
                 (current, descriptionTag) => current + "\n" + ExtractContentFromHtml(descriptionTag.Html()));
 
 
@@ -74,6 +73,7 @@ namespace PrjModule25_Parser.Controllers
             var fullPriceSelector =
                 (IHtmlSpanElement) productPage.QuerySelector("span[data-qaid='price_without_discount']");
             var optPriceSelector = (IHtmlSpanElement) productPage.QuerySelector("span[data-qaid='opt_price']");
+            
             var shortCompanyRating =
                 (IHtmlDivElement) productPage.QuerySelector("div[data-qaid='short_company_rating']");
             var breadcrumbsSeo = (IHtmlDivElement) productPage.QuerySelector("div[data-qaid='breadcrumbs_seo']");
@@ -104,8 +104,11 @@ namespace PrjModule25_Parser.Controllers
                     .QuerySelector("img[data-qaid='image_thumb']"))?.Source) //Src="Urls"
                 .ToList();
 
+
             var fullCategorySchema = JsonSchema.FromType<Category>().ToJson();
             var fullCategoryJson = JsonConvert.SerializeObject(fullCategory);
+
+            //ParseCategory();
 
             var jsonProductDat = new ProductJson
             {
@@ -127,7 +130,8 @@ namespace PrjModule25_Parser.Controllers
                 SyncDate = DateTime.Now,
                 JsonCategory = fullCategoryJson,
                 JsonCategorySchema = fullCategorySchema,
-                ExternalId = externalId
+                ExternalId = externalId,
+                StringCategory = CategoryToString(fullCategory)
             };
 
 
@@ -307,7 +311,7 @@ namespace PrjModule25_Parser.Controllers
             var currentCategory = topLevelCategory;
             for (var i = 0; i < divElement.Children.Length - 1; i++)
             {
-                var childCategory = (IHtmlAnchorElement) divElement.Children[i].Children.First();
+                var childCategory = (IHtmlAnchorElement)divElement.Children[i].Children.First();
                 var subCategory = new Category();
 
                 currentCategory.Href = childCategory.Href;
@@ -321,6 +325,19 @@ namespace PrjModule25_Parser.Controllers
 
             return topLevelCategory;
         }
+        private static string CategoryToString(Category category)
+        {
+            var finalString = "";
+            var tmpCategory = category;
+            while (tmpCategory!= null)
+            {
+                finalString += tmpCategory.Name+ " > ";
+                if (tmpCategory.SubCategory == null) finalString = finalString.Remove(finalString.Length - 3);
+                tmpCategory = tmpCategory.SubCategory;
+            }
+
+            return finalString;
+        }
 
         private static string ExtractContentFromHtml(string input)
         {
@@ -330,3 +347,4 @@ namespace PrjModule25_Parser.Controllers
         }
     }
 }
+

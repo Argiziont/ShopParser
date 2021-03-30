@@ -447,6 +447,9 @@ export const ParseDataSegment: React.FC = () => {
           </Typography>
           <Typography variant="h6" gutterBottom>
             {checkedProduct.companyName}
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+            {checkedProduct.stringCategory}
           </Typography>
           <Typography variant="body2" gutterBottom>
             {checkedProduct.presence}

@@ -25,6 +25,7 @@ namespace PrjModule25_Parser.Models.JSON_DTO
         public string RatingsPerLastYear { get; set; }
         public List<string> ImageUrls { get; set; }
         public string JsonCategory { get; set; }
+        public string StringCategory { get; set; }
         public string JsonCategorySchema { get; set; }
     }
 }
