@@ -66,8 +66,8 @@ namespace PrjModule25_Parser
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .SetIsOriginAllowed(origin => true) // allow any origin
-                .AllowCredentials()
-                .WithExposedHeaders("Content-Disposition")); // allow credentials
+                .AllowCredentials()// allow credentials
+                .WithExposedHeaders("Content-Disposition")); 
 
             app.UseAuthorization();
 

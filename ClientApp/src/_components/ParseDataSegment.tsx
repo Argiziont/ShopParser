@@ -383,6 +383,8 @@ export const ParseDataSegment: React.FC = () => {
         </div>
       </Grid>
     );
+  
+  //Product list component
   const productsBlocks = isProductsLodaing ? (
     <CircularProgress color="inherit" />
   ) : (
@@ -433,7 +435,7 @@ export const ParseDataSegment: React.FC = () => {
     })
   );
 
-  //Product list component
+  //Product which was chosen
   const productBlocks =
     checkedProduct == undefined ? (
       <div></div>
@@ -470,6 +472,7 @@ export const ParseDataSegment: React.FC = () => {
             <Link
               key={i}
               href={imgUrl}
+              rel="noreferrer"
               onClick={preventDefault}
               color="inherit"
             >

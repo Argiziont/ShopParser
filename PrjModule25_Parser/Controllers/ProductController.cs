@@ -281,8 +281,9 @@ namespace PrjModule25_Parser.Controllers
             try
             {
                 var productSource = await _dbContext.Products
-                    .Where(p => p.ShopId == id && p.ProductState == ProductState.Success)
-                    .Skip(page * rowsPerPage).Take(rowsPerPage).ToListAsync();
+                    .Where(p => p.ShopId == id && p.ProductState == ProductState.Success)//Take products which owned by current shop and was parsed successfully
+                    .OrderBy(p=>p.Id)//Order by internal DB id
+                    .Skip(page * rowsPerPage).Take(rowsPerPage).ToListAsync();//Take products by page
 
                 return Ok(productSource.Select(p => new ResponseProduct
                 {
