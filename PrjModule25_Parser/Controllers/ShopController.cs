@@ -32,7 +32,7 @@ namespace PrjModule25_Parser.Controllers
             _dbContext = db;
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("ParseSellerPageProducts")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(List<string>), StatusCodes.Status200OK)]
@@ -103,7 +103,7 @@ namespace PrjModule25_Parser.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("AddShopByUrl")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ResponseShop), StatusCodes.Status200OK)]
@@ -163,7 +163,7 @@ namespace PrjModule25_Parser.Controllers
         }
 
 
-        [HttpPost]
+        [HttpGet]
         [Route("GetShopById")]
         [ProducesResponseType(typeof(ResponseShop), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
@@ -193,7 +193,7 @@ namespace PrjModule25_Parser.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("GetShops")]
         [ProducesResponseType(typeof(IEnumerable<ResponseShop>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]

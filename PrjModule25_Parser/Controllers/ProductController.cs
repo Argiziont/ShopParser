@@ -41,7 +41,7 @@ namespace PrjModule25_Parser.Controllers
         }
 
         [HttpGet]
-        [Route("ParseProductPage")]
+        [Route("GetParsedProductPage")]
         [ProducesResponseType(typeof(ProductData), StatusCodes.Status200OK)]
         [ProducesDefaultResponseType]
         public async Task<IActionResult> ParseDataInsideProductPageAsync(string productUrl)
