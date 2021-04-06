@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using PrjModule25_Parser.Models.Helpers;
 
 namespace PrjModule25_Parser.Models
@@ -26,5 +28,6 @@ namespace PrjModule25_Parser.Models
 
         //Data base connections
         public ShopData Shop { get; set; }
+        public ICollection<Category> Categories { get; set; } = new List<Category>();
     }
 }

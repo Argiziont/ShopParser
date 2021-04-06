@@ -79,6 +79,27 @@ namespace PrjModule25_Parser.Controllers
             var breadcrumbsSeo = (IHtmlDivElement) productPage.QuerySelector("div[data-qaid='breadcrumbs_seo']");
 
             var fullCategory = UnScrubCategory(breadcrumbsSeo);
+            foreach (var category in fullCategory.Where(category => _dbContext.Categories.FirstOrDefault(cat=> cat.Name== category.Name)==null))
+            {
+                if (category.SupCategory?.SupCategory != null)
+                    category.SupCategory.SupCategory = null;
+
+                var subcat = category.SupCategory == null
+                    ? null
+                    : _dbContext.Categories.FirstOrDefault(c => c.Name == category.SupCategory.Name);
+                await _dbContext.Categories.AddAsync(new Category()
+                {
+                    Href = category.Href,
+                    Name = category.Name,
+                    SupCategory = category.SupCategory == null
+                        ? null
+                        : _dbContext.Categories.FirstOrDefault(c => c.Name == category.SupCategory.Name)
+                });
+
+                await _dbContext.SaveChangesAsync();
+
+            }
+
             var price = priceSelector?.Dataset["qaprice"] ?? "";
             var currency = priceSelector?.Dataset["qacurrency"] ?? "";
 
@@ -106,9 +127,7 @@ namespace PrjModule25_Parser.Controllers
 
 
             var fullCategorySchema = JsonSchema.FromType<Category>().ToJson();
-            var fullCategoryJson = JsonConvert.SerializeObject(fullCategory);
-
-            //ParseCategory();
+            var fullCategoryJson = JsonConvert.SerializeObject(fullCategory[0]);
 
             var jsonProductDat = new ProductJson
             {
@@ -148,7 +167,8 @@ namespace PrjModule25_Parser.Controllers
                 Price = jsonProductDat.Price,
                 Title = jsonProductDat.Title,
                 Shop = shop,
-                ProductState = ProductState.Success
+                ProductState = ProductState.Success,
+                Categories = fullCategory
             };
             return Ok(product);
         }
@@ -198,7 +218,9 @@ namespace PrjModule25_Parser.Controllers
             try
             {
                 var productOkObject = await ParseDataInsideProductPageAsync(currentProduct.Url) as OkObjectResult;
-                var parsedProduct = (ProductData) productOkObject?.Value;
+                var parsedProduct = (ProductData)productOkObject?.Value;
+
+
                 if (parsedProduct != null)
                 {
                     currentProduct.ProductState = parsedProduct.ProductState;
@@ -212,6 +234,12 @@ namespace PrjModule25_Parser.Controllers
                     currentProduct.Title = parsedProduct.Title;
                     currentProduct.Url = parsedProduct.Url;
                 }
+
+                if (parsedProduct?.Categories != null)
+                    foreach (var currentCategory in parsedProduct.Categories)
+                    {
+                        currentProduct.Categories.Add(_dbContext.Categories.FirstOrDefault(c => c.Name == currentCategory.Name));
+                    }
 
                 await _dbContext.SaveChangesAsync();
             }
@@ -305,38 +333,27 @@ namespace PrjModule25_Parser.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, e);
             }
         }
-        private static Category UnScrubCategory(IParentNode divElement)
+        private static List<Category> UnScrubCategory(IParentNode divElement)
         {
-            var topLevelCategory = new Category();
-            var currentCategory = topLevelCategory;
+            var categories = new List<Category>();
+            Category higherLevelCategory = null;
             for (var i = 0; i < divElement.Children.Length - 1; i++)
             {
                 var childCategory = (IHtmlAnchorElement)divElement.Children[i].Children.First();
-                var subCategory = new Category();
+                var currentCategory = new Category {SupCategory = higherLevelCategory};
+                higherLevelCategory = currentCategory;
 
                 currentCategory.Href = childCategory.Href;
                 currentCategory.Name = childCategory.Title;
-                currentCategory.SubCategory = subCategory;
-                if (i != divElement.Children.Length - 2)
-                    currentCategory = subCategory;
-                else
-                    currentCategory.SubCategory = null;
+                categories.Add(currentCategory);
             }
 
-            return topLevelCategory;
+            return categories;
         }
-        private static string CategoryToString(Category category)
+        private static string CategoryToString(IEnumerable<Category> categories)
         {
-            var finalString = "";
-            var tmpCategory = category;
-            while (tmpCategory!= null)
-            {
-                finalString += tmpCategory.Name+ " > ";
-                if (tmpCategory.SubCategory == null) finalString = finalString.Remove(finalString.Length - 3);
-                tmpCategory = tmpCategory.SubCategory;
-            }
-
-            return finalString;
+            var categoryString= categories.Aggregate("", (current, category) => current + (category.Name + " > "));
+            return categoryString.Remove(categoryString.Length - 3);
         }
 
         private static string ExtractContentFromHtml(string input)

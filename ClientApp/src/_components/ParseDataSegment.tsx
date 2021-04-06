@@ -478,6 +478,10 @@ export const ParseDataSegment: React.FC = () => {
         spacing={3}
         direction="row"
         justify="center"
+        style={{
+          margin: 0,
+          width: '100%',
+        }}
       >
         <Grid
           container
