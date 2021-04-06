@@ -130,11 +130,6 @@ export const ParseDataSegment: React.FC = () => {
     }
   }, [snackPack, messageInfo, openSnack]);
 
-  //Prevent default for a button click
-  const preventDefault = (event: React.SyntheticEvent) => {
-    return event.preventDefault();
-  };
-
   //Product actions (product click/products page change/etc)
   const handleSetPage = async (pageNumber: number, rowsCount = rowsPerPage) => {
     setPage(pageNumber);
@@ -229,6 +224,10 @@ export const ParseDataSegment: React.FC = () => {
       ...prev,
       { message, key: new Date().getTime(), type },
     ]);
+  };
+  //Actions for Product component
+  const handleExternalUrlClick = (url: string) => {
+    window.location.assign(url);
   };
 
   //Smooth scroll to the top of page on product click
@@ -453,7 +452,7 @@ export const ParseDataSegment: React.FC = () => {
                 key={i}
                 href={imgUrl}
                 rel="noreferrer"
-                onClick={preventDefault}
+                onClick={()=>handleExternalUrlClick(imgUrl)}
                 color="inherit"
               >
                 <Typography variant="body2" gutterBottom noWrap>
