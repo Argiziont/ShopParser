@@ -16,6 +16,7 @@ export const UserService = {
   GetProductById,
   AddShopByUrl,
   GetProductByShopIdAndPage,
+  GetProductByCategoryIdAndPage,
   GetAllCategories,
   GetAllCategoriesByPage,
   GetSubCategories
@@ -85,6 +86,16 @@ async function GetProductById(id:number): Promise<ProductJson> {
 async function GetProductByShopIdAndPage(id:number,page:number,rows:number): Promise<ResponseProduct[]> {
 
   return ProductApi().getPagedProductsByShopId(id,page,rows).then((productResponse) => {
+    return productResponse;
+    //Ok
+  }, async (error) => {
+    const handledException = await handleExeption(error);
+    return Promise.reject(handledException);
+  });
+}
+async function GetProductByCategoryIdAndPage(id:number,page:number,rows:number): Promise<ResponseNestedCategory[]> {
+
+  return ProductApi().getPagedProductsByCategoryId(id,page,rows).then((productResponse) => {
     return productResponse;
     //Ok
   }, async (error) => {

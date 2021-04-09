@@ -212,6 +212,30 @@ export const ParseDataSegment: React.FC = () => {
       }
     } catch {}
   };
+
+  const handleGetProductRequestByCategory = async (
+    id: number | undefined,
+    page: number | undefined,
+    rowsCount: number | undefined
+  ) => {
+    try {
+      if (id != undefined && page != undefined && rowsCount != undefined) {
+        setCurrentShopId(id);
+        setCheckedProduct(undefined);
+        setIsProductsLodaing(true);
+        const response = await UserActions.GetProductByCategoryIdAndPage(
+          id,
+          page,
+          rowsCount
+        );
+        setIsProductsLodaing(false);
+
+        if (response != undefined) {
+          setProductList(response);
+        }
+      }
+    } catch {}
+  };
   const handleProductClick = async (id: number | undefined) => {
     if (id != undefined) {
       const response = await UserActions.GetProductById(id);
@@ -220,6 +244,11 @@ export const ParseDataSegment: React.FC = () => {
         setCheckedProduct(response);
         scrollToTop();
       }
+    }
+  };
+  const handleCategoryClick = async (id: number | undefined) => {
+    if (id != undefined) {
+      handleGetProductRequestByCategory(id, productPage, rowsPerProductPage);
     }
   };
 
@@ -233,7 +262,6 @@ export const ParseDataSegment: React.FC = () => {
       setNumberOfProductsInShop(productCount != undefined ? productCount : 0);
     }
   };
-
   const handleShopsUpdate = () => {
     setIsShopsLodaing(true);
     UserActions.GetAllShops().then((shopList) => {
@@ -285,7 +313,6 @@ export const ParseDataSegment: React.FC = () => {
   const handleOpenSortBy = () => {
     setOpenedSortBy(true);
   };
-
   const handleCloseSortBy = (value: string) => {
     setOpenedSortBy(false);
     setSelectedSortByValue(value);
@@ -597,7 +624,8 @@ export const ParseDataSegment: React.FC = () => {
                 <Grid item>
                   <div className={classes.shopItem}>
                     <NestedCategoryList
-                      padding={0}
+                      setCurrentShopId={handleCategoryClick}
+                      padding={5}
                       list={categoriesList}
                     ></NestedCategoryList>
                   </div>

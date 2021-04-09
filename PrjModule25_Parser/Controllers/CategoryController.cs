@@ -34,6 +34,7 @@ namespace PrjModule25_Parser.Controllers
                 var categoryList = await _dbContext.Categories.ToListAsync();
                 return Ok(categoryList.Select(c => new ResponseCategory
                 {
+                    Id = c.Id,
                     Href = c.Href,
                     Name = c.Name,
                     ProductsCount = _dbContext.Products.Count(cat => cat.Categories.Contains(c)).ToString()
@@ -60,6 +61,7 @@ namespace PrjModule25_Parser.Controllers
                 
                 return Ok(categorySource.Select(c => new ResponseCategory
                 {
+                    Id=c.Id,
                     Href = c.Href,
                     Name = c.Name,
                     ProductsCount = _dbContext.Products.Count(cat => cat.Categories.Contains(c)).ToString()
@@ -97,7 +99,8 @@ namespace PrjModule25_Parser.Controllers
         private static ResponseNestedCategory ReverseCategoryListRecursive(Category mainCategory, ApplicationDb dbContext)
         {
             return new ()
-            {
+            { 
+                Id= mainCategory.Id,
                 Name = mainCategory.Name,
                 Href = mainCategory.Href,
                 ProductsCount = dbContext.Products.Count(cat => cat.Categories.Contains(mainCategory)).ToString(),

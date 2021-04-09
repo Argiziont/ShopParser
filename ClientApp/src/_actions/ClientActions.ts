@@ -797,6 +797,7 @@ export class ShopClient {
 }
 
 export class ResponseCategory implements IResponseCategory {
+    id?: number;
     name?: string | undefined;
     href?: string | undefined;
     productsCount?: string | undefined;
@@ -812,6 +813,7 @@ export class ResponseCategory implements IResponseCategory {
 
     init(_data?: any) {
         if (_data) {
+            this.id = _data["id"];
             this.name = _data["name"];
             this.href = _data["href"];
             this.productsCount = _data["productsCount"];
@@ -827,6 +829,7 @@ export class ResponseCategory implements IResponseCategory {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
         data["name"] = this.name;
         data["href"] = this.href;
         data["productsCount"] = this.productsCount;
@@ -835,6 +838,7 @@ export class ResponseCategory implements IResponseCategory {
 }
 
 export interface IResponseCategory {
+    id?: number;
     name?: string | undefined;
     href?: string | undefined;
     productsCount?: string | undefined;

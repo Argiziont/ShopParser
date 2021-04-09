@@ -9,7 +9,8 @@ export const UserActions = {
   GetProductById,
   AddShopByUrl,
   GetProductByShopIdAndPage,
-  GetSubCategories
+  GetSubCategories,
+  GetProductByCategoryIdAndPage
 };
 async function GetAllShops(): Promise<IResponseShop[]|undefined> {
   try {
@@ -32,6 +33,15 @@ async function GetAllProductInShop(id:number): Promise<IResponseShop[]|undefined
 async function GetProductByShopIdAndPage(id:number,page:number,rows:number): Promise<IResponseShop[]|undefined> {
   try {
     const response = await  UserService.GetProductByShopIdAndPage(id,page,rows);
+    return response;
+  } 
+  catch(error) {
+    console.error(error);
+  }
+}
+async function GetProductByCategoryIdAndPage(id:number,page:number,rows:number): Promise<IResponseNestedCategory[]|undefined> {
+  try {
+    const response = await  UserService.GetProductByCategoryIdAndPage(id,page,rows);
     return response;
   } 
   catch(error) {

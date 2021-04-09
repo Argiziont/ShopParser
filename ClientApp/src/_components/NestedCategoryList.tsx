@@ -1,5 +1,5 @@
 import React from "react";
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
+import { makeStyles, createStyles } from "@material-ui/core/styles";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
@@ -7,38 +7,59 @@ import Collapse from "@material-ui/core/Collapse";
 import ExpandLess from "@material-ui/icons/ExpandLess";
 import ExpandMore from "@material-ui/icons/ExpandMore";
 import { IResponseNestedCategory } from "../_actions";
+import IconButton from "@material-ui/core/IconButton";
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      width: "100%",
-      maxWidth: 360,
-    },
-  })
-);
 export interface NestedCategoryListProps {
   list: IResponseNestedCategory[];
   padding: number;
+  setCurrentShopId: (id: number | undefined) => void;
 }
 export const NestedCategoryList: React.FC<NestedCategoryListProps> = (
   props: NestedCategoryListProps
 ) => {
+  const useStyles = makeStyles(() =>
+    createStyles({
+      root: {
+        width: "100%",
+        maxWidth: 360,
+      },
+      categoryItem: {
+        maxWidth: "320px",
+        minWidth: "300px",
+        background: "#D3D3D3",
+        border: 0,
+        borderRadius: 16,
+        padding: "15px 15px",
+      },
+      listItem: {
+        paddingLeft: props.padding + "px",
+        paddingTop: "5px",
+        paddingBottom: "5px",
+      },
+    })
+  );
   const classes = useStyles();
   const [open, setOpen] = React.useState<number>(-1);
 
-  const handleContainedExpandClick = (id: number) => {
-    if (id == open) {
+  const handleContainedExpandClick = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    index: number
+  ) => {
+    event.stopPropagation();
+    if (index == open) {
       setOpen(-1);
     } else {
-      setOpen(id);
+      setOpen(index);
     }
+  };
+
+  const handleCategoryClick = (id: number | undefined) => {
+    console.log(id);
+    props.setCurrentShopId(id);
   };
 
   return (
     <List
-      style={{
-        paddingLeft: props.padding + "px",
-      }}
       component="nav"
       aria-labelledby="nested-list-subheader"
       className={classes.root}
@@ -49,13 +70,26 @@ export const NestedCategoryList: React.FC<NestedCategoryListProps> = (
             {element.subCategories == undefined ? (
               <></>
             ) : element.subCategories.length === 0 ? (
-              <ListItem button>
+              <ListItem
+                classes={{ root: classes.listItem }}
+                button
+                onClick={() => handleCategoryClick(element.id)}
+              >
                 <ListItemText primary={element.name} />
               </ListItem>
             ) : (
-              <ListItem button onClick={() => handleContainedExpandClick(i)}>
+              <ListItem
+                classes={{ root: classes.listItem }}
+                button
+                onClick={() => handleCategoryClick(element.id)}
+              >
                 <ListItemText primary={element.name} />
-                {open == i ? <ExpandLess /> : <ExpandMore />}
+                <IconButton
+                  edge="end"
+                  onClick={(event) => handleContainedExpandClick(event, i)}
+                >
+                  {open == i ? <ExpandLess /> : <ExpandMore />}
+                </IconButton>
               </ListItem>
             )}
             {element.subCategories == undefined ? (
@@ -63,8 +97,9 @@ export const NestedCategoryList: React.FC<NestedCategoryListProps> = (
             ) : (
               <Collapse in={open == i} timeout="auto" unmountOnExit>
                 <NestedCategoryList
+                  setCurrentShopId={props.setCurrentShopId}
                   list={element.subCategories}
-                  padding={props.padding + 2}
+                  padding={props.padding + 10}
                 ></NestedCategoryList>
               </Collapse>
             )}
@@ -74,3 +109,4 @@ export const NestedCategoryList: React.FC<NestedCategoryListProps> = (
     </List>
   );
 };
+//setCurrentShopId
