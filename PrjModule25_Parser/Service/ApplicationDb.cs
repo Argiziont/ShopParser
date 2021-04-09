@@ -8,6 +8,7 @@ namespace PrjModule25_Parser.Service
         public ApplicationDb(DbContextOptions<ApplicationDb> options)
             : base(options)
         {
+            //Database.EnsureDeleted();
             Database.EnsureCreated();
         }
 

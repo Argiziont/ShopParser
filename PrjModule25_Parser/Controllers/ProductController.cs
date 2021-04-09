@@ -84,9 +84,6 @@ namespace PrjModule25_Parser.Controllers
                 if (category.SupCategory?.SupCategory != null)
                     category.SupCategory.SupCategory = null;
 
-                var subcat = category.SupCategory == null
-                    ? null
-                    : _dbContext.Categories.FirstOrDefault(c => c.Name == category.SupCategory.Name);
                 await _dbContext.Categories.AddAsync(new Category()
                 {
                     Href = category.Href,
@@ -255,6 +252,27 @@ namespace PrjModule25_Parser.Controllers
         }
 
         [HttpGet]
+        [Route("GetFullProductsById")]
+        [ProducesResponseType(typeof(ProductJson), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
+        [ProducesDefaultResponseType]
+        public IActionResult GetFullProductsById(int id)
+        {
+            try
+            {
+                var jsonData = _dbContext.Products.FirstOrDefault(p => p.Id == id)?.JsonData;
+                var deserializeJson =
+                    JsonConvert.DeserializeObject<ProductJson>(jsonData ?? throw new InvalidOperationException());
+
+                return Ok(deserializeJson);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e);
+            }
+        }
+
+        [HttpGet]
         [Route("GetProductsByShopId")]
         [ProducesResponseType(typeof(IEnumerable<ResponseProduct>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
@@ -283,19 +301,31 @@ namespace PrjModule25_Parser.Controllers
         }
 
         [HttpGet]
-        [Route("GetFullProductsById")]
-        [ProducesResponseType(typeof(ProductJson), StatusCodes.Status200OK)]
+        [Route("GetProductsByCategoryId")]
+        [ProducesResponseType(typeof(IEnumerable<ResponseProduct>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesDefaultResponseType]
-        public IActionResult GetFullProductsById(int id)
+        public async Task<IActionResult> GetProductsByCategoryIdAsync(int id)
         {
             try
             {
-                var jsonData = _dbContext.Products.FirstOrDefault(p => p.Id == id)?.JsonData;
-                var deserializeJson =
-                    JsonConvert.DeserializeObject<ProductJson>(jsonData ?? throw new InvalidOperationException());
-
-                return Ok(deserializeJson);
+                var currentCategory =await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == id);
+                if (currentCategory == null)
+                    return NotFound();
+                
+                var productList = await _dbContext.Products
+                    .Where(p => p.Categories.Contains(currentCategory) && p.ProductState == ProductState.Success).ToListAsync();
+                return Ok(productList.Select(p => new ResponseProduct
+                {
+                    Description = p.Description,
+                    ExternalId = p.ExternalId,
+                    Id = p.Id,
+                    Url = p.Url,
+                    SyncDate = p.SyncDate,
+                    Price = p.Price,
+                    Title = p.Title
+                }));
             }
             catch (Exception e)
             {
@@ -333,6 +363,43 @@ namespace PrjModule25_Parser.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, e);
             }
         }
+
+        [HttpGet]
+        [Route("GetPagedProductsByCategoryId")]
+        [ProducesResponseType(typeof(IEnumerable<ProductData>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> GetPagedProductsByCategoryIdAsync(int id, int page, int rowsPerPage)
+        {
+            try
+            {
+                var currentCategory = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == id);
+                if (currentCategory == null)
+                    return NotFound();
+                
+                var productSource = await _dbContext.Products
+                    .Where(p => p.Categories.Contains(currentCategory) && p.ProductState == ProductState.Success)//Take products which owned by current shop and was parsed successfully
+                    .OrderBy(p => p.Id)//Order by internal DB id
+                    .Skip(page * rowsPerPage).Take(rowsPerPage).ToListAsync();//Take products by page
+
+                return Ok(productSource.Select(p => new ResponseProduct
+                {
+                    Description = p.Description,
+                    ExternalId = p.ExternalId,
+                    Id = p.Id,
+                    Url = p.Url,
+                    SyncDate = p.SyncDate,
+                    Price = p.Price,
+                    Title = p.Title
+                }));
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e);
+            }
+        }
+
         private static List<Category> UnScrubCategory(IParentNode divElement)
         {
             var categories = new List<Category>();
@@ -350,6 +417,7 @@ namespace PrjModule25_Parser.Controllers
 
             return categories;
         }
+       
         private static string CategoryToString(IEnumerable<Category> categories)
         {
             var categoryString= categories.Aggregate("", (current, category) => current + (category.Name + " > "));

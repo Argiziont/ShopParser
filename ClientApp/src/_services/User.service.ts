@@ -1,16 +1,24 @@
 import {
-  ApiException, ProductJson, ResponseProduct, ResponseShop,
+  ApiException,
+  ProductJson,
+  ResponseCategory,
+  ResponseNestedCategory,
+  ResponseProduct,
+  ResponseShop
 } from "../_actions";
 import {
   ShopApi
 } from "./";
-import { ProductApi } from "./Helpers/WebApis";
+import { CategoryApi, ProductApi } from "./Helpers/WebApis";
 export const UserService = {
   GetAllShops,
   GetAllProductInShop,
   GetProductById,
   AddShopByUrl,
-  GetProductByIdAndPage
+  GetProductByShopIdAndPage,
+  GetAllCategories,
+  GetAllCategoriesByPage,
+  GetSubCategories
 };
 
 async function GetAllShops(): Promise<ResponseShop[]> {
@@ -23,6 +31,37 @@ async function GetAllShops(): Promise<ResponseShop[]> {
     return Promise.reject(handledException);
   });
 }
+async function GetAllCategories(): Promise<ResponseCategory[]> {
+
+  return CategoryApi().getCategories().then((categoryResponse) => {
+    return categoryResponse;
+    //Ok
+  }, async (error) => {
+    const handledException = await handleExeption(error);
+    return Promise.reject(handledException);
+  });
+}
+async function GetAllCategoriesByPage(page:number,rows:number): Promise<ResponseCategory[]> {
+
+  return CategoryApi().getPagedCategories(page,rows).then((categoryResponse) => {
+    return categoryResponse;
+    //Ok
+  }, async (error) => {
+    const handledException = await handleExeption(error);
+    return Promise.reject(handledException);
+  });
+}
+async function GetSubCategories(): Promise<ResponseNestedCategory> {
+
+  return CategoryApi().getSubCategories().then((categoryResponse) => {
+    return categoryResponse;
+    //Ok
+  }, async (error) => {
+    const handledException = await handleExeption(error);
+    return Promise.reject(handledException);
+  });
+}
+
 async function GetAllProductInShop(id:number): Promise<ResponseProduct[]> {
 
   return ProductApi().getProductsByShopId(id).then((shopResponse) => {
@@ -43,7 +82,7 @@ async function GetProductById(id:number): Promise<ProductJson> {
     return Promise.reject(handledException);
   });
 }
-async function GetProductByIdAndPage(id:number,page:number,rows:number): Promise<ResponseProduct[]> {
+async function GetProductByShopIdAndPage(id:number,page:number,rows:number): Promise<ResponseProduct[]> {
 
   return ProductApi().getPagedProductsByShopId(id,page,rows).then((productResponse) => {
     return productResponse;
@@ -63,6 +102,7 @@ async function AddShopByUrl(url:string): Promise<ResponseShop> {
     return Promise.reject(handledException);
   });
 }
+
 async function handleExeption(error: ApiException) {
 
   const exeptionRefuse = JSON.parse(error.response);

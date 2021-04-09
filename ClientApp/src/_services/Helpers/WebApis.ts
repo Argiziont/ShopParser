@@ -1,6 +1,7 @@
 import {
   ShopClient,
-  ProductClient
+  ProductClient,
+  CategoryClient
 } from "../../_actions";
 
 import {
@@ -12,4 +13,7 @@ export const ShopApi = (): ShopClient => {
 };
 export const ProductApi = (): ProductClient => {
   return new ProductClient(ApiUrl);
+};
+export const CategoryApi = (): CategoryClient => {
+  return new CategoryClient(ApiUrl);
 };

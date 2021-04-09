@@ -1,14 +1,15 @@
 import {
   UserService
 } from "../_services";
-import { IResponseShop, IProductJson } from "./ClientActions";
+import { IResponseShop, IProductJson,IResponseNestedCategory } from "./ClientActions";
 
 export const UserActions = {
   GetAllShops,
   GetAllProductInShop,
   GetProductById,
   AddShopByUrl,
-  GetProductByIdAndPage
+  GetProductByShopIdAndPage,
+  GetSubCategories
 };
 async function GetAllShops(): Promise<IResponseShop[]|undefined> {
   try {
@@ -28,9 +29,9 @@ async function GetAllProductInShop(id:number): Promise<IResponseShop[]|undefined
     console.error(error);
   }
 }
-async function GetProductByIdAndPage(id:number,page:number,rows:number): Promise<IResponseShop[]|undefined> {
+async function GetProductByShopIdAndPage(id:number,page:number,rows:number): Promise<IResponseShop[]|undefined> {
   try {
-    const response = await  UserService.GetProductByIdAndPage(id,page,rows);
+    const response = await  UserService.GetProductByShopIdAndPage(id,page,rows);
     return response;
   } 
   catch(error) {
@@ -40,6 +41,15 @@ async function GetProductByIdAndPage(id:number,page:number,rows:number): Promise
 async function GetProductById(id:number): Promise<IProductJson|undefined> {
   try {
     const response = await  UserService.GetProductById(id);
+    return response;
+  } 
+  catch(error) {
+    console.error(error);
+  }
+}
+async function GetSubCategories(): Promise<IResponseNestedCategory|undefined> {
+  try {
+    const response = await  UserService.GetSubCategories();
     return response;
   } 
   catch(error) {

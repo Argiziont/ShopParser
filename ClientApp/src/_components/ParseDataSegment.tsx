@@ -16,17 +16,24 @@ import {
   IconButton,
 } from "@material-ui/core";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
+import SortIcon from "@material-ui/icons/Sort";
 import CloseIcon from "@material-ui/icons/Close";
 import MuiAlert, { Color } from "@material-ui/lab/Alert";
 
 //Self project imports
 import {
   IProductJson,
+  IResponseNestedCategory,
   IResponseProduct,
   IResponseShop,
   UserActions,
 } from "../_actions";
 import { ApiUrl, SnackbarMessage } from "../_services";
+import {
+  SelectSortTypeDialog,
+  SortTypes,
+  NestedCategoryList,
+} from "../_components";
 
 const useStyles = makeStyles((theme) => ({
   rootBox: {
@@ -37,27 +44,40 @@ const useStyles = makeStyles((theme) => ({
     padding: "0 30px",
   },
   shopItem: {
+    maxWidth: "320px",
+    minWidth: "300px",
     background: "#D3D3D3",
     border: 0,
     borderRadius: 16,
     padding: "15px 15px",
-    minWidth: "250px",
+  },
+  productItem: {
+    maxWidth: "400px",
+    minWidth: "350px",
+    background: "#D3D3D3",
+    border: 0,
+    borderRadius: 16,
+    padding: "15px 15px",
+  },
+  shopInput: {
+    maxWidth: "150px",
   },
   shopOuterItem: {
     border: 0,
     borderRadius: 16,
-    minWidth: "250px",
-    maxWidth: "350px",
+    //minWidth: "250px",
+    //maxWidth: "350px",
   },
   divPointer: {
     cursor: "pointer",
   },
+  divDefault: {
+    cursor: "default",
+  },
 }));
-
 export const ParseDataSegment: React.FC = () => {
   //Procucts states
   const [productList, setProductList] = useState<IResponseProduct[]>();
-  const [isProductDivExtended, setIsProductDivExtended] = useState<number>(-1);
   const [isProductsLodaing, setIsProductsLodaing] = useState<boolean>(false);
   const [numberOfProductsInShop, setNumberOfProductsInShop] = useState<number>(
     0
@@ -69,14 +89,13 @@ export const ParseDataSegment: React.FC = () => {
   //Shop states
   const [shopList, setShopList] = useState<IResponseShop[]>();
   const [currentShopId, setCurrentShopId] = useState<number>();
-  const [isDivHover, setIsDivHover] = useState<boolean>();
   const [isShopsLodaing, setIsShopsLodaing] = useState<boolean>(false);
   const [isShopDivExtended, setIsShopDivExtended] = useState<number>(-1);
   const [shopUrl, setShopUrl] = useState<string>("");
 
-  //Pagination states
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  //Products Pagination states
+  const [productPage, setProductPage] = React.useState(0);
+  const [rowsPerProductPage, setRowsPerProductPage] = React.useState(10);
 
   //Snack states
   const [openSnack, setOpenSnack] = React.useState<boolean>(false);
@@ -84,6 +103,17 @@ export const ParseDataSegment: React.FC = () => {
   const [messageInfo, setMessageInfo] = React.useState<
     SnackbarMessage | undefined
   >(undefined);
+
+  //SortBy dialog states
+  const [openedSortBy, setOpenedSortBy] = React.useState(false);
+  const [selectedSortByValue, setSelectedSortByValue] = React.useState(
+    SortTypes[0]
+  );
+
+  //Categories states
+  const [categoriesList, setCategoriesList] = useState<
+    IResponseNestedCategory[]
+  >();
 
   const classes = useStyles();
 
@@ -107,10 +137,17 @@ export const ParseDataSegment: React.FC = () => {
 
       .catch((e) => console.log("Connection failed: ", e));
     UserActions.GetAllShops().then((shopList) => {
-      if (isMounted) {
-        setShopList(shopList);
-        setIsShopsLodaing(false);
-      }
+      UserActions.GetSubCategories().then((categoryList) => {
+        if (isMounted) {
+          setShopList(shopList);
+          if (categoryList != undefined) {
+            const nestedArray: IResponseNestedCategory[] = new Array(1);
+            nestedArray[0] = categoryList;
+            setCategoriesList(nestedArray);
+          }
+          setIsShopsLodaing(false);
+        }
+      });
     });
     return () => {
       isMounted = false;
@@ -131,25 +168,28 @@ export const ParseDataSegment: React.FC = () => {
   }, [snackPack, messageInfo, openSnack]);
 
   //Product actions (product click/products page change/etc)
-  const handleSetPage = async (pageNumber: number, rowsCount = rowsPerPage) => {
-    setPage(pageNumber);
+  const handleSetProductPage = async (
+    pageNumber: number,
+    rowsCount = rowsPerProductPage
+  ) => {
+    setProductPage(pageNumber);
     setCheckedProduct(undefined);
-    handleGetProductRequest(currentShopId, pageNumber, rowsCount);
+    handleGetProductRequestByShops(currentShopId, pageNumber, rowsCount);
   };
-  const handleChangePage = (
+  const handleChangeProductPage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number
   ) => {
-    handleSetPage(newPage);
+    handleSetProductPage(newPage);
   };
-  const handleChangeRowsPerPage = (
+  const handleChangeProductRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const rowsPerPageParsed: number = parseInt(event.target.value, 10);
-    setRowsPerPage(rowsPerPageParsed);
-    handleSetPage(0, rowsPerPageParsed);
+    setRowsPerProductPage(rowsPerPageParsed);
+    handleSetProductPage(0, rowsPerPageParsed);
   };
-  const handleGetProductRequest = async (
+  const handleGetProductRequestByShops = async (
     id: number | undefined,
     page: number | undefined,
     rowsCount: number | undefined
@@ -159,7 +199,7 @@ export const ParseDataSegment: React.FC = () => {
         setCurrentShopId(id);
         setCheckedProduct(undefined);
         setIsProductsLodaing(true);
-        const response = await UserActions.GetProductByIdAndPage(
+        const response = await UserActions.GetProductByShopIdAndPage(
           id,
           page,
           rowsCount
@@ -184,6 +224,16 @@ export const ParseDataSegment: React.FC = () => {
   };
 
   //Shop Actions
+  const handleShopShowProductsClick = (
+    id: number | undefined,
+    productCount: number | undefined
+  ) => {
+    if (id != undefined && productCount != undefined) {
+      handleGetProductRequestByShops(id, productPage, rowsPerProductPage);
+      setNumberOfProductsInShop(productCount != undefined ? productCount : 0);
+    }
+  };
+
   const handleShopsUpdate = () => {
     setIsShopsLodaing(true);
     UserActions.GetAllShops().then((shopList) => {
@@ -225,9 +275,20 @@ export const ParseDataSegment: React.FC = () => {
       { message, key: new Date().getTime(), type },
     ]);
   };
+
   //Actions for Product component
   const handleExternalUrlClick = (url: string) => {
     window.location.assign(url);
+  };
+
+  //Actions for SortBy
+  const handleOpenSortBy = () => {
+    setOpenedSortBy(true);
+  };
+
+  const handleCloseSortBy = (value: string) => {
+    setOpenedSortBy(false);
+    setSelectedSortByValue(value);
   };
 
   //Smooth scroll to the top of page on product click
@@ -292,11 +353,6 @@ export const ParseDataSegment: React.FC = () => {
             className={`${classes.shopOuterItem} ${classes.divPointer}`}
             onMouseEnter={() => setIsShopDivExtended(i)}
             onMouseLeave={() => setIsShopDivExtended(-1)}
-            onClick={() => {
-              if (!isDivHover) {
-                console.log("Click");
-              }
-            }}
             style={
               isShopDivExtended == i
                 ? {
@@ -315,14 +371,9 @@ export const ParseDataSegment: React.FC = () => {
           >
             <div
               className={`${classes.shopItem} ${classes.divPointer}`}
-              onMouseEnter={() => setIsDivHover(true)}
-              onMouseLeave={() => setIsDivHover(false)}
-              onClick={() => {
-                handleGetProductRequest(shop.id, page, rowsPerPage);
-                setNumberOfProductsInShop(
-                  shop.productCount != undefined ? shop.productCount : 0
-                );
-              }}
+              onClick={() =>
+                handleShopShowProductsClick(shop.id, shop.productCount)
+              }
             >
               <Typography variant="h6" gutterBottom>
                 {shop.name}
@@ -345,16 +396,16 @@ export const ParseDataSegment: React.FC = () => {
     isProductsLodaing || productList == undefined || productList.length == 0 ? (
       <div></div>
     ) : (
-      <Grid item xs>
-        <div className={classes.shopItem} style={{ width: "95%" }}>
+      <Grid item>
+        <div className={classes.shopItem} style={{ width: "100%" }}>
           <TablePagination
             component="div"
             count={numberOfProductsInShop}
-            page={page}
-            onChangePage={handleChangePage}
-            rowsPerPage={rowsPerPage}
+            page={productPage}
+            onChangePage={handleChangeProductPage}
+            rowsPerPage={rowsPerProductPage}
             rowsPerPageOptions={[10, 25, 50, 75, 100]}
-            onChangeRowsPerPage={handleChangeRowsPerPage}
+            onChangeRowsPerPage={handleChangeProductRowsPerPage}
           />
         </div>
       </Grid>
@@ -364,47 +415,19 @@ export const ParseDataSegment: React.FC = () => {
   const productsBlocks = isProductsLodaing ? (
     <CircularProgress color="inherit" />
   ) : (
-    productList?.map((product, i) => {
+    productList?.map((product) => {
       return (
-        <Grid item xs key={product.id} zeroMinWidth>
+        <Grid item key={product.id}>
           <div
-            className={`${classes.shopOuterItem} ${classes.divPointer}`}
-            onMouseEnter={() => setIsProductDivExtended(i)}
-            onMouseLeave={() => setIsProductDivExtended(-1)}
-            onClick={() => {
-              if (!isDivHover) {
-                console.log("Click");
-              }
-            }}
-            style={
-              isProductDivExtended == i
-                ? {
-                    borderRadius: 18,
-                    padding: "0px 10px 0px 0px",
-                    background: "#be0000",
-                    transition: "padding 0.15s ease-in, background 0s",
-                  }
-                : {
-                    borderRadius: 18,
-                    padding: "0px 0px 0px 0px",
-                    background: "#ffff",
-                    transition: "padding 0.2s ease-in, background 1s",
-                  }
-            }
+            className={`${classes.shopItem} ${classes.divPointer}`}
+            onClick={() => handleProductClick(product.id)}
           >
-            <div
-              className={`${classes.shopItem} ${classes.divPointer}`}
-              onClick={() => handleProductClick(product.id)}
-              onMouseEnter={() => setIsDivHover(true)}
-              onMouseLeave={() => setIsDivHover(false)}
-            >
-              <Typography variant="h6" gutterBottom noWrap>
-                {product.title}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                {"Price: " + product.price}
-              </Typography>
-            </div>
+            <Typography variant="h6" gutterBottom noWrap>
+              {product.title}
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              {"Price: " + product.price}
+            </Typography>
           </div>
         </Grid>
       );
@@ -416,8 +439,8 @@ export const ParseDataSegment: React.FC = () => {
     checkedProduct == undefined ? (
       <div></div>
     ) : (
-      <Grid item xs zeroMinWidth>
-        <div className={classes.shopItem}>
+      <Grid item>
+        <div className={classes.productItem}>
           <Typography variant="h5" gutterBottom>
             {checkedProduct.title}
           </Typography>
@@ -452,7 +475,7 @@ export const ParseDataSegment: React.FC = () => {
                 key={i}
                 href={imgUrl}
                 rel="noreferrer"
-                onClick={()=>handleExternalUrlClick(imgUrl)}
+                onClick={() => handleExternalUrlClick(imgUrl)}
                 color="inherit"
               >
                 <Typography variant="body2" gutterBottom noWrap>
@@ -475,12 +498,12 @@ export const ParseDataSegment: React.FC = () => {
     <React.Fragment>
       <Grid
         container
-        spacing={3}
+        spacing={10}
         direction="row"
         justify="center"
         style={{
           margin: 0,
-          width: '100%',
+          width: "100%",
         }}
       >
         <Grid
@@ -492,25 +515,96 @@ export const ParseDataSegment: React.FC = () => {
           direction="column"
           alignItems="flex-start"
         >
-          <Grid item key={-1}>
+          <Grid item>
             <div className={classes.shopItem}>
-              <TextField
-                label="Shop URL"
-                variant="standard"
-                value={shopUrl}
-                onChange={handleShopUrlChange}
-              />
-
-              <Button
-                variant="contained"
-                endIcon={<CloudUploadIcon />}
-                onClick={handleShopUrlUploadClick}
+              <Grid
+                item
+                container
+                spacing={3}
+                direction="row"
+                justify="center"
+                alignItems="center"
               >
-                {"Submit"}
-              </Button>
+                <Grid item>
+                  <TextField
+                    variant="outlined"
+                    disabled
+                    value={selectedSortByValue}
+                    color="secondary"
+                    size="small"
+                    className={classes.shopInput}
+                    onChange={handleShopUrlChange}
+                  />
+                </Grid>
+                <Grid item>
+                  <Button
+                    variant="contained"
+                    endIcon={<SortIcon />}
+                    onClick={handleOpenSortBy}
+                  >
+                    {"Sort by"}
+                  </Button>
+                  <SelectSortTypeDialog
+                    selectedValue={selectedSortByValue}
+                    open={openedSortBy}
+                    onClose={handleCloseSortBy}
+                  />
+                </Grid>
+              </Grid>
             </div>
           </Grid>
-          {shopsBlocks}
+          {selectedSortByValue == "Shops" ? (
+            <>
+              <Grid item>
+                <div className={classes.shopItem}>
+                  <Grid
+                    item
+                    container
+                    spacing={3}
+                    direction="row"
+                    justify="center"
+                    alignItems="center"
+                  >
+                    <Grid item>
+                      <TextField
+                        label="Shop URL"
+                        variant="outlined"
+                        value={shopUrl}
+                        size="small"
+                        className={classes.shopInput}
+                        onChange={handleShopUrlChange}
+                      />
+                    </Grid>
+                    <Grid item>
+                      <Button
+                        variant="contained"
+                        endIcon={<CloudUploadIcon />}
+                        onClick={handleShopUrlUploadClick}
+                      >
+                        {"Submit"}
+                      </Button>
+                    </Grid>
+                  </Grid>
+                </div>
+              </Grid>
+              {shopsBlocks}
+            </>
+          ) : (
+            <>
+              {categoriesList == undefined ? (
+                <></>
+              ) : (
+                <Grid item>
+                  <div className={classes.shopItem}>
+                    <NestedCategoryList
+                      padding={0}
+                      list={categoriesList}
+                    ></NestedCategoryList>
+                  </div>
+                </Grid>
+              )}
+            </>
+          )}
         </Grid>
         <Grid
           container
@@ -521,8 +615,19 @@ export const ParseDataSegment: React.FC = () => {
           direction="column"
           alignItems="flex-start"
         >
-          {productBlockPagination}
-          {productsBlocks}
+          <Grid
+            container
+            item
+            spacing={3}
+            justify="flex-start"
+            direction="column"
+            alignItems="flex-start"
+          >
+            <Grid item>{productBlockPagination}</Grid>
+            <Grid item container spacing={3}>
+              {productsBlocks}
+            </Grid>
+          </Grid>
         </Grid>
         <Grid
           container
@@ -531,12 +636,12 @@ export const ParseDataSegment: React.FC = () => {
           spacing={3}
           justify="flex-start"
           direction="column"
-          alignItems="flex-end"
+          alignItems="flex-start"
         >
           {productBlocks}
-          {snackBarContainter}
         </Grid>
       </Grid>
+      {snackBarContainter}
     </React.Fragment>
   );
 };
