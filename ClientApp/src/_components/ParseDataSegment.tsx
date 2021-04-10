@@ -76,19 +76,25 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 export const ParseDataSegment: React.FC = () => {
+  //Styles
+  const classes = useStyles();
+
+  //Init Pagination Pages
+  const pagesArray = [10, 25, 50, 75, 100];
   //Procucts states
   const [productList, setProductList] = useState<IResponseProduct[]>();
   const [isProductsLodaing, setIsProductsLodaing] = useState<boolean>(false);
-  const [numberOfProductsInShop, setNumberOfProductsInShop] = useState<number>(
-    0
-  );
+  const [
+    numberOfProductsInTotal,
+    setNumberOfProductsInTotal,
+  ] = useState<number>(0);
   const [checkedProduct, setCheckedProduct] = useState<
     IProductJson | undefined
   >();
+  const [currentProductListId, setCurrentProductListId] = useState<number>();
 
   //Shop states
   const [shopList, setShopList] = useState<IResponseShop[]>();
-  const [currentShopId, setCurrentShopId] = useState<number>();
   const [isShopsLodaing, setIsShopsLodaing] = useState<boolean>(false);
   const [isShopDivExtended, setIsShopDivExtended] = useState<number>(-1);
   const [shopUrl, setShopUrl] = useState<string>("");
@@ -96,6 +102,9 @@ export const ParseDataSegment: React.FC = () => {
   //Products Pagination states
   const [productPage, setProductPage] = React.useState(0);
   const [rowsPerProductPage, setRowsPerProductPage] = React.useState(10);
+  const [rowsPerProductPageList, setRowsPerProductPageList] = React.useState(
+    pagesArray
+  );
 
   //Snack states
   const [openSnack, setOpenSnack] = React.useState<boolean>(false);
@@ -114,8 +123,6 @@ export const ParseDataSegment: React.FC = () => {
   const [categoriesList, setCategoriesList] = useState<
     IResponseNestedCategory[]
   >();
-
-  const classes = useStyles();
 
   //SignalR and page loading effect
   useEffect(() => {
@@ -174,7 +181,18 @@ export const ParseDataSegment: React.FC = () => {
   ) => {
     setProductPage(pageNumber);
     setCheckedProduct(undefined);
-    handleGetProductRequestByShops(currentShopId, pageNumber, rowsCount);
+    const result = await handleGetProductRequestByShops(
+      currentProductListId,
+      pageNumber,
+      rowsCount
+    );
+    if (!result) {
+      await handleGetProductRequestByCategory(
+        currentProductListId,
+        pageNumber,
+        rowsCount
+      );
+    }
   };
   const handleChangeProductPage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -193,10 +211,10 @@ export const ParseDataSegment: React.FC = () => {
     id: number | undefined,
     page: number | undefined,
     rowsCount: number | undefined
-  ) => {
+  ): Promise<boolean | undefined> => {
     try {
       if (id != undefined && page != undefined && rowsCount != undefined) {
-        setCurrentShopId(id);
+        setCurrentProductListId(id);
         setCheckedProduct(undefined);
         setIsProductsLodaing(true);
         const response = await UserActions.GetProductByShopIdAndPage(
@@ -208,19 +226,24 @@ export const ParseDataSegment: React.FC = () => {
 
         if (response != undefined) {
           setProductList(response);
+          if (response.length === 0) {
+            return false;
+          }
+          return true;
         }
       }
-    } catch {}
+    } catch {
+      return false;
+    }
   };
-
   const handleGetProductRequestByCategory = async (
     id: number | undefined,
     page: number | undefined,
     rowsCount: number | undefined
-  ) => {
+  ): Promise<boolean | undefined> => {
     try {
       if (id != undefined && page != undefined && rowsCount != undefined) {
-        setCurrentShopId(id);
+        setCurrentProductListId(id);
         setCheckedProduct(undefined);
         setIsProductsLodaing(true);
         const response = await UserActions.GetProductByCategoryIdAndPage(
@@ -232,9 +255,15 @@ export const ParseDataSegment: React.FC = () => {
 
         if (response != undefined) {
           setProductList(response);
+          if (response.length === 0) {
+            return false;
+          }
+          return true;
         }
       }
-    } catch {}
+    } catch {
+      return false;
+    }
   };
   const handleProductClick = async (id: number | undefined) => {
     if (id != undefined) {
@@ -248,7 +277,32 @@ export const ParseDataSegment: React.FC = () => {
   };
   const handleCategoryClick = async (id: number | undefined) => {
     if (id != undefined) {
+      setProductPage(0);
+      setCurrentProductListId(id);
       handleGetProductRequestByCategory(id, productPage, rowsPerProductPage);
+    }
+  };
+  const handlesetNumberOfProductsInTotal = (pages: number | undefined) => {
+    if (pages != undefined) {
+      if (pages <= pagesArray[0]) {
+        setRowsPerProductPageList([]);
+        setRowsPerProductPage(pages);
+      } else if (pages >= pagesArray[pagesArray.length - 1]) {
+        setRowsPerProductPageList(pagesArray);
+        setRowsPerProductPage(pagesArray[0]);
+      } else {
+        const pagesTmpArray = pagesArray;
+        for (let _i = 0; _i < pagesTmpArray.length; _i++) {
+          if (pagesTmpArray[_i] > pages) {
+            pagesTmpArray.splice(_i, 1);
+            _i--;
+          }
+        }
+        setRowsPerProductPageList(pagesTmpArray);
+        setRowsPerProductPage(pagesTmpArray[0]);
+      }
+
+      setNumberOfProductsInTotal(pages);
     }
   };
 
@@ -258,8 +312,11 @@ export const ParseDataSegment: React.FC = () => {
     productCount: number | undefined
   ) => {
     if (id != undefined && productCount != undefined) {
+      setProductPage(0);
       handleGetProductRequestByShops(id, productPage, rowsPerProductPage);
-      setNumberOfProductsInShop(productCount != undefined ? productCount : 0);
+      handlesetNumberOfProductsInTotal(
+        productCount != undefined ? productCount : 0
+      );
     }
   };
   const handleShopsUpdate = () => {
@@ -427,11 +484,11 @@ export const ParseDataSegment: React.FC = () => {
         <div className={classes.shopItem} style={{ width: "100%" }}>
           <TablePagination
             component="div"
-            count={numberOfProductsInShop}
+            count={numberOfProductsInTotal}
             page={productPage}
             onChangePage={handleChangeProductPage}
             rowsPerPage={rowsPerProductPage}
-            rowsPerPageOptions={[10, 25, 50, 75, 100]}
+            rowsPerPageOptions={rowsPerProductPageList}
             onChangeRowsPerPage={handleChangeProductRowsPerPage}
           />
         </div>
@@ -625,6 +682,7 @@ export const ParseDataSegment: React.FC = () => {
                   <div className={classes.shopItem}>
                     <NestedCategoryList
                       setCurrentShopId={handleCategoryClick}
+                      setNumberOfProducts={handlesetNumberOfProductsInTotal}
                       padding={5}
                       list={categoriesList}
                     ></NestedCategoryList>
