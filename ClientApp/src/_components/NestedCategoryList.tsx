@@ -13,8 +13,10 @@ import { Typography } from "@material-ui/core";
 export interface NestedCategoryListProps {
   list: IResponseNestedCategory[];
   padding: number;
-  setCurrentShopId: (id: number | undefined) => void;
-  setNumberOfProducts: (pages: number | undefined) => void;
+  setCurrentShopId: (
+    id: number | undefined,
+    pagesCount: number | undefined
+  ) => Promise<void>;
 }
 export const NestedCategoryList: React.FC<NestedCategoryListProps> = (
   props: NestedCategoryListProps
@@ -59,8 +61,7 @@ export const NestedCategoryList: React.FC<NestedCategoryListProps> = (
     id: number | undefined,
     products: string | undefined
   ) => {
-    props.setCurrentShopId(id);
-    props.setNumberOfProducts(Number(products));
+    props.setCurrentShopId(id, Number(products));
   };
 
   return (
@@ -126,7 +127,6 @@ export const NestedCategoryList: React.FC<NestedCategoryListProps> = (
             ) : (
               <Collapse in={openedCategoryId == i} timeout="auto" unmountOnExit>
                 <NestedCategoryList
-                  setNumberOfProducts={props.setNumberOfProducts}
                   setCurrentShopId={props.setCurrentShopId}
                   list={element.subCategories}
                   padding={props.padding + 10}

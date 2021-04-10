@@ -275,21 +275,31 @@ export const ParseDataSegment: React.FC = () => {
       }
     }
   };
-  const handleCategoryClick = async (id: number | undefined) => {
-    if (id != undefined) {
+  const handleCategoryClick = async (
+    id: number | undefined,
+    pagesCount: number | undefined
+  ) => {
+    if (id != undefined && pagesCount != undefined) {
+      const products = handlesetNumberOfProductsInTotal(pagesCount);
+
       setProductPage(0);
       setCurrentProductListId(id);
-      handleGetProductRequestByCategory(id, productPage, rowsPerProductPage);
+      handleGetProductRequestByCategory(id, productPage, products);
     }
   };
-  const handlesetNumberOfProductsInTotal = (pages: number | undefined) => {
+  const handlesetNumberOfProductsInTotal = (
+    pages: number | undefined
+  ): number => {
     if (pages != undefined) {
+      setNumberOfProductsInTotal(pages);
       if (pages <= pagesArray[0]) {
         setRowsPerProductPageList([]);
         setRowsPerProductPage(pages);
+        return pages;
       } else if (pages >= pagesArray[pagesArray.length - 1]) {
         setRowsPerProductPageList(pagesArray);
         setRowsPerProductPage(pagesArray[0]);
+        return pagesArray[0];
       } else {
         const pagesTmpArray = pagesArray;
         for (let _i = 0; _i < pagesTmpArray.length; _i++) {
@@ -300,10 +310,10 @@ export const ParseDataSegment: React.FC = () => {
         }
         setRowsPerProductPageList(pagesTmpArray);
         setRowsPerProductPage(pagesTmpArray[0]);
+        return pagesTmpArray[0];
       }
-
-      setNumberOfProductsInTotal(pages);
     }
+    return 0;
   };
 
   //Shop Actions
@@ -427,54 +437,49 @@ export const ParseDataSegment: React.FC = () => {
   );
 
   //Shop list component
-  const shopsBlocks = isShopsLodaing ? (
-    <CircularProgress color="inherit" />
-  ) : (
-    shopList?.map((shop, i) => {
-      return (
-        <Grid item key={shop.id}>
+  const shopsBlocks = shopList?.map((shop, i) => {
+    return (
+      <Grid item key={shop.id}>
+        <div
+          className={`${classes.shopOuterItem} ${classes.divPointer}`}
+          onMouseEnter={() => setIsShopDivExtended(i)}
+          onMouseLeave={() => setIsShopDivExtended(-1)}
+          style={
+            isShopDivExtended == i
+              ? {
+                  borderRadius: 18,
+                  padding: "0px 10px 0px 0px",
+                  background: "#be0000",
+                  transition: "padding 0.15s ease-in, background 0s",
+                }
+              : {
+                  borderRadius: 18,
+                  padding: "0px 0px 0px 0px",
+                  background: "#ffff",
+                  transition: "padding 0.2s ease-in, background 1s",
+                }
+          }
+        >
           <div
-            className={`${classes.shopOuterItem} ${classes.divPointer}`}
-            onMouseEnter={() => setIsShopDivExtended(i)}
-            onMouseLeave={() => setIsShopDivExtended(-1)}
-            style={
-              isShopDivExtended == i
-                ? {
-                    borderRadius: 18,
-                    padding: "0px 10px 0px 0px",
-                    background: "#be0000",
-                    transition: "padding 0.15s ease-in, background 0s",
-                  }
-                : {
-                    borderRadius: 18,
-                    padding: "0px 0px 0px 0px",
-                    background: "#ffff",
-                    transition: "padding 0.2s ease-in, background 1s",
-                  }
+            className={`${classes.shopItem} ${classes.divPointer}`}
+            onClick={() =>
+              handleShopShowProductsClick(shop.id, shop.productCount)
             }
           >
-            <div
-              className={`${classes.shopItem} ${classes.divPointer}`}
-              onClick={() =>
-                handleShopShowProductsClick(shop.id, shop.productCount)
-              }
-            >
-              <Typography variant="h6" gutterBottom>
-                {shop.name}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                {"Shop Id: " + shop.externalId}
-              </Typography>
-              <Typography variant="body2" gutterBottom>
-                {"Products updated: " + shop.productCount}
-              </Typography>
-            </div>
+            <Typography variant="h6" gutterBottom>
+              {shop.name}
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              {"Shop Id: " + shop.externalId}
+            </Typography>
+            <Typography variant="body2" gutterBottom>
+              {"Products updated: " + shop.productCount}
+            </Typography>
           </div>
-        </Grid>
-      );
-    })
-  );
-
+        </div>
+      </Grid>
+    );
+  });
   //Product list component pagintaion
   const productBlockPagination =
     isProductsLodaing || productList == undefined || productList.length == 0 ? (
@@ -496,27 +501,23 @@ export const ParseDataSegment: React.FC = () => {
     );
 
   //Product list component
-  const productsBlocks = isProductsLodaing ? (
-    <CircularProgress color="inherit" />
-  ) : (
-    productList?.map((product) => {
-      return (
-        <Grid item key={product.id}>
-          <div
-            className={`${classes.shopItem} ${classes.divPointer}`}
-            onClick={() => handleProductClick(product.id)}
-          >
-            <Typography variant="h6" gutterBottom noWrap>
-              {product.title}
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-              {"Price: " + product.price}
-            </Typography>
-          </div>
-        </Grid>
-      );
-    })
-  );
+  const productsBlocks = productList?.map((product) => {
+    return (
+      <Grid item key={product.id}>
+        <div
+          className={`${classes.shopItem} ${classes.divPointer}`}
+          onClick={() => handleProductClick(product.id)}
+        >
+          <Typography variant="h6" gutterBottom noWrap>
+            {product.title}
+          </Typography>
+          <Typography variant="body1" gutterBottom>
+            {"Price: " + product.price}
+          </Typography>
+        </div>
+      </Grid>
+    );
+  });
 
   //Product which was chosen
   const productBlocks =
@@ -585,136 +586,154 @@ export const ParseDataSegment: React.FC = () => {
         spacing={10}
         direction="row"
         justify="center"
+        alignItems="flex-start"
         style={{
           margin: 0,
           width: "100%",
         }}
       >
-        <Grid
-          container
-          item
-          xs={3}
-          spacing={3}
-          justify="flex-start"
-          direction="column"
-          alignItems="flex-start"
-        >
-          <Grid item>
-            <div className={classes.shopItem}>
-              <Grid
-                item
-                container
-                spacing={3}
-                direction="row"
-                justify="center"
-                alignItems="center"
-              >
-                <Grid item>
-                  <TextField
-                    variant="outlined"
-                    disabled
-                    value={selectedSortByValue}
-                    color="secondary"
-                    size="small"
-                    className={classes.shopInput}
-                    onChange={handleShopUrlChange}
-                  />
-                </Grid>
-                <Grid item>
-                  <Button
-                    variant="contained"
-                    endIcon={<SortIcon />}
-                    onClick={handleOpenSortBy}
-                  >
-                    {"Sort by"}
-                  </Button>
-                  <SelectSortTypeDialog
-                    selectedValue={selectedSortByValue}
-                    open={openedSortBy}
-                    onClose={handleCloseSortBy}
-                  />
-                </Grid>
-              </Grid>
-            </div>
+        {isShopsLodaing ? (
+          <Grid item xs={3} container justify="center" direction="row">
+            <Grid>
+              <CircularProgress color="inherit" />
+            </Grid>
           </Grid>
-          {selectedSortByValue == "Shops" ? (
-            <>
-              <Grid item>
-                <div className={classes.shopItem}>
-                  <Grid
-                    item
-                    container
-                    spacing={3}
-                    direction="row"
-                    justify="center"
-                    alignItems="center"
-                  >
-                    <Grid item>
-                      <TextField
-                        label="Shop URL"
-                        variant="outlined"
-                        value={shopUrl}
-                        size="small"
-                        className={classes.shopInput}
-                        onChange={handleShopUrlChange}
-                      />
-                    </Grid>
-                    <Grid item>
-                      <Button
-                        variant="contained"
-                        endIcon={<CloudUploadIcon />}
-                        onClick={handleShopUrlUploadClick}
-                      >
-                        {"Submit"}
-                      </Button>
-                    </Grid>
-                  </Grid>
-                </div>
-              </Grid>
-              {shopsBlocks}
-            </>
-          ) : (
-            <>
-              {categoriesList == undefined ? (
-                <></>
-              ) : (
-                <Grid item>
-                  <div className={classes.shopItem}>
-                    <NestedCategoryList
-                      setCurrentShopId={handleCategoryClick}
-                      setNumberOfProducts={handlesetNumberOfProductsInTotal}
-                      padding={5}
-                      list={categoriesList}
-                    ></NestedCategoryList>
-                  </div>
-                </Grid>
-              )}
-            </>
-          )}
-        </Grid>
-        <Grid
-          container
-          item
-          xs={3}
-          spacing={3}
-          justify="flex-start"
-          direction="column"
-          alignItems="flex-start"
-        >
+        ) : (
           <Grid
             container
             item
+            xs={3}
             spacing={3}
             justify="flex-start"
             direction="column"
             alignItems="flex-start"
           >
-            <Grid item>{productBlockPagination}</Grid>
-            <Grid item container spacing={3}>
-              {productsBlocks}
+            <Grid item>
+              <div className={classes.shopItem}>
+                <Grid
+                  item
+                  container
+                  spacing={3}
+                  direction="row"
+                  justify="center"
+                  alignItems="center"
+                >
+                  <Grid item>
+                    <TextField
+                      variant="outlined"
+                      disabled
+                      value={selectedSortByValue}
+                      color="secondary"
+                      size="small"
+                      className={classes.shopInput}
+                      onChange={handleShopUrlChange}
+                    />
+                  </Grid>
+                  <Grid item>
+                    <Button
+                      variant="contained"
+                      endIcon={<SortIcon />}
+                      onClick={handleOpenSortBy}
+                    >
+                      {"Sort by"}
+                    </Button>
+                    <SelectSortTypeDialog
+                      selectedValue={selectedSortByValue}
+                      open={openedSortBy}
+                      onClose={handleCloseSortBy}
+                    />
+                  </Grid>
+                </Grid>
+              </div>
+            </Grid>
+            {selectedSortByValue == "Shops" ? (
+              <>
+                <Grid item>
+                  <div className={classes.shopItem}>
+                    <Grid
+                      item
+                      container
+                      spacing={3}
+                      direction="row"
+                      justify="center"
+                      alignItems="center"
+                    >
+                      <Grid item>
+                        <TextField
+                          label="Shop URL"
+                          variant="outlined"
+                          value={shopUrl}
+                          size="small"
+                          className={classes.shopInput}
+                          onChange={handleShopUrlChange}
+                        />
+                      </Grid>
+                      <Grid item>
+                        <Button
+                          variant="contained"
+                          endIcon={<CloudUploadIcon />}
+                          onClick={handleShopUrlUploadClick}
+                        >
+                          {"Submit"}
+                        </Button>
+                      </Grid>
+                    </Grid>
+                  </div>
+                </Grid>
+                {shopsBlocks}
+              </>
+            ) : (
+              <>
+                {categoriesList == undefined ? (
+                  <></>
+                ) : (
+                  <Grid item>
+                    <div className={classes.shopItem}>
+                      <NestedCategoryList
+                        setCurrentShopId={handleCategoryClick}
+                        padding={5}
+                        list={categoriesList}
+                      ></NestedCategoryList>
+                    </div>
+                  </Grid>
+                )}
+              </>
+            )}
+          </Grid>
+        )}
+
+        {isProductsLodaing ? (
+          <Grid item xs={3} container justify="center" direction="row">
+            <Grid>
+              <CircularProgress color="inherit" />
             </Grid>
           </Grid>
-        </Grid>
+        ) : (
+          <Grid
+            container
+            item
+            xs={3}
+            spacing={3}
+            justify="flex-start"
+            direction="column"
+            alignItems="flex-start"
+          >
+            <Grid
+              container
+              item
+              spacing={3}
+              justify="flex-start"
+              direction="column"
+              alignItems="flex-start"
+            >
+              <Grid item>{productBlockPagination}</Grid>
+              <Grid item container spacing={3}>
+                {productsBlocks}
+              </Grid>
+            </Grid>
+          </Grid>
+        )}
+
         <Grid
           container
           item
