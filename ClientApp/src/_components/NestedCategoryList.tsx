@@ -1,14 +1,21 @@
 import React from "react";
-import { makeStyles, createStyles } from "@material-ui/core/styles";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import Collapse from "@material-ui/core/Collapse";
+
+//Material UI imports
 import ExpandLess from "@material-ui/icons/ExpandLess";
 import ExpandMore from "@material-ui/icons/ExpandMore";
+import {
+  Typography,
+  List,
+  ListItem,
+  ListItemText,
+  Collapse,
+  IconButton,
+  makeStyles,
+  createStyles,
+} from "@material-ui/core";
+
+//Self project imports
 import { IResponseNestedCategory } from "../_actions";
-import IconButton from "@material-ui/core/IconButton";
-import { Typography } from "@material-ui/core";
 
 export interface NestedCategoryListProps {
   list: IResponseNestedCategory[];
