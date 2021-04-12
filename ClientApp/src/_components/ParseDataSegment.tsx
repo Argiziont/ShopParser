@@ -14,6 +14,9 @@ import {
   TablePagination,
   Snackbar,
   IconButton,
+  List,
+  ListItem,
+  ListItemText,
 } from "@material-ui/core";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import SortIcon from "@material-ui/icons/Sort";
@@ -74,6 +77,10 @@ const useStyles = makeStyles((theme) => ({
   divDefault: {
     cursor: "default",
   },
+  shopListRoot: {
+    width: "100%",
+    maxWidth: 360,
+  },
 }));
 export const ParseDataSegment: React.FC = () => {
   //Styles
@@ -96,7 +103,6 @@ export const ParseDataSegment: React.FC = () => {
   //Shop states
   const [shopList, setShopList] = useState<IResponseShop[]>();
   const [isShopsLodaing, setIsShopsLodaing] = useState<boolean>(false);
-  const [isShopDivExtended, setIsShopDivExtended] = useState<number>(-1);
   const [shopUrl, setShopUrl] = useState<string>("");
 
   //Products Pagination states
@@ -437,49 +443,65 @@ export const ParseDataSegment: React.FC = () => {
   );
 
   //Shop list component
-  const shopsBlocks = shopList?.map((shop, i) => {
-    return (
-      <Grid item key={shop.id}>
-        <div
-          className={`${classes.shopOuterItem} ${classes.divPointer}`}
-          onMouseEnter={() => setIsShopDivExtended(i)}
-          onMouseLeave={() => setIsShopDivExtended(-1)}
-          style={
-            isShopDivExtended == i
-              ? {
-                  borderRadius: 18,
-                  padding: "0px 10px 0px 0px",
-                  background: "#be0000",
-                  transition: "padding 0.15s ease-in, background 0s",
+  const shopsBlocks = (
+    <List
+      component="nav"
+      aria-labelledby="nested-list-subheader"
+      className={classes.shopListRoot}
+    >
+      {shopList?.map((shop, i) => {
+        return (
+          <div key={i}>
+            {Number(shop.productCount) > 0 ? (
+              <ListItem
+                button
+                onClick={() =>
+                  handleShopShowProductsClick(shop.id, shop.productCount)
                 }
-              : {
-                  borderRadius: 18,
-                  padding: "0px 0px 0px 0px",
-                  background: "#ffff",
-                  transition: "padding 0.2s ease-in, background 1s",
-                }
-          }
-        >
-          <div
-            className={`${classes.shopItem} ${classes.divPointer}`}
-            onClick={() =>
-              handleShopShowProductsClick(shop.id, shop.productCount)
-            }
-          >
-            <Typography variant="h6" gutterBottom>
-              {shop.name}
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-              {"Shop Id: " + shop.externalId}
-            </Typography>
-            <Typography variant="body2" gutterBottom>
-              {"Products updated: " + shop.productCount}
-            </Typography>
+              >
+                <ListItemText
+                  disableTypography
+                  primary={
+                    <>
+                      <Typography variant="h6" gutterBottom>
+                        {shop.name}
+                      </Typography>
+                      <Typography variant="body1" gutterBottom>
+                        {"Shop Id: " + shop.externalId}
+                      </Typography>
+                      <Typography variant="body2" gutterBottom>
+                        {"Products updated: " + shop.productCount}
+                      </Typography>
+                    </>
+                  }
+                />
+              </ListItem>
+            ) : (
+              <ListItem>
+                <ListItemText
+                  disableTypography
+                  primary={
+                    <>
+                      <Typography variant="h6" gutterBottom>
+                        {shop.name}
+                      </Typography>
+                      <Typography variant="body1" gutterBottom>
+                        {"Shop Id: " + shop.externalId}
+                      </Typography>
+                      <Typography variant="body2" gutterBottom>
+                        {"Products updated: " + shop.productCount}
+                      </Typography>
+                    </>
+                  }
+                />
+              </ListItem>
+            )}
           </div>
-        </div>
-      </Grid>
-    );
-  });
+        );
+      })}
+    </List>
+  );
+
   //Product list component pagintaion
   const productBlockPagination =
     isProductsLodaing || productList == undefined || productList.length == 0 ? (
@@ -680,7 +702,9 @@ export const ParseDataSegment: React.FC = () => {
                     </Grid>
                   </div>
                 </Grid>
-                {shopsBlocks}
+                <Grid item>
+                  <div className={classes.shopItem}>{shopsBlocks}</div>
+                </Grid>
               </>
             ) : (
               <>
@@ -750,3 +774,49 @@ export const ParseDataSegment: React.FC = () => {
     </React.Fragment>
   );
 };
+
+//Shops Block Old
+//const [isShopDivExtended, setIsShopDivExtended] = useState<number>(-1);
+// const shopsBlocksOld = shopList?.map((shop, i) => {
+//   return (
+//     <Grid item key={shop.id}>
+//       <div
+//         className={`${classes.shopOuterItem} ${classes.divPointer}`}
+//         onMouseEnter={() => setIsShopDivExtended(i)}
+//         onMouseLeave={() => setIsShopDivExtended(-1)}
+//         style={
+//           isShopDivExtended == i
+//             ? {
+//                 borderRadius: 18,
+//                 padding: "0px 10px 0px 0px",
+//                 background: "#be0000",
+//                 transition: "padding 0.15s ease-in, background 0s",
+//               }
+//             : {
+//                 borderRadius: 18,
+//                 padding: "0px 0px 0px 0px",
+//                 background: "#ffff",
+//                 transition: "padding 0.2s ease-in, background 1s",
+//               }
+//         }
+//       >
+//         <div
+//           className={`${classes.shopItem} ${classes.divPointer}`}
+//           onClick={() =>
+//             handleShopShowProductsClick(shop.id, shop.productCount)
+//           }
+//         >
+//           <Typography variant="h6" gutterBottom>
+//             {shop.name}
+//           </Typography>
+//           <Typography variant="body1" gutterBottom>
+//             {"Shop Id: " + shop.externalId}
+//           </Typography>
+//           <Typography variant="body2" gutterBottom>
+//             {"Products updated: " + shop.productCount}
+//           </Typography>
+//         </div>
+//       </div>
+//     </Grid>
+//   );
+// });

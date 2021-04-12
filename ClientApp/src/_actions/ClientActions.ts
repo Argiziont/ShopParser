@@ -520,6 +520,13 @@ export class ProductClient {
             result500 = Exception.fromJS(resultData500);
             return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             });
+        } else if (status === 404) {
+            return response.text().then((_responseText) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            });
         } else {
             return response.text().then((_responseText) => {
             let resultdefault: any = null;

@@ -337,6 +337,7 @@ namespace PrjModule25_Parser.Controllers
         [Route("GetPagedProductsByShopId")]
         [ProducesResponseType(typeof(IEnumerable<ProductData>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesDefaultResponseType]
         public async Task<IActionResult> GetPagedProductsByShopIdAsync(int id, int page, int rowsPerPage)
         {
@@ -346,6 +347,9 @@ namespace PrjModule25_Parser.Controllers
                     .Where(p => p.ShopId == id && p.ProductState == ProductState.Success)//Take products which owned by current shop and was parsed successfully
                     .OrderBy(p=>p.Id)//Order by internal DB id
                     .Skip(page * rowsPerPage).Take(rowsPerPage).ToListAsync();//Take products by page
+                
+                if(productSource.Count==0)
+                    return NotFound();
 
                 return Ok(productSource.Select(p => new ResponseProduct
                 {
