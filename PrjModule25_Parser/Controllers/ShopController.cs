@@ -68,9 +68,9 @@ namespace PrjModule25_Parser.Controllers
                         page.QuerySelectorAll("*[data-qaid='product_link']").ToList().Cast<IHtmlAnchorElement>()
                             .Select(u => u.Href));
 
-                    if ((Math.Round((double)pageCount / i) * 100)%10==0)
+                    if ((Math.Round((double)i / pageCount) * 100)%10==0&& (Math.Round((double)i / pageCount) * 100)!=0)
                     {
-                        await _shopHub.Clients.All.ReceiveMessage($"Currently parsing shop with name \"{sellerName}\" \n Already done \"{Math.Round((double)pageCount/i)*100}%\" pages");
+                        await _shopHub.Clients.All.ReceiveMessage($"Currently parsing shop with name \"{sellerName}\" \n Already done \"{Math.Round((double)i/pageCount)*100}%\" pages");
                     }
 
                     Thread.Sleep(2000);
