@@ -52,10 +52,9 @@ namespace PrjModule25_Parser.Controllers
 
             //External id from url
             var externalId = productUrl
-                .Split("//")[1]
-                .Split('/')[1].Split('-').First();
+                .Split("/").Last().Split('-').First();
 
-            
+
             var companyName = productPage.QuerySelector("*[data-qaid='company_name']")?.InnerHtml ?? "";
             var shop = _dbContext.Shops.FirstOrDefault(s => s.Name == companyName);
             var title = productPage.QuerySelector("*[data-qaid='product_name']")?.InnerHtml ?? "";

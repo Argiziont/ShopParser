@@ -98,7 +98,7 @@ namespace PrjModule25_Parser.Controllers
         
         private static ResponseNestedCategory ReverseCategoryListRecursive(Category mainCategory, ApplicationDb dbContext)
         {
-            return new ()
+            return new ResponseNestedCategory()
             { 
                 Id= mainCategory.Id,
                 Name = mainCategory.Name,

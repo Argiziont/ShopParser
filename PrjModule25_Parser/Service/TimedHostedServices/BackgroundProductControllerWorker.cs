@@ -14,7 +14,7 @@ namespace PrjModule25_Parser.Service.TimedHostedServices
 {
     public class BackgroundProductControllerWorker : IHostedService, IDisposable
     {
-        private readonly object _lockerObject = new();
+        private readonly object _lockerObject = new object();
         private readonly ILogger<BackgroundProductControllerWorker> _logger;
         private readonly ProductController _productController;
         private readonly IServiceProvider _serviceProvider;
