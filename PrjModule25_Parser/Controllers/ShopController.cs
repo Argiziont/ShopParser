@@ -125,8 +125,13 @@ namespace PrjModule25_Parser.Controllers
             {
                 var sellerPage = await _context.OpenAsync(sellerUrl);
 
+                //Example
+                //https://prom.ua/ua/c1036196-ibabykievua-internet-magazin.html
+                //c1036196-ibabykievua-internet-magazin.html
+                //c1036196
+
                 //Seller data
-                var externalId = sellerUrl.Split("//")[1].Split('/')[1].Split('-').First();
+                var externalId = sellerUrl.Split("/").Last().Split('-').First();
                 var sellerName = sellerPage.QuerySelector("span[data-qaid='company_name']")?.InnerHtml ?? "";
 
                 if (_dbContext.Shops.FirstOrDefault(s => s.ExternalId == externalId) != null)
