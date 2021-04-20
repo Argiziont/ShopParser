@@ -286,6 +286,7 @@ export const ParseDataSegment: React.FC = () => {
     pagesCount: number | undefined
   ) => {
     if (id != undefined && pagesCount != undefined) {
+
       const products = handlesetNumberOfProductsInTotal(pagesCount);
 
       setProductPage(0);
@@ -328,8 +329,11 @@ export const ParseDataSegment: React.FC = () => {
     productCount: number | undefined
   ) => {
     if (id != undefined && productCount != undefined) {
+
+      const products = handlesetNumberOfProductsInTotal(productCount);
+      
       setProductPage(0);
-      handleGetProductRequestByShops(id, productPage, rowsPerProductPage);
+      handleGetProductRequestByShops(id, productPage, products);
       handlesetNumberOfProductsInTotal(
         productCount != undefined ? productCount : 0
       );

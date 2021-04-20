@@ -4,15 +4,11 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AngleSharp;
-using AngleSharp.Dom;
-using AngleSharp.Html.Dom;
-using AngleSharp.Html.Parser;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using NJsonSchema;
 using PrjModule25_Parser.Models;
 using PrjModule25_Parser.Models.Helpers;
 using PrjModule25_Parser.Models.Hubs;
@@ -21,6 +17,7 @@ using PrjModule25_Parser.Models.JSON_DTO;
 using PrjModule25_Parser.Models.ResponseModels;
 using PrjModule25_Parser.Service;
 using PrjModule25_Parser.Service.Exceptions;
+using PrjModule25_Parser.Service.Helpers;
 
 namespace PrjModule25_Parser.Controllers
 {
@@ -50,123 +47,9 @@ namespace PrjModule25_Parser.Controllers
             if (productPage.StatusCode == HttpStatusCode.TooManyRequests)
                 throw new TooManyRequestsException();
 
-            //External id from url
-            var externalId = productUrl
-                .Split("/").Last().Split('-').First();
+            var parsedProduct =await ProductService.ParseSinglePage(productPage, productUrl, _dbContext);
 
-
-            var companyName = productPage.QuerySelector("*[data-qaid='company_name']")?.InnerHtml ?? "";
-            var shop = _dbContext.Shops.FirstOrDefault(s => s.Name == companyName);
-            var title = productPage.QuerySelector("*[data-qaid='product_name']")?.InnerHtml ?? "";
-            var sku = productPage.QuerySelector("span[data-qaid='product-sku']")?.InnerHtml ?? "";
-            var presence =
-                productPage.QuerySelector("span[data-qaid='product_presence']")?.FirstElementChild?.InnerHtml ??
-                "";
-
-            //Parsing description 
-            var description = productPage.QuerySelector("div[data-qaid='descriptions']")?.Children?.Aggregate("",
-                (current, descriptionTag) => current + "\n" + ExtractContentFromHtml(descriptionTag.Html()));
-
-
-            var priceSelector = (IHtmlSpanElement) productPage.QuerySelector("span[data-qaid='product_price']");
-            var fullPriceSelector =
-                (IHtmlSpanElement) productPage.QuerySelector("span[data-qaid='price_without_discount']");
-            var optPriceSelector = (IHtmlSpanElement) productPage.QuerySelector("span[data-qaid='opt_price']");
-            
-            var shortCompanyRating =
-                (IHtmlDivElement) productPage.QuerySelector("div[data-qaid='short_company_rating']");
-            var breadcrumbsSeo = (IHtmlDivElement) productPage.QuerySelector("div[data-qaid='breadcrumbs_seo']");
-
-            var fullCategory = UnScrubCategory(breadcrumbsSeo);
-            foreach (var category in fullCategory.Where(category => _dbContext.Categories.FirstOrDefault(cat=> cat.Name== category.Name)==null))
-            {
-                if (category.SupCategory?.SupCategory != null)
-                    category.SupCategory.SupCategory = null;
-
-                await _dbContext.Categories.AddAsync(new Category()
-                {
-                    Href = category.Href,
-                    Name = category.Name,
-                    SupCategory = category.SupCategory == null
-                        ? null
-                        : _dbContext.Categories.FirstOrDefault(c => c.Name == category.SupCategory.Name)
-                });
-
-                await _dbContext.SaveChangesAsync();
-
-            }
-
-            var price = priceSelector?.Dataset["qaprice"] ?? "";
-            var currency = priceSelector?.Dataset["qacurrency"] ?? "";
-
-            var fullPrice = fullPriceSelector?.Dataset["qaprice"] ?? "";
-            var fullCurrency = fullPriceSelector?.Dataset["qacurrency"] ?? "";
-
-            var optPrice = optPriceSelector?.Dataset["qaprice"] ?? "";
-            var optCurrency = optPriceSelector?.Dataset["qacurrency"] ?? "";
-
-            var posPercent = shortCompanyRating?.Dataset["qapositive"] + "%";
-            var lastYrReply = shortCompanyRating?.Dataset["qacount"] ?? "";
-
-
-            //Picking image list
-            var imageSrcList = productPage.QuerySelector("div[data-qaid='image_block']") //<Upper div>
-                ?.Children //<Lower divs>
-                ?.First(m => m.ClassList
-                    .Contains("ek-grid__item_width_expand") == false) //<Lower div with thumbnails>
-                ?.Children //<Ul>
-                ?.First()
-                ?.Children //<Li>
-                ?.Select(i => ((IHtmlImageElement) i //<Img>
-                    .QuerySelector("img[data-qaid='image_thumb']"))?.Source) //Src="Urls"
-                .ToList();
-
-
-            var fullCategorySchema = JsonSchema.FromType<Category>().ToJson();
-            var fullCategoryJson = JsonConvert.SerializeObject(fullCategory[0]);
-
-            var jsonProductDat = new ProductJson
-            {
-                Currency = currency,
-                Price = price,
-                FullCurrency = fullCurrency,
-                FullPrice = fullPrice,
-                OptCurrency = optCurrency,
-                OptPrice = optPrice,
-                Description = description,
-                Presence = presence,
-                ScuCode = sku,
-                Title = title,
-                CompanyName = companyName,
-                ImageUrls = imageSrcList,
-                PositivePercent = posPercent,
-                RatingsPerLastYear = lastYrReply,
-                Url = productUrl,
-                SyncDate = DateTime.Now,
-                JsonCategory = fullCategoryJson,
-                JsonCategorySchema = fullCategorySchema,
-                ExternalId = externalId,
-                StringCategory = CategoryToString(fullCategory)
-            };
-
-
-            var productSchema = JsonSchema.FromType<ProductJson>().ToJson();
-            var productJson = JsonConvert.SerializeObject(jsonProductDat);
-            var product = new ProductData
-            {
-                SyncDate = jsonProductDat.SyncDate,
-                Url = jsonProductDat.Url,
-                Description = jsonProductDat.Description,
-                ExternalId = jsonProductDat.ExternalId,
-                JsonData = productJson,
-                JsonDataSchema = productSchema,
-                Price = jsonProductDat.Price,
-                Title = jsonProductDat.Title,
-                Shop = shop,
-                ProductState = ProductState.Success,
-                Categories = fullCategory
-            };
-            return Ok(product);
+            return Ok(parsedProduct);
         }
 
         [HttpPost]
@@ -182,8 +65,12 @@ namespace PrjModule25_Parser.Controllers
             var productsList = _dbContext.Products.Where(p => p.Shop.Id == seller.Id).ToArray();
             for (var i = 0; i < productsList.Length; i++)
             {
-                var productOkObject = await ParseDataInsideProductPageAsync(productsList[i].Url) as OkObjectResult;
-                var parsedProduct = (ProductData) productOkObject?.Value;
+                var productPage = await _context.OpenAsync(productsList[i].Url);
+                if (productPage.StatusCode == HttpStatusCode.TooManyRequests)
+                    throw new TooManyRequestsException();
+
+                var parsedProduct = await ProductService.ParseSinglePage(productPage, productsList[i].Url, _dbContext);
+
                 if (parsedProduct != null)
                 {
                     parsedProduct.Id = productsList[i].Id;
@@ -207,37 +94,18 @@ namespace PrjModule25_Parser.Controllers
         public async Task<IActionResult> ParseSingleProductInsideSellerPageAsync(string productId)
         {
             var currentProduct = _dbContext.Products.FirstOrDefault(s => s.Id == Convert.ToInt32(productId));
+
             if (currentProduct == null)
                 return BadRequest("This product doesn't exist in database");
             if (currentProduct.ProductState == ProductState.Success)
                 return Accepted("This product already up to date");
             try
             {
-                var productOkObject = await ParseDataInsideProductPageAsync(currentProduct.Url) as OkObjectResult;
-                var parsedProduct = (ProductData)productOkObject?.Value;
+                var productPage = await _context.OpenAsync(currentProduct.Url);
+                if (productPage.StatusCode == HttpStatusCode.TooManyRequests)
+                    throw new TooManyRequestsException();
 
-
-                if (parsedProduct != null)
-                {
-                    currentProduct.ProductState = parsedProduct.ProductState;
-                    currentProduct.Description = parsedProduct.Description;
-                    currentProduct.ExpirationDate = parsedProduct.ExpirationDate;
-                    currentProduct.JsonData = parsedProduct.JsonData;
-                    currentProduct.ExternalId = parsedProduct.ExternalId;
-                    currentProduct.JsonDataSchema = parsedProduct.JsonDataSchema;
-                    currentProduct.Price = parsedProduct.Price;
-                    currentProduct.SyncDate = parsedProduct.SyncDate;
-                    currentProduct.Title = parsedProduct.Title;
-                    currentProduct.Url = parsedProduct.Url;
-                }
-
-                if (parsedProduct?.Categories != null)
-                    foreach (var currentCategory in parsedProduct.Categories)
-                    {
-                        currentProduct.Categories.Add(_dbContext.Categories.FirstOrDefault(c => c.Name == currentCategory.Name));
-                    }
-
-                await _dbContext.SaveChangesAsync();
+                await ProductService.ParseSinglePageAndInsertToDB(productPage, currentProduct.Url, _dbContext);
             }
             catch (TooManyRequestsException)
             {
@@ -403,36 +271,8 @@ namespace PrjModule25_Parser.Controllers
             }
         }
 
-        private static List<Category> UnScrubCategory(IParentNode divElement)
-        {
-            var categories = new List<Category>();
-            Category higherLevelCategory = null;
-            for (var i = 0; i < divElement.Children.Length - 1; i++)
-            {
-                var childCategory = (IHtmlAnchorElement)divElement.Children[i].Children.First();
-                var currentCategory = new Category {SupCategory = higherLevelCategory};
-                higherLevelCategory = currentCategory;
 
-                currentCategory.Href = childCategory.Href;
-                currentCategory.Name = childCategory.Title;
-                categories.Add(currentCategory);
-            }
 
-            return categories;
-        }
-       
-        private static string CategoryToString(IEnumerable<Category> categories)
-        {
-            var categoryString= categories.Aggregate("", (current, category) => current + (category.Name + " > "));
-            return categoryString.Remove(categoryString.Length - 3);
-        }
-
-        private static string ExtractContentFromHtml(string input)
-        {
-           var hp = new HtmlParser();
-            var hpResult = hp.ParseFragment(input, null);
-            return string.Concat(hpResult.Select(x => x.Text()));
-        }
     }
 }
 

@@ -30,6 +30,7 @@
 
   <ItemGroup>
     <Folder Include="Models\Helpers\" />
+    <Folder Include="Service\Helpers\" />
   </ItemGroup>
 
 </Project>
