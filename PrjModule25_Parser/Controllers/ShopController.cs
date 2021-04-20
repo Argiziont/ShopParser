@@ -7,11 +7,14 @@ using AngleSharp;
 using AngleSharp.Html.Dom;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Schema.Generation;
 using PrjModule25_Parser.Models;
 using PrjModule25_Parser.Models.Helpers;
+using PrjModule25_Parser.Models.Hubs;
+using PrjModule25_Parser.Models.Hubs.Clients;
 using PrjModule25_Parser.Models.JSON_DTO;
 using PrjModule25_Parser.Models.ResponseModels;
 using PrjModule25_Parser.Service;
@@ -24,12 +27,14 @@ namespace PrjModule25_Parser.Controllers
     {
         private readonly IBrowsingContext _context;
         private readonly ApplicationDb _dbContext;
+        private readonly IHubContext<ApiHub, IApiClient> _shopHub;
 
-        public ShopController(ApplicationDb db)
+        public ShopController(ApplicationDb db, IHubContext<ApiHub, IApiClient> shopHub)
         {
             var config = Configuration.Default.WithDefaultLoader();
             _context = BrowsingContext.New(config);
             _dbContext = db;
+            _shopHub = shopHub;
         }
 
         [HttpPost]
@@ -62,6 +67,10 @@ namespace PrjModule25_Parser.Controllers
                     productsLinkList.AddRange(
                         page.QuerySelectorAll("*[data-qaid='product_link']").ToList().Cast<IHtmlAnchorElement>()
                             .Select(u => u.Href));
+                    if ((Math.Round((double)pageCount / productsLinkList.Count) * 100)%10==0)
+                    {
+                        await _shopHub.Clients.All.ReceiveMessage($"Currently parsing shop with name \"{sellerName}\" \n Already done \"{Math.Round((double)pageCount/productsLinkList.Count)*100}%\" ");
+                    }
 
                     Thread.Sleep(2000);
                 }

@@ -61,6 +61,7 @@ namespace PrjModule25_Parser.Service.TimedHostedServices
                 {
                     if (context == null) return;
                     if (context.Products.Count(p => p.ProductState == ProductState.Idle) != 0) return;
+
                     //first product with idle
                     var shop = context.Shops.FirstOrDefault(p => p.Products.Count == 0);
                     if (shop == null) return;

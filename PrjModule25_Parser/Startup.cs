@@ -39,8 +39,8 @@ namespace PrjModule25_Parser
             services.AddScoped<ShopController>();
 
             //Background workers for parsing data
-            //services.AddHostedService<BackgroundProductControllerWorker>();
-            //services.AddHostedService<BackgroundShopControllerWorker>();
+            services.AddHostedService<BackgroundProductControllerWorker>();
+            services.AddHostedService<BackgroundShopControllerWorker>();
 
             services.AddControllers();
             services.AddOpenApiDocument();
