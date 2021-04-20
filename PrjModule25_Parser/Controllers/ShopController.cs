@@ -54,7 +54,7 @@ namespace PrjModule25_Parser.Controllers
                 var sellerPage = await _context.OpenAsync(sellerUrl);
 
                 //Number of pages   
-                var pageCount = sellerPage.QuerySelectorAll("button[data-qaid='pages']")
+                    var pageCount = sellerPage.QuerySelectorAll("button[data-qaid='pages']")
                     .Select(m => int.Parse(m.InnerHtml))
                     .Max();
 
@@ -67,9 +67,10 @@ namespace PrjModule25_Parser.Controllers
                     productsLinkList.AddRange(
                         page.QuerySelectorAll("*[data-qaid='product_link']").ToList().Cast<IHtmlAnchorElement>()
                             .Select(u => u.Href));
-                    if ((Math.Round((double)pageCount / productsLinkList.Count) * 100)%10==0)
+
+                    if ((Math.Round((double)pageCount / i) * 100)%10==0)
                     {
-                        await _shopHub.Clients.All.ReceiveMessage($"Currently parsing shop with name \"{sellerName}\" \n Already done \"{Math.Round((double)pageCount/productsLinkList.Count)*100}%\" ");
+                        await _shopHub.Clients.All.ReceiveMessage($"Currently parsing shop with name \"{sellerName}\" \n Already done \"{Math.Round((double)pageCount/i)*100}%\" pages");
                     }
 
                     Thread.Sleep(2000);
