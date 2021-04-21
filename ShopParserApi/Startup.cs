@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using ShopParserApi.Controllers;
 using ShopParserApi.Models.Hubs;
 using ShopParserApi.Service;
 using ShopParserApi.Service.TimedHostedServices;
@@ -33,10 +32,6 @@ namespace ShopParserApi
 
             //SignalR connection
             services.AddSignalR();
-
-            //Make services from controllers
-            services.AddScoped<ProductController>();
-            services.AddScoped<ShopController>();
 
             //Background workers for parsing data
             services.AddHostedService<BackgroundProductControllerWorker>();

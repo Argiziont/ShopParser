@@ -26,6 +26,7 @@
     <PackageReference Include="NSwag.Core" Version="13.10.8" />
     <PackageReference Include="NSwag.SwaggerGeneration" Version="12.3.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
+    <PackageReference Include="System.Composition" Version="5.0.1" />
   </ItemGroup>
 
 </Project>
