@@ -21,6 +21,8 @@ namespace PrjModule25_Parser.Models
         public ProductState ProductState { get; set; }
         public string Description { get; set; }
         public string Price { get; set; }
+        public string KeyWords { get; set; }
+        
 
         //Json-serialized data
         public string JsonData { get; set; }
@@ -29,5 +31,6 @@ namespace PrjModule25_Parser.Models
         //Data base connections
         public ShopData Shop { get; set; }
         public ICollection<Category> Categories { get; set; } = new List<Category>();
+        public ICollection<ProductAttribute> ProductAttribute { get; set; } = new List<ProductAttribute>();
     }
 }

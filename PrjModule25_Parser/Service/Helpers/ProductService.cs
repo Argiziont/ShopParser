@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using AngleSharp.Dom;
+﻿using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
 using Newtonsoft.Json;
@@ -12,12 +7,17 @@ using PrjModule25_Parser.Models;
 using PrjModule25_Parser.Models.Helpers;
 using PrjModule25_Parser.Models.JSON_DTO;
 using PrjModule25_Parser.Service.Exceptions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace PrjModule25_Parser.Service.Helpers
 {
     public static class ProductService
     {
-        public static async Task ParseSinglePageAndInsertToDB(IDocument page, string productUrl,
+        public static async Task ParseSinglePageAndInsertToDb(IDocument page, string productUrl,
             ApplicationDb dbContext)
         {
             var currentProduct = dbContext.Products.FirstOrDefault(s => s.Url == productUrl);
@@ -41,6 +41,8 @@ namespace PrjModule25_Parser.Service.Helpers
                     currentProduct.SyncDate = parsedProduct.SyncDate;
                     currentProduct.Title = parsedProduct.Title;
                     currentProduct.Url = parsedProduct.Url;
+                    currentProduct.KeyWords = parsedProduct.KeyWords;
+                    currentProduct.ProductAttribute = parsedProduct.ProductAttribute;
                 }
 
                 if (parsedProduct?.Categories != null)
@@ -48,6 +50,16 @@ namespace PrjModule25_Parser.Service.Helpers
                     {
                         currentProduct.Categories.Add(dbContext.Categories.FirstOrDefault(c => c.Name == currentCategory.Name));
                     }
+
+                if (currentProduct?.ProductAttribute.Count > 0)
+                {
+                    foreach (var attribute in currentProduct.ProductAttribute)
+                    {
+                        attribute.Product = currentProduct;
+                    }
+                   // await dbContext.AddRangeAsync()
+                }
+                  
             }
 
             await dbContext.SaveChangesAsync();
@@ -60,6 +72,21 @@ namespace PrjModule25_Parser.Service.Helpers
             var companyName = page.QuerySelector("*[data-qaid='company_name']")?.InnerHtml ?? "";
             var shop = dbContext.Shops.FirstOrDefault(s => s.Name == companyName);
             var title = page.QuerySelector("*[data-qaid='product_name']")?.InnerHtml ?? "";
+
+            var attributesBlock = page.QuerySelector("li[data-qaid='attributes']");
+            var attributesList = new List<ProductAttribute>();
+            if (attributesBlock!=null)
+            {
+                var attributeNames = attributesBlock.QuerySelectorAll("span[class='ek-text ek-text_color_black-600 ek-text_wrap_break']").Select(a => a.InnerHtml).ToList();
+                var attributeValues = attributesBlock.QuerySelectorAll("span[class='ek-text ek-text_wrap_break']").Select(a => a.InnerHtml).ToList();
+
+                attributesList.AddRange(attributeNames.Select((t, i) => new ProductAttribute() {AttributeName = t, AttributeValue = attributeValues[i]}));
+            }
+
+
+            var keyWordsBlock= page.QuerySelector("meta[name='keywords']") as IHtmlMetaElement;
+            var keyWords = keyWordsBlock?.Content;
+
             var sku = page.QuerySelector("span[data-qaid='product-sku']")?.InnerHtml ?? "";
             var presence =
                 page.QuerySelector("span[data-qaid='product_presence']")?.FirstElementChild?.InnerHtml ??
@@ -152,7 +179,9 @@ namespace PrjModule25_Parser.Service.Helpers
                 JsonCategorySchema = fullCategorySchema,
                 StringCategory = CategoryToString(fullCategory),
                 Url = page.Url,
-                ExternalId = externalId
+                ExternalId = externalId,
+                KeyWords = keyWords,
+                ProductAttribute = attributesList
             };
 
 
@@ -170,7 +199,9 @@ namespace PrjModule25_Parser.Service.Helpers
                 Title = jsonProductDat.Title,
                 Shop = shop,
                 ProductState = ProductState.Success,
-                Categories = fullCategory
+                Categories = fullCategory,
+                KeyWords = keyWords,
+                ProductAttribute = attributesList,
             };
 
         }

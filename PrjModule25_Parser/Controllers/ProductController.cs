@@ -105,7 +105,7 @@ namespace PrjModule25_Parser.Controllers
                 if (productPage.StatusCode == HttpStatusCode.TooManyRequests)
                     throw new TooManyRequestsException();
 
-                await ProductService.ParseSinglePageAndInsertToDB(productPage, currentProduct.Url, _dbContext);
+                await ProductService.ParseSinglePageAndInsertToDb(productPage, currentProduct.Url, _dbContext);
             }
             catch (TooManyRequestsException)
             {

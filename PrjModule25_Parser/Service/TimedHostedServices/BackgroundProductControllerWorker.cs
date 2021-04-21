@@ -83,7 +83,7 @@ namespace PrjModule25_Parser.Service.TimedHostedServices
                         if (productPage.StatusCode == HttpStatusCode.TooManyRequests)
                             throw new TooManyRequestsException();
 
-                        await ProductService.ParseSinglePageAndInsertToDB(productPage, product.Url, context);
+                        await ProductService.ParseSinglePageAndInsertToDb(productPage, product.Url, context);
 
                     }
                     catch (TooManyRequestsException)

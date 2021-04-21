@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using PrjModule25_Parser.Models.Helpers;
 
 namespace PrjModule25_Parser.Models.JSON_DTO
 {
@@ -24,8 +25,10 @@ namespace PrjModule25_Parser.Models.JSON_DTO
         public string PositivePercent { get; set; }
         public string RatingsPerLastYear { get; set; }
         public List<string> ImageUrls { get; set; }
+        public ICollection<ProductAttribute> ProductAttribute { get; set; }
         public string JsonCategory { get; set; }
         public string StringCategory { get; set; }
         public string JsonCategorySchema { get; set; }
+        public string KeyWords { get; set; }
     }
 }
