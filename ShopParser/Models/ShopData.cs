@@ -20,7 +20,7 @@ namespace PrjModule25_Parser.Models
         public string JsonDataSchema { get; set; }
 
         //Data base connections
-        public ICollection<ProductData> Products { get; set; }
+        public ICollection<ProductData> Products { get; set; } = new List<ProductData>();
         public ShopSource Source { get; set; }
     }
 }

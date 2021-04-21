@@ -18,6 +18,7 @@ using PrjModule25_Parser.Models.Hubs.Clients;
 using PrjModule25_Parser.Models.JSON_DTO;
 using PrjModule25_Parser.Models.ResponseModels;
 using PrjModule25_Parser.Service;
+using PrjModule25_Parser.Service.Helpers;
 
 namespace PrjModule25_Parser.Controllers
 {
@@ -53,60 +54,13 @@ namespace PrjModule25_Parser.Controllers
                 var sellerUrl = _dbContext.Shops.FirstOrDefault(u => u.Name == sellerName)?.Url;
                 var sellerPage = await _context.OpenAsync(sellerUrl);
 
-                //Number of pages   
-                    var pageCount = sellerPage.QuerySelectorAll("button[data-qaid='pages']")
-                    .Select(m => int.Parse(m.InnerHtml))
-                    .Max();
+                await ShopService.AddProductsFromSellerPageToDb(shop, sellerPage, _dbContext, _shopHub);
 
 
-                //Get all pages for current seller
-                var productsLinkList = new List<string>();
-                for (var i = 1; i <= pageCount; i++)
-                {
-                    var page = await _context.OpenAsync(sellerUrl?.Replace(".html", "") + ";" + i + ".html");
-                    productsLinkList.AddRange(
-                        page.QuerySelectorAll("*[data-qaid='product_link']").ToList().Cast<IHtmlAnchorElement>()
-                            .Select(u => u.Href));
-
-                    var currentParsingPercent =  (int)(i / (double)pageCount * 100);
-                    if (currentParsingPercent % 10==0&& currentParsingPercent != 0)
-                    {
-                        await _shopHub.Clients.All.ReceiveMessage($"Currently parsing shop with name \"{sellerName}\" \n Already done \"{currentParsingPercent}%\" pages");
-                    }
-
-                    Thread.Sleep(2000);
-                }
-
-                var emptyProducts = productsLinkList.Select(url => new ProductData
-                {
-                    Url = url,
-                    Shop = shop,
-                    ProductState = ProductState.Idle
-                }).ToList();
-
-                shop.SyncDate = DateTime.Now;
-
-                var jsonSellerDat = new ShopJson
-                {
-                    ExternalId = shop.ExternalId,
-                    Url = shop.Url,
-                    SyncDate = shop.SyncDate,
-                    Name = shop.Name
-                };
-
-                var generator = new JSchemaGenerator();
-                var fullCategorySchema = generator.Generate(typeof(ShopJson)).ToString();
-                var fullCategoryJson = JsonConvert.SerializeObject(jsonSellerDat);
-
-                shop.Products = emptyProducts;
-                shop.JsonData = fullCategoryJson;
-                shop.JsonDataSchema = fullCategorySchema;
-
-                await _dbContext.Products.AddRangeAsync(emptyProducts);
                 _dbContext.Entry(shop).State = EntityState.Modified;
                 await _dbContext.SaveChangesAsync();
 
-                return Ok(productsLinkList);
+                return Ok(shop.Products);
             }
             catch (Exception e)
             {
@@ -154,6 +108,7 @@ namespace PrjModule25_Parser.Controllers
                 var seller = new ShopData
                 {
                     Url = jsonSellerDat.Url,
+                    Products = new List<ProductData>(),
                     ExternalId = jsonSellerDat.ExternalId,
                     SyncDate = jsonSellerDat.SyncDate,
                     Name = jsonSellerDat.Name,

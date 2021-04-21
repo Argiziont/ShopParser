@@ -286,7 +286,6 @@ export const ParseDataSegment: React.FC = () => {
     pagesCount: number | undefined
   ) => {
     if (id != undefined && pagesCount != undefined) {
-
       const products = handlesetNumberOfProductsInTotal(pagesCount);
 
       setProductPage(0);
@@ -329,9 +328,8 @@ export const ParseDataSegment: React.FC = () => {
     productCount: number | undefined
   ) => {
     if (id != undefined && productCount != undefined) {
-
       const products = handlesetNumberOfProductsInTotal(productCount);
-      
+
       setProductPage(0);
       handleGetProductRequestByShops(id, productPage, products);
       handlesetNumberOfProductsInTotal(
@@ -339,13 +337,20 @@ export const ParseDataSegment: React.FC = () => {
       );
     }
   };
-  const handleShopsUpdate = () => {
+  const handleProductsUpdate = () => {
     setIsShopsLodaing(true);
     UserActions.GetAllShops().then((shopList) => {
-      setShopList(shopList);
-      setIsShopsLodaing(false);
-      setCheckedProduct(undefined);
-      setProductList(undefined);
+      UserActions.GetSubCategories().then((categoryList) => {
+        if (categoryList != undefined && shopList != undefined) {
+          const nestedArray: IResponseNestedCategory[] = new Array(1);
+          nestedArray[0] = categoryList;
+          setCategoriesList(nestedArray);
+          setShopList(shopList);
+          setIsShopsLodaing(false);
+          setCheckedProduct(undefined);
+          setProductList(undefined);
+        }
+      });
     });
   };
   const handleShopUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -357,7 +362,7 @@ export const ParseDataSegment: React.FC = () => {
         const response = await UserActions.AddShopByUrl(shopUrl);
 
         if (response != undefined) {
-          handleShopsUpdate();
+          handleProductsUpdate();
         }
       }
     } catch {}
@@ -423,7 +428,7 @@ export const ParseDataSegment: React.FC = () => {
               size="small"
               aria-label="close"
               color="inherit"
-              onClick={handleShopsUpdate}
+              onClick={handleProductsUpdate}
             >
               Update
             </Button>

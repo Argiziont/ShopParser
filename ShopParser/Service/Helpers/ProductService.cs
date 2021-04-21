@@ -43,6 +43,7 @@ namespace PrjModule25_Parser.Service.Helpers
                     currentProduct.Url = parsedProduct.Url;
                     currentProduct.KeyWords = parsedProduct.KeyWords;
                     currentProduct.ProductAttribute = parsedProduct.ProductAttribute;
+
                 }
 
                 if (parsedProduct?.Categories != null)
