@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -23,7 +22,6 @@ namespace ShopParserApi.Service.TimedHostedServices
         private readonly ILogger<BackgroundProductControllerWorker> _logger;
         private readonly IHubContext<ApiHub, IApiClient> _productsHub;
         private readonly IServiceProvider _serviceProvider;
-        private Timer _timer;
 
         public BackgroundProductControllerWorker(ILogger<BackgroundProductControllerWorker> logger,
             IServiceProvider serviceProvider, IHubContext<ApiHub, IApiClient> productsHub)
@@ -37,7 +35,6 @@ namespace ShopParserApi.Service.TimedHostedServices
 
         public void Dispose()
         {
-            _timer?.Dispose();
         }
 
         public async Task StartAsync(CancellationToken stoppingToken)
@@ -54,14 +51,12 @@ namespace ShopParserApi.Service.TimedHostedServices
         {
             _logger.LogInformation("Product Hosted Service is stopping.");
 
-            _timer?.Change(Timeout.Infinite, 0);
-
             return Task.CompletedTask;
         }
 
         private async Task DoWork(CancellationToken ct)
         {
-            await Task.Factory.StartNew((async () =>
+            await Task.Run((async () =>
             {
                 while (!ct.IsCancellationRequested)
                 {
