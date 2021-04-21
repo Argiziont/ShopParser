@@ -1,27 +1,27 @@
-﻿using AngleSharp;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using PrjModule25_Parser.Models.Helpers;
-using PrjModule25_Parser.Models.Hubs;
-using PrjModule25_Parser.Models.Hubs.Clients;
-using PrjModule25_Parser.Service.Exceptions;
-using PrjModule25_Parser.Service.Helpers;
-using System;
+﻿using System;
 using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using AngleSharp;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using ShopParserApi.Models.Helpers;
+using ShopParserApi.Models.Hubs;
+using ShopParserApi.Models.Hubs.Clients;
+using ShopParserApi.Service.Exceptions;
+using ShopParserApi.Service.Helpers;
 
-namespace PrjModule25_Parser.Service.TimedHostedServices
+namespace ShopParserApi.Service.TimedHostedServices
 {
     public class BackgroundProductControllerWorker : IHostedService, IDisposable
     {
         private readonly IBrowsingContext _context;
         private readonly ILogger<BackgroundProductControllerWorker> _logger;
-        private readonly IServiceProvider _serviceProvider;
         private readonly IHubContext<ApiHub, IApiClient> _productsHub;
+        private readonly IServiceProvider _serviceProvider;
         private Timer _timer;
 
         public BackgroundProductControllerWorker(ILogger<BackgroundProductControllerWorker> logger,
@@ -76,15 +76,14 @@ namespace PrjModule25_Parser.Service.TimedHostedServices
                         _logger.LogError("Something went wrong with background product parser");
                         throw new NullReferenceException();
                     }
+
                     try
                     {
-
                         var productPage = await _context.OpenAsync(product.Url);
                         if (productPage.StatusCode == HttpStatusCode.TooManyRequests)
                             throw new TooManyRequestsException();
 
                         await ProductService.ParseSinglePageAndInsertToDb(productPage, product.Url, context);
-
                     }
                     catch (TooManyRequestsException)
                     {

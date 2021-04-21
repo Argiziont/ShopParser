@@ -1,15 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PrjModule25_Parser.Models;
-using PrjModule25_Parser.Models.Helpers;
+using ShopParserApi.Models;
+using ShopParserApi.Models.Helpers;
 
-namespace PrjModule25_Parser.Service
+namespace ShopParserApi.Service
 {
     public sealed class ApplicationDb : DbContext
     {
         public ApplicationDb(DbContextOptions<ApplicationDb> options)
             : base(options)
         {
-           // Database.EnsureDeleted();
+            // Database.EnsureDeleted();
             Database.EnsureCreated();
             //Database.Migrate();
         }

@@ -1,19 +1,18 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using PrjModule25_Parser.Controllers;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AngleSharp;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using PrjModule25_Parser.Models.Hubs;
-using PrjModule25_Parser.Models.Hubs.Clients;
-using PrjModule25_Parser.Service.Helpers;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using ShopParserApi.Models.Hubs;
+using ShopParserApi.Models.Hubs.Clients;
+using ShopParserApi.Service.Helpers;
 
-namespace PrjModule25_Parser.Service.TimedHostedServices
+namespace ShopParserApi.Service.TimedHostedServices
 {
     public class BackgroundShopControllerWorker : IHostedService, IDisposable
     {
@@ -57,7 +56,7 @@ namespace PrjModule25_Parser.Service.TimedHostedServices
             return Task.CompletedTask;
         }
 
-        private async  void DoWork(object state)
+        private async void DoWork(object state)
         {
             using var scope = _serviceProvider.CreateScope();
             var context = scope.ServiceProvider.GetService<ApplicationDb>();
@@ -65,7 +64,7 @@ namespace PrjModule25_Parser.Service.TimedHostedServices
             {
                 var shop = context?.Shops.FirstOrDefault(p => p.Products.Count == 0);
                 if (shop == null) return;
-                    
+
                 var sellerPage = await _context.OpenAsync(shop.Url);
 
                 await ShopService.AddProductsFromSellerPageToDb(shop, sellerPage, context, _shopHub);
@@ -79,7 +78,6 @@ namespace PrjModule25_Parser.Service.TimedHostedServices
             {
                 _logger.LogError(e.Message);
             }
-            
         }
     }
 }

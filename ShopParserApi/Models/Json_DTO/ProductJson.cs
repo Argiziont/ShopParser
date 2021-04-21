@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using PrjModule25_Parser.Models.Helpers;
+using ShopParserApi.Models.Helpers;
 
-namespace PrjModule25_Parser.Models.JSON_DTO
+namespace ShopParserApi.Models.Json_DTO
 {
     public class ProductJson
     {

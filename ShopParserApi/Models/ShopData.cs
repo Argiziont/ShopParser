@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace PrjModule25_Parser.Models
+namespace ShopParserApi.Models
 {
     public class ShopData
     {

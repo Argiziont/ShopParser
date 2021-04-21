@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.SignalR;
-using PrjModule25_Parser.Models.Hubs.Clients;
+using ShopParserApi.Models.Hubs.Clients;
 
-namespace PrjModule25_Parser.Models.Hubs
+namespace ShopParserApi.Models.Hubs
 {
     public class ApiHub : Hub<IApiClient>
     {

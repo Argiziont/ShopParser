@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PrjModule25_Parser.Models.JSON_DTO
+namespace ShopParserApi.Models.Json_DTO
 {
     public class ShopJson
     {

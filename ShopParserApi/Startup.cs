@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using PrjModule25_Parser.Controllers;
-using PrjModule25_Parser.Models.Hubs;
-using PrjModule25_Parser.Service;
-using PrjModule25_Parser.Service.TimedHostedServices;
+using ShopParserApi.Controllers;
+using ShopParserApi.Models.Hubs;
+using ShopParserApi.Service;
+using ShopParserApi.Service.TimedHostedServices;
 
-namespace PrjModule25_Parser
+namespace ShopParserApi
 {
     public class Startup
     {
@@ -66,8 +66,8 @@ namespace PrjModule25_Parser
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .SetIsOriginAllowed(origin => true) // allow any origin
-                .AllowCredentials()// allow credentials
-                .WithExposedHeaders("Content-Disposition")); 
+                .AllowCredentials() // allow credentials
+                .WithExposedHeaders("Content-Disposition"));
 
             app.UseAuthorization();
 

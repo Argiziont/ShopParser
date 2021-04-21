@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace PrjModule25_Parser.Models.Hubs.Clients
+namespace ShopParserApi.Models.Hubs.Clients
 {
     public interface IApiClient
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PrjModule25_Parser.Service.Exceptions
+namespace ShopParserApi.Service.Exceptions
 {
     public class TooManyRequestsException : Exception
     {

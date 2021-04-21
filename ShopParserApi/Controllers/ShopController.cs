@@ -1,26 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using AngleSharp;
-using AngleSharp.Html.Dom;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Schema.Generation;
-using PrjModule25_Parser.Models;
-using PrjModule25_Parser.Models.Helpers;
-using PrjModule25_Parser.Models.Hubs;
-using PrjModule25_Parser.Models.Hubs.Clients;
-using PrjModule25_Parser.Models.JSON_DTO;
-using PrjModule25_Parser.Models.ResponseModels;
-using PrjModule25_Parser.Service;
-using PrjModule25_Parser.Service.Helpers;
+using ShopParserApi.Models;
+using ShopParserApi.Models.Helpers;
+using ShopParserApi.Models.Hubs;
+using ShopParserApi.Models.Hubs.Clients;
+using ShopParserApi.Models.Json_DTO;
+using ShopParserApi.Models.ResponseModels;
+using ShopParserApi.Service;
+using ShopParserApi.Service.Helpers;
 
-namespace PrjModule25_Parser.Controllers
+namespace ShopParserApi.Controllers
 {
     [Route("[controller]")]
     [ApiController]

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PrjModule25_Parser.Models.ResponseModels
+namespace ShopParserApi.Models.ResponseModels
 {
     public class ResponseShop
     {

@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using PrjModule25_Parser.Models.Helpers;
+using ShopParserApi.Models.Helpers;
 
-namespace PrjModule25_Parser.Models
+namespace ShopParserApi.Models
 {
     public class ProductData
     {
@@ -22,7 +21,7 @@ namespace PrjModule25_Parser.Models
         public string Description { get; set; }
         public string Price { get; set; }
         public string KeyWords { get; set; }
-        
+
 
         //Json-serialized data
         public string JsonData { get; set; }

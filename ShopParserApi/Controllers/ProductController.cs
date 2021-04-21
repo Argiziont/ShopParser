@@ -9,17 +9,17 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using PrjModule25_Parser.Models;
-using PrjModule25_Parser.Models.Helpers;
-using PrjModule25_Parser.Models.Hubs;
-using PrjModule25_Parser.Models.Hubs.Clients;
-using PrjModule25_Parser.Models.JSON_DTO;
-using PrjModule25_Parser.Models.ResponseModels;
-using PrjModule25_Parser.Service;
-using PrjModule25_Parser.Service.Exceptions;
-using PrjModule25_Parser.Service.Helpers;
+using ShopParserApi.Models;
+using ShopParserApi.Models.Helpers;
+using ShopParserApi.Models.Hubs;
+using ShopParserApi.Models.Hubs.Clients;
+using ShopParserApi.Models.Json_DTO;
+using ShopParserApi.Models.ResponseModels;
+using ShopParserApi.Service;
+using ShopParserApi.Service.Exceptions;
+using ShopParserApi.Service.Helpers;
 
-namespace PrjModule25_Parser.Controllers
+namespace ShopParserApi.Controllers
 {
     [Route("[controller]")]
     [ApiController]
@@ -47,7 +47,7 @@ namespace PrjModule25_Parser.Controllers
             if (productPage.StatusCode == HttpStatusCode.TooManyRequests)
                 throw new TooManyRequestsException();
 
-            var parsedProduct =await ProductService.ParseSinglePage(productPage, productUrl, _dbContext);
+            var parsedProduct = await ProductService.ParseSinglePage(productPage, productUrl, _dbContext);
 
             return Ok(parsedProduct);
         }
@@ -177,12 +177,13 @@ namespace PrjModule25_Parser.Controllers
         {
             try
             {
-                var currentCategory =await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == id);
+                var currentCategory = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == id);
                 if (currentCategory == null)
                     return NotFound();
-                
+
                 var productList = await _dbContext.Products
-                    .Where(p => p.Categories.Contains(currentCategory) && p.ProductState == ProductState.Success).ToListAsync();
+                    .Where(p => p.Categories.Contains(currentCategory) && p.ProductState == ProductState.Success)
+                    .ToListAsync();
                 return Ok(productList.Select(p => new ResponseProduct
                 {
                     Description = p.Description,
@@ -211,11 +212,14 @@ namespace PrjModule25_Parser.Controllers
             try
             {
                 var productSource = await _dbContext.Products
-                    .Where(p => p.ShopId == id && p.ProductState == ProductState.Success)//Take products which owned by current shop and was parsed successfully
-                    .OrderBy(p=>p.Id)//Order by internal DB id
-                    .Skip(page * rowsPerPage).Take(rowsPerPage).ToListAsync();//Take products by page
-                
-                if(productSource.Count==0)
+                    .Where(p => p.ShopId == id &&
+                                p.ProductState ==
+                                ProductState
+                                    .Success) //Take products which owned by current shop and was parsed successfully
+                    .OrderBy(p => p.Id) //Order by internal DB id
+                    .Skip(page * rowsPerPage).Take(rowsPerPage).ToListAsync(); //Take products by page
+
+                if (productSource.Count == 0)
                     return NotFound();
 
                 return Ok(productSource.Select(p => new ResponseProduct
@@ -248,11 +252,14 @@ namespace PrjModule25_Parser.Controllers
                 var currentCategory = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == id);
                 if (currentCategory == null)
                     return NotFound();
-                
+
                 var productSource = await _dbContext.Products
-                    .Where(p => p.Categories.Contains(currentCategory) && p.ProductState == ProductState.Success)//Take products which owned by current shop and was parsed successfully
-                    .OrderBy(p => p.Id)//Order by internal DB id
-                    .Skip(page * rowsPerPage).Take(rowsPerPage).ToListAsync();//Take products by page
+                    .Where(p => p.Categories.Contains(currentCategory) &&
+                                p.ProductState ==
+                                ProductState
+                                    .Success) //Take products which owned by current shop and was parsed successfully
+                    .OrderBy(p => p.Id) //Order by internal DB id
+                    .Skip(page * rowsPerPage).Take(rowsPerPage).ToListAsync(); //Take products by page
 
                 return Ok(productSource.Select(p => new ResponseProduct
                 {
@@ -270,9 +277,5 @@ namespace PrjModule25_Parser.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, e);
             }
         }
-
-
-
     }
 }
-

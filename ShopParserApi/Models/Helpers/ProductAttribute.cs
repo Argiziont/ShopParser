@@ -1,4 +1,4 @@
-﻿namespace PrjModule25_Parser.Models.Helpers
+﻿namespace ShopParserApi.Models.Helpers
 {
     public class ProductAttribute
     {

@@ -1,191 +1,188 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace PrjModule25_Parser.Migrations
+namespace ShopParserApi.Migrations
 {
     public partial class InitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Categories",
-                columns: table => new
+                "Categories",
+                table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>("int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Href = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SupCategoryId = table.Column<int>(type: "int", nullable: true)
+                    Name = table.Column<string>("nvarchar(max)", nullable: true),
+                    Href = table.Column<string>("nvarchar(max)", nullable: true),
+                    SupCategoryId = table.Column<int>("int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Categories", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Categories_Categories_SupCategoryId",
-                        column: x => x.SupCategoryId,
-                        principalTable: "Categories",
-                        principalColumn: "Id",
+                        "FK_Categories_Categories_SupCategoryId",
+                        x => x.SupCategoryId,
+                        "Categories",
+                        "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Sources",
-                columns: table => new
+                "Sources",
+                table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>("int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Name = table.Column<string>("nvarchar(max)", nullable: true)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Sources", x => x.Id);
-                });
+                constraints: table => { table.PrimaryKey("PK_Sources", x => x.Id); });
 
             migrationBuilder.CreateTable(
-                name: "Shops",
-                columns: table => new
+                "Shops",
+                table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>("int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    SourceId = table.Column<int>(type: "int", nullable: true),
-                    ExternalId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Url = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SyncDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    JsonData = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    JsonDataSchema = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    SourceId = table.Column<int>("int", nullable: true),
+                    ExternalId = table.Column<string>("nvarchar(max)", nullable: true),
+                    Name = table.Column<string>("nvarchar(max)", nullable: true),
+                    Url = table.Column<string>("nvarchar(max)", nullable: true),
+                    SyncDate = table.Column<DateTime>("datetime2", nullable: false),
+                    JsonData = table.Column<string>("nvarchar(max)", nullable: true),
+                    JsonDataSchema = table.Column<string>("nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Shops", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Shops_Sources_SourceId",
-                        column: x => x.SourceId,
-                        principalTable: "Sources",
-                        principalColumn: "Id",
+                        "FK_Shops_Sources_SourceId",
+                        x => x.SourceId,
+                        "Sources",
+                        "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Products",
-                columns: table => new
+                "Products",
+                table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>("int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ShopId = table.Column<int>(type: "int", nullable: true),
-                    ExternalId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Url = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SyncDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ExpirationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ProductState = table.Column<int>(type: "int", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Price = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    KeyWords = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    JsonData = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    JsonDataSchema = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    ShopId = table.Column<int>("int", nullable: true),
+                    ExternalId = table.Column<string>("nvarchar(max)", nullable: true),
+                    Title = table.Column<string>("nvarchar(max)", nullable: true),
+                    Url = table.Column<string>("nvarchar(max)", nullable: true),
+                    SyncDate = table.Column<DateTime>("datetime2", nullable: false),
+                    ExpirationDate = table.Column<DateTime>("datetime2", nullable: false),
+                    ProductState = table.Column<int>("int", nullable: false),
+                    Description = table.Column<string>("nvarchar(max)", nullable: true),
+                    Price = table.Column<string>("nvarchar(max)", nullable: true),
+                    KeyWords = table.Column<string>("nvarchar(max)", nullable: true),
+                    JsonData = table.Column<string>("nvarchar(max)", nullable: true),
+                    JsonDataSchema = table.Column<string>("nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Products", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Products_Shops_ShopId",
-                        column: x => x.ShopId,
-                        principalTable: "Shops",
-                        principalColumn: "Id",
+                        "FK_Products_Shops_ShopId",
+                        x => x.ShopId,
+                        "Shops",
+                        "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "CategoryProductData",
-                columns: table => new
+                "CategoryProductData",
+                table => new
                 {
-                    CategoriesId = table.Column<int>(type: "int", nullable: false),
-                    ProductsId = table.Column<int>(type: "int", nullable: false)
+                    CategoriesId = table.Column<int>("int", nullable: false),
+                    ProductsId = table.Column<int>("int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CategoryProductData", x => new { x.CategoriesId, x.ProductsId });
+                    table.PrimaryKey("PK_CategoryProductData", x => new {x.CategoriesId, x.ProductsId});
                     table.ForeignKey(
-                        name: "FK_CategoryProductData_Categories_CategoriesId",
-                        column: x => x.CategoriesId,
-                        principalTable: "Categories",
-                        principalColumn: "Id",
+                        "FK_CategoryProductData_Categories_CategoriesId",
+                        x => x.CategoriesId,
+                        "Categories",
+                        "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CategoryProductData_Products_ProductsId",
-                        column: x => x.ProductsId,
-                        principalTable: "Products",
-                        principalColumn: "Id",
+                        "FK_CategoryProductData_Products_ProductsId",
+                        x => x.ProductsId,
+                        "Products",
+                        "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductAttributes",
-                columns: table => new
+                "ProductAttributes",
+                table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>("int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ProductId = table.Column<int>(type: "int", nullable: true),
-                    AttributeName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AttributeValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    ProductId = table.Column<int>("int", nullable: true),
+                    AttributeName = table.Column<string>("nvarchar(max)", nullable: true),
+                    AttributeValue = table.Column<string>("nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ProductAttributes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProductAttributes_Products_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Products",
-                        principalColumn: "Id",
+                        "FK_ProductAttributes_Products_ProductId",
+                        x => x.ProductId,
+                        "Products",
+                        "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Categories_SupCategoryId",
-                table: "Categories",
-                column: "SupCategoryId");
+                "IX_Categories_SupCategoryId",
+                "Categories",
+                "SupCategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CategoryProductData_ProductsId",
-                table: "CategoryProductData",
-                column: "ProductsId");
+                "IX_CategoryProductData_ProductsId",
+                "CategoryProductData",
+                "ProductsId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductAttributes_ProductId",
-                table: "ProductAttributes",
-                column: "ProductId");
+                "IX_ProductAttributes_ProductId",
+                "ProductAttributes",
+                "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Products_ShopId",
-                table: "Products",
-                column: "ShopId");
+                "IX_Products_ShopId",
+                "Products",
+                "ShopId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Shops_SourceId",
-                table: "Shops",
-                column: "SourceId");
+                "IX_Shops_SourceId",
+                "Shops",
+                "SourceId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "CategoryProductData");
+                "CategoryProductData");
 
             migrationBuilder.DropTable(
-                name: "ProductAttributes");
+                "ProductAttributes");
 
             migrationBuilder.DropTable(
-                name: "Categories");
+                "Categories");
 
             migrationBuilder.DropTable(
-                name: "Products");
+                "Products");
 
             migrationBuilder.DropTable(
-                name: "Shops");
+                "Shops");
 
             migrationBuilder.DropTable(
-                name: "Sources");
+                "Sources");
         }
     }
 }

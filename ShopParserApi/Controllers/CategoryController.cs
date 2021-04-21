@@ -1,15 +1,15 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using PrjModule25_Parser.Models;
-using PrjModule25_Parser.Models.ResponseModels;
-using PrjModule25_Parser.Service;
+using ShopParserApi.Models;
+using ShopParserApi.Models.ResponseModels;
+using ShopParserApi.Service;
 
-namespace PrjModule25_Parser.Controllers
+namespace ShopParserApi.Controllers
 {
     [Route("[controller]")]
     [ApiController]
@@ -21,7 +21,7 @@ namespace PrjModule25_Parser.Controllers
         {
             _dbContext = dbContext;
         }
-        
+
         [HttpGet]
         [Route("GetCategories")]
         [ProducesResponseType(typeof(IEnumerable<ResponseCategory>), StatusCodes.Status200OK)]
@@ -58,10 +58,10 @@ namespace PrjModule25_Parser.Controllers
                 var categorySource = await _dbContext.Categories
                     .OrderBy(p => p.Id)
                     .Skip(page * rowsPerPage).Take(rowsPerPage).ToListAsync();
-                
+
                 return Ok(categorySource.Select(c => new ResponseCategory
                 {
-                    Id=c.Id,
+                    Id = c.Id,
                     Href = c.Href,
                     Name = c.Name,
                     ProductsCount = _dbContext.Products.Count(cat => cat.Categories.Contains(c)).ToString()
@@ -72,7 +72,7 @@ namespace PrjModule25_Parser.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, e);
             }
         }
-        
+
         [HttpGet]
         [Route("GetSubCategories")]
         [ProducesResponseType(typeof(ResponseNestedCategory), StatusCodes.Status200OK)]
@@ -84,7 +84,7 @@ namespace PrjModule25_Parser.Controllers
             try
             {
                 var currentCategory = await _dbContext.Categories.FirstOrDefaultAsync(cat => cat.Name == "Prom.ua");
-                if (currentCategory==null)
+                if (currentCategory == null)
                     return NotFound();
 
                 var reversedCategory = ReverseCategoryListRecursive(currentCategory, _dbContext);
@@ -95,16 +95,18 @@ namespace PrjModule25_Parser.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, e);
             }
         }
-        
-        private static ResponseNestedCategory ReverseCategoryListRecursive(Category mainCategory, ApplicationDb dbContext)
+
+        private static ResponseNestedCategory ReverseCategoryListRecursive(Category mainCategory,
+            ApplicationDb dbContext)
         {
-            return new ResponseNestedCategory()
-            { 
-                Id= mainCategory.Id,
+            return new ResponseNestedCategory
+            {
+                Id = mainCategory.Id,
                 Name = mainCategory.Name,
                 Href = mainCategory.Href,
                 ProductsCount = dbContext.Products.Count(cat => cat.Categories.Contains(mainCategory)).ToString(),
-                SubCategories = dbContext.Categories.Where(cat => cat.SupCategory == mainCategory).Select(cat=>ReverseCategoryListRecursive(cat, dbContext)).ToList()
+                SubCategories = dbContext.Categories.Where(cat => cat.SupCategory == mainCategory)
+                    .Select(cat => ReverseCategoryListRecursive(cat, dbContext)).ToList()
             };
         }
     }
