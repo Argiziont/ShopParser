@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using ShopParserApi.Models.Helpers;
 
 namespace ShopParserApi.Models
 {
@@ -14,7 +15,8 @@ namespace ShopParserApi.Models
         public string Name { get; set; }
         public string Url { get; set; }
         public DateTime SyncDate { get; set; }
-
+        public ShopState ShopState { get; set; }
+        
         //Json-serialized data
         public string JsonData { get; set; }
         public string JsonDataSchema { get; set; }

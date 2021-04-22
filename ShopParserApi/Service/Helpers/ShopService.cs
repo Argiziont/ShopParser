@@ -27,8 +27,9 @@ namespace ShopParserApi.Service.Helpers
             var pageCount = sellerPage.QuerySelectorAll("button[data-qaid='pages']")
                 .Select(m => int.Parse(m.InnerHtml))
                 .Max();
-
-
+            shop.ShopState = ShopState.Processing;
+            
+            await dbContext.SaveChangesAsync();
             //Get all pages for current seller
             for (var i = 1; i <= pageCount; i++)
             {
@@ -57,7 +58,7 @@ namespace ShopParserApi.Service.Helpers
                 Thread.Sleep(2000);
             }
 
-
+            shop.ShopState = ShopState.Success;
             shop.SyncDate = DateTime.Now;
 
             var jsonSellerDat = new ShopJson

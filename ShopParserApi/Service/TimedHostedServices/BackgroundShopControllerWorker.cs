@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using AngleSharp;
+﻿using AngleSharp;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +7,10 @@ using Microsoft.Extensions.Logging;
 using ShopParserApi.Models.Hubs;
 using ShopParserApi.Models.Hubs.Clients;
 using ShopParserApi.Service.Helpers;
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ShopParserApi.Service.TimedHostedServices
 {
@@ -20,7 +20,6 @@ namespace ShopParserApi.Service.TimedHostedServices
         private readonly ILogger<BackgroundProductControllerWorker> _logger;
         private readonly IServiceProvider _serviceProvider;
         private readonly IHubContext<ApiHub, IApiClient> _shopHub;
-        private Timer _timer;
 
         public BackgroundShopControllerWorker(ILogger<BackgroundProductControllerWorker> logger,
             IServiceProvider serviceProvider, IHubContext<ApiHub, IApiClient> shopHub)
@@ -34,16 +33,17 @@ namespace ShopParserApi.Service.TimedHostedServices
 
         public void Dispose()
         {
-            _timer?.Dispose();
         }
 
         public Task StartAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("Product Hosted Service running.");
 
-            _timer = new Timer(DoWork, null, TimeSpan.Zero,
-                TimeSpan.FromSeconds(10));
+            var cts = new CancellationTokenSource();
+            var ct = cts.Token;
 
+            Task.Run(() => DoWork(ct), ct);
+            
             return Task.CompletedTask;
         }
 
@@ -51,32 +51,37 @@ namespace ShopParserApi.Service.TimedHostedServices
         {
             _logger.LogInformation("Product Hosted Service is stopping.");
 
-            _timer?.Change(Timeout.Infinite, 0);
-
             return Task.CompletedTask;
         }
 
-        private async void DoWork(object state)
+        private async Task DoWork(CancellationToken ct)
         {
-            using var scope = _serviceProvider.CreateScope();
-            var context = scope.ServiceProvider.GetService<ApplicationDb>();
-            try
+            while (!ct.IsCancellationRequested)
             {
-                var shop = context?.Shops.FirstOrDefault(p => p.Products.Count == 0);
-                if (shop == null) return;
+                await Task.Delay(TimeSpan.FromSeconds(5), ct);
 
-                var sellerPage = await _context.OpenAsync(shop.Url);
+                using var scope = _serviceProvider.CreateScope();
+                var context = scope.ServiceProvider.GetService<ApplicationDb>();
+                try
+                {
+                    if (context == null) throw new NullReferenceException(nameof(context));
 
-                await ShopService.AddProductsFromSellerPageToDb(shop, sellerPage, context, _shopHub);
+                    var shop = context.Shops.FirstOrDefault(p => p.Products.Count == 0);
+                    if (shop == null) continue;
+
+                    var sellerPage = await _context.OpenAsync(shop.Url, ct);
+
+                    await ShopService.AddProductsFromSellerPageToDb(shop, sellerPage, context, _shopHub);
 
 
-                context.Entry(shop).State = EntityState.Modified;
+                    context.Entry(shop).State = EntityState.Modified;
 
-                await context.SaveChangesAsync();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e.Message);
+                    await context.SaveChangesAsync(ct);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e.Message);
+                }
             }
         }
     }

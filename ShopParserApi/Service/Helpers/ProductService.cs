@@ -66,7 +66,10 @@ namespace ShopParserApi.Service.Helpers
             var shop = dbContext.Shops.FirstOrDefault(s => s.Name == companyName);
             var title = page.QuerySelector("*[data-qaid='product_name']")?.InnerHtml ?? "";
 
-            var attributesBlock = page.QuerySelector("li[data-qaid='attributes']");
+            var attributesBlock = page.QuerySelector("li[data-qaid='attributes']"); 
+            var deliveryBlock = page.QuerySelector("=ul[data-qaid='delivery']");
+            var paymentsBlock = page.QuerySelector("=ul[data-qaid='payments']");
+            
             var attributesList = new List<ProductAttribute>();
             if (attributesBlock != null)
             {
@@ -78,6 +81,20 @@ namespace ShopParserApi.Service.Helpers
 
                 attributesList.AddRange(attributeNames.Select((t, i) => new ProductAttribute
                     {AttributeName = t, AttributeValue = attributeValues[i]}));
+            }
+            //
+            var deliveryList = new List<string>();
+            if (deliveryBlock != null)
+            {
+                var deliveryValues = deliveryBlock.QuerySelectorAll("div[class='ek-grid__item ek-grid__item_width_expand']")
+                    .Select(a => a.InnerHtml).ToList();
+            }
+            
+            var paymentsList = new List<string>();
+            if (deliveryBlock != null)
+            {
+                var paymentsValues = paymentsBlock.QuerySelectorAll("li[class='ek-list__item']").Where(li=>li.Children==null)
+                    .Select(a => a.InnerHtml).ToList();
             }
 
 

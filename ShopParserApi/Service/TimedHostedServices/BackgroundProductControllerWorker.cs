@@ -1,9 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
-using AngleSharp;
+﻿using AngleSharp;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -13,6 +8,11 @@ using ShopParserApi.Models.Hubs;
 using ShopParserApi.Models.Hubs.Clients;
 using ShopParserApi.Service.Exceptions;
 using ShopParserApi.Service.Helpers;
+using System;
+using System.Linq;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ShopParserApi.Service.TimedHostedServices
 {
@@ -37,14 +37,16 @@ namespace ShopParserApi.Service.TimedHostedServices
         {
         }
 
-        public async Task StartAsync(CancellationToken stoppingToken)
+        public Task StartAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("Product Hosted Service running.");
 
             var cts = new CancellationTokenSource();
             var ct = cts.Token;
 
-            await DoWork(ct);
+            Task.Run(() => DoWork(ct), ct);
+
+            return Task.CompletedTask;
         }
 
         public Task StopAsync(CancellationToken stoppingToken)
@@ -56,55 +58,51 @@ namespace ShopParserApi.Service.TimedHostedServices
 
         private async Task DoWork(CancellationToken ct)
         {
-            await Task.Run((async () =>
+            while (!ct.IsCancellationRequested)
             {
-                while (!ct.IsCancellationRequested)
+                await Task.Delay(TimeSpan.FromSeconds(5), ct);
+                using var scope = _serviceProvider.CreateScope();
+                var context = scope.ServiceProvider.GetService<ApplicationDb>();
+                try
                 {
-                    using var scope = _serviceProvider.CreateScope();
-                    var context = scope.ServiceProvider.GetService<ApplicationDb>();
+                    if (context == null) throw new NullReferenceException(nameof(context));
+
+                    if (context.Products.Count(p => p.ProductState == ProductState.Idle) == 0)
+                        continue;
+                    if (context.Shops.Count(s => s.ShopState == ShopState.Processing&& s.ShopState == ShopState.Idle) != 0)
+                        continue;
+
+                    //first product with idle state
+
+                    var product = context.Products.FirstOrDefault(p => p.ProductState == ProductState.Idle);
+                    if (product == null)
+                    {
+                        _logger.LogError("Something went wrong with background product parser");
+                        throw new NullReferenceException();
+                    }
+
                     try
                     {
-                        if (context == null) return;
+                        var productPage = await _context.OpenAsync(product.Url, cancellation: ct);
+                        if (productPage.StatusCode == HttpStatusCode.TooManyRequests)
+                            throw new TooManyRequestsException();
 
-                        if (context.Products.Count(p => p.ProductState == ProductState.Idle) == 0)
-                            return;
-                        if (context.Shops.FirstOrDefault(s => s.Products.Count == 0) != null)
-                            return;
-
-                        //first product with idle state
-
-                        var product = context.Products.FirstOrDefault(p => p.ProductState == ProductState.Idle);
-                        if (product == null)
-                        {
-                            _logger.LogError("Something went wrong with background product parser");
-                            throw new NullReferenceException();
-                        }
-
-                        try
-                        {
-                            var productPage = await _context.OpenAsync(product.Url);
-                            if (productPage.StatusCode == HttpStatusCode.TooManyRequests)
-                                throw new TooManyRequestsException();
-
-                            await ProductService.ParseSinglePageAndInsertToDb(productPage, product.Url, context);
-                        }
-                        catch (TooManyRequestsException)
-                        {
-                            product.ProductState = ProductState.Failed;
-                            _logger.LogError($"Product with id \"{product.Id}\" couldn't be updated");
-                        }
-
-                        await _productsHub.Clients.All.ReceiveMessage(
-                            $"Product with name id: {product.ExternalId} was updated successfully");
+                        await ProductService.ParseSinglePageAndInsertToDb(productPage, product.Url, context);
                     }
-                    catch (Exception e)
+                    catch (TooManyRequestsException)
                     {
-                        _logger.LogError(e.Message);
+                        product.ProductState = ProductState.Failed;
+                        _logger.LogError($"Product with id \"{product.Id}\" couldn't be updated");
                     }
-                    await Task.Delay(TimeSpan.FromSeconds(5), ct);
-                }
 
-            }), ct);
+                    await _productsHub.Clients.All.ReceiveMessage(
+                        $"Product with name id: {product.ExternalId} was updated successfully");
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e.Message);
+                }
+            }
         }
     }
 }

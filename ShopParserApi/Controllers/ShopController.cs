@@ -86,7 +86,7 @@ namespace ShopParserApi.Controllers
 
                 //Seller data
                 var externalId = sellerUrl.Split("/").Last().Split('-').First();
-                var sellerName = sellerPage.QuerySelector("span[data-qaid='company_name']")?.InnerHtml ?? "";
+                var sellerName = sellerPage.QuerySelector("span[class='ek-text ek-text_weight_bold ek-text_wrap_ellipsis']")?.InnerHtml ?? "";
 
                 if (_dbContext.Shops.FirstOrDefault(s => s.ExternalId == externalId) != null)
                     return BadRequest("Database already contains this seller");
@@ -111,7 +111,8 @@ namespace ShopParserApi.Controllers
                     SyncDate = jsonSellerDat.SyncDate,
                     Name = jsonSellerDat.Name,
                     JsonData = fullCategoryJson,
-                    JsonDataSchema = fullCategorySchema
+                    JsonDataSchema = fullCategorySchema,
+                    ShopState = ShopState.Idle
                 };
                 await _dbContext.Shops.AddAsync(seller);
                 await _dbContext.SaveChangesAsync();

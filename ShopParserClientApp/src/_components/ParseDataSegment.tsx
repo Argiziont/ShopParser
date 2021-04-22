@@ -453,62 +453,75 @@ export const ParseDataSegment: React.FC = () => {
 
   //Shop list component
   const shopsBlocks = (
-    <List
-      component="nav"
-      aria-labelledby="nested-list-subheader"
-      className={classes.shopListRoot}
-    >
-      {shopList?.map((shop, i) => {
-        return (
-          <div key={i}>
-            {Number(shop.productCount) > 0 ? (
-              <ListItem
-                button
-                onClick={() =>
-                  handleShopShowProductsClick(shop.id, shop.productCount)
-                }
+    <>
+      {() => {
+        if (shopList != undefined) {
+          if (shopList?.length > 0) {
+            return (
+              <List
+                component="nav"
+                aria-labelledby="nested-list-subheader"
+                className={classes.shopListRoot}
               >
-                <ListItemText
-                  disableTypography
-                  primary={
-                    <>
-                      <Typography variant="h6" gutterBottom>
-                        {shop.name}
-                      </Typography>
-                      <Typography variant="body1" gutterBottom>
-                        {"Shop Id: " + shop.externalId}
-                      </Typography>
-                      <Typography variant="body2" gutterBottom>
-                        {"Products updated: " + shop.productCount}
-                      </Typography>
-                    </>
-                  }
-                />
-              </ListItem>
-            ) : (
-              <ListItem>
-                <ListItemText
-                  disableTypography
-                  primary={
-                    <>
-                      <Typography variant="h6" gutterBottom>
-                        {shop.name}
-                      </Typography>
-                      <Typography variant="body1" gutterBottom>
-                        {"Shop Id: " + shop.externalId}
-                      </Typography>
-                      <Typography variant="body2" gutterBottom>
-                        {"Products updated: " + shop.productCount}
-                      </Typography>
-                    </>
-                  }
-                />
-              </ListItem>
-            )}
-          </div>
-        );
-      })}
-    </List>
+                {shopList?.map((shop, i) => {
+                  return (
+                    <div key={i}>
+                      {Number(shop.productCount) > 0 ? (
+                        <ListItem
+                          button
+                          onClick={() =>
+                            handleShopShowProductsClick(
+                              shop.id,
+                              shop.productCount
+                            )
+                          }
+                        >
+                          <ListItemText
+                            disableTypography
+                            primary={
+                              <>
+                                <Typography variant="h6" gutterBottom>
+                                  {shop.name}
+                                </Typography>
+                                <Typography variant="body1" gutterBottom>
+                                  {"Shop Id: " + shop.externalId}
+                                </Typography>
+                                <Typography variant="body2" gutterBottom>
+                                  {"Products updated: " + shop.productCount}
+                                </Typography>
+                              </>
+                            }
+                          />
+                        </ListItem>
+                      ) : (
+                        <ListItem>
+                          <ListItemText
+                            disableTypography
+                            primary={
+                              <>
+                                <Typography variant="h6" gutterBottom>
+                                  {shop.name}
+                                </Typography>
+                                <Typography variant="body1" gutterBottom>
+                                  {"Shop Id: " + shop.externalId}
+                                </Typography>
+                                <Typography variant="body2" gutterBottom>
+                                  {"Products updated: " + shop.productCount}
+                                </Typography>
+                              </>
+                            }
+                          />
+                        </ListItem>
+                      )}
+                    </div>
+                  );
+                })}
+              </List>
+            );
+          }
+        }
+      }}
+    </>
   );
 
   //Product list component pagintaion
