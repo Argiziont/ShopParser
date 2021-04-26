@@ -10,7 +10,7 @@ namespace ShopParserApi.Service
             : base(options)
         {
             // Database.EnsureDeleted();
-            Database.EnsureCreated();
+            //Database.EnsureCreated();
             //Database.Migrate();
         }
 

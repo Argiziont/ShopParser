@@ -67,8 +67,8 @@ namespace ShopParserApi.Service.Helpers
             var title = page.QuerySelector("*[data-qaid='product_name']")?.InnerHtml ?? "";
 
             var attributesBlock = page.QuerySelector("li[data-qaid='attributes']"); 
-            var deliveryBlock = page.QuerySelector("=ul[data-qaid='delivery']");
-            var paymentsBlock = page.QuerySelector("=ul[data-qaid='payments']");
+            //var deliveryBlock =page.QuerySelectorAll("*[class='ek-list ek-list_indent_xs ek-list_color_indigo-500 ek-list_blackhole_circle']");
+            //var paymentsBlock =   page.QuerySelector("*[data-qaid='prom_payment_label']");
             
             var attributesList = new List<ProductAttribute>();
             if (attributesBlock != null)
@@ -83,19 +83,19 @@ namespace ShopParserApi.Service.Helpers
                     {AttributeName = t, AttributeValue = attributeValues[i]}));
             }
             //
-            var deliveryList = new List<string>();
-            if (deliveryBlock != null)
-            {
-                var deliveryValues = deliveryBlock.QuerySelectorAll("div[class='ek-grid__item ek-grid__item_width_expand']")
-                    .Select(a => a.InnerHtml).ToList();
-            }
+            //var deliveryList = new List<string>();
+            //if (deliveryBlock != null)
+            //{
+            //    var deliveryValues = deliveryBlock.QuerySelectorAll("div[class='ek-grid__item ek-grid__item_width_expand']")
+            //        .Select(a => a.InnerHtml).ToList();
+            //}
             
-            var paymentsList = new List<string>();
-            if (deliveryBlock != null)
-            {
-                var paymentsValues = paymentsBlock.QuerySelectorAll("li[class='ek-list__item']").Where(li=>li.Children==null)
-                    .Select(a => a.InnerHtml).ToList();
-            }
+            //var paymentsList = new List<string>();
+            //if (deliveryBlock != null)
+            //{
+            //    var paymentsValues = paymentsBlock.QuerySelectorAll("li[class='ek-list__item']").Where(li=>li.Children==null)
+            //        .Select(a => a.InnerHtml).ToList();
+            //}
 
 
             var keyWordsBlock = page.QuerySelector("meta[name='keywords']") as IHtmlMetaElement;

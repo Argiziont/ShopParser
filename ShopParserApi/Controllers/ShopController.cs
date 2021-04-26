@@ -5,14 +5,11 @@ using System.Threading.Tasks;
 using AngleSharp;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Schema.Generation;
 using ShopParserApi.Models;
 using ShopParserApi.Models.Helpers;
-using ShopParserApi.Models.Hubs;
-using ShopParserApi.Models.Hubs.Clients;
 using ShopParserApi.Models.Json_DTO;
 using ShopParserApi.Models.ResponseModels;
 using ShopParserApi.Service;
@@ -26,14 +23,12 @@ namespace ShopParserApi.Controllers
     {
         private readonly IBrowsingContext _context;
         private readonly ApplicationDb _dbContext;
-        private readonly IHubContext<ApiHub, IApiClient> _shopHub;
 
-        public ShopController(ApplicationDb db, IHubContext<ApiHub, IApiClient> shopHub)
+        public ShopController(ApplicationDb db)
         {
             var config = Configuration.Default.WithDefaultLoader();
             _context = BrowsingContext.New(config);
             _dbContext = db;
-            _shopHub = shopHub;
         }
 
         [HttpPost]
@@ -52,7 +47,7 @@ namespace ShopParserApi.Controllers
                 var sellerUrl = _dbContext.Shops.FirstOrDefault(u => u.Name == sellerName)?.Url;
                 var sellerPage = await _context.OpenAsync(sellerUrl);
 
-                await ShopService.AddProductsFromSellerPageToDb(shop, sellerPage, _dbContext, _shopHub);
+                await ShopService.AddProductsFromSellerPageToDb(shop, sellerPage, _dbContext);
 
 
                 _dbContext.Entry(shop).State = EntityState.Modified;
@@ -86,7 +81,7 @@ namespace ShopParserApi.Controllers
 
                 //Seller data
                 var externalId = sellerUrl.Split("/").Last().Split('-').First();
-                var sellerName = sellerPage.QuerySelector("span[class='ek-text ek-text_weight_bold ek-text_wrap_ellipsis']")?.InnerHtml ?? "";
+                var sellerName = sellerPage.QuerySelector("span[data-qaid='company_name']")?.InnerHtml ?? "";
 
                 if (_dbContext.Shops.FirstOrDefault(s => s.ExternalId == externalId) != null)
                     return BadRequest("Database already contains this seller");

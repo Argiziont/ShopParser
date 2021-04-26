@@ -71,7 +71,7 @@ namespace ShopParserApi.Service.TimedHostedServices
 
                     var sellerPage = await _context.OpenAsync(shop.Url, ct);
 
-                    await ShopService.AddProductsFromSellerPageToDb(shop, sellerPage, context, _shopHub);
+                    await ShopService.AddProductsFromSellerPageToDb(shop, sellerPage, context);
 
 
                     context.Entry(shop).State = EntityState.Modified;
