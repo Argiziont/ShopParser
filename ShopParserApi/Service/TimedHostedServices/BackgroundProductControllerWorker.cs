@@ -13,6 +13,7 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using AngleSharp.Io;
 
 namespace ShopParserApi.Service.TimedHostedServices
 {
@@ -26,7 +27,9 @@ namespace ShopParserApi.Service.TimedHostedServices
         public BackgroundProductControllerWorker(ILogger<BackgroundProductControllerWorker> logger,
             IServiceProvider serviceProvider, IHubContext<ApiHub, IApiClient> productsHub)
         {
-            var config = Configuration.Default.WithDefaultLoader();
+            var loaderOptions = new LoaderOptions{IsResourceLoadingEnabled = true};
+            
+            var config = Configuration.Default.WithJs().WithCss().WithDefaultLoader();
             _context = BrowsingContext.New(config);
             _logger = logger;
             _serviceProvider = serviceProvider;
@@ -84,6 +87,7 @@ namespace ShopParserApi.Service.TimedHostedServices
                     try
                     {
                         var productPage = await _context.OpenAsync(product.Url, cancellation: ct);
+                        
                         if (productPage.StatusCode == HttpStatusCode.TooManyRequests)
                             throw new TooManyRequestsException();
 

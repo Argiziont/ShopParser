@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
@@ -69,7 +70,10 @@ namespace ShopParserApi.Service.Helpers
             var attributesBlock = page.QuerySelector("li[data-qaid='attributes']"); 
             //var deliveryBlock =page.QuerySelectorAll("*[class='ek-list ek-list_indent_xs ek-list_color_indigo-500 ek-list_blackhole_circle']");
             //var paymentsBlock =   page.QuerySelector("*[data-qaid='prom_payment_label']");
-            
+
+            var html = page.DocumentElement.OuterHtml;
+
+
             var attributesList = new List<ProductAttribute>();
             if (attributesBlock != null)
             {
