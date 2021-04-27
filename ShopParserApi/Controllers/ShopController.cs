@@ -7,12 +7,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema.Generation;
 using ShopParserApi.Models;
 using ShopParserApi.Models.Helpers;
 using ShopParserApi.Models.Json_DTO;
 using ShopParserApi.Models.ResponseModels;
 using ShopParserApi.Service;
+using ShopParserApi.Service.Extensions;
 using ShopParserApi.Service.Helpers;
 
 namespace ShopParserApi.Controllers
@@ -26,7 +28,7 @@ namespace ShopParserApi.Controllers
 
         public ShopController(ApplicationDb db)
         {
-            var config = Configuration.Default.WithDefaultLoader();
+            var config = Configuration.Default.WithDefaultLoader().WithJs();
             _context = BrowsingContext.New(config);
             _dbContext = db;
         }
@@ -79,8 +81,17 @@ namespace ShopParserApi.Controllers
                 //c1036196-ibabykievua-internet-magazin.html
                 //c1036196
 
+                
+                var externalId = sellerUrl.Split("/").Last().Split('-').First().Replace("c","");
+
+
+
+                var jsonString = sellerPage.ToHtml().SubstringJson("window.ApolloCacheState =", "window.SPAConfig");
+
+                var json = JObject.Parse(jsonString);
+
+
                 //Seller data
-                var externalId = sellerUrl.Split("/").Last().Split('-').First();
                 var sellerName = sellerPage.QuerySelector("span[data-qaid='company_name']")?.InnerHtml ?? "";
 
                 if (_dbContext.Shops.FirstOrDefault(s => s.ExternalId == externalId) != null)

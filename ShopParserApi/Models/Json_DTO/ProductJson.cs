@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using ShopParserApi.Models.Helpers;
 
 namespace ShopParserApi.Models.Json_DTO
@@ -7,28 +8,24 @@ namespace ShopParserApi.Models.Json_DTO
     public class ProductJson
     {
         //Internal data
-        public string Title { get; set; }
-        public string ExternalId { get; set; }
-        public string Url { get; set; }
+        [JsonProperty("nameForCatalog")]public string Title { get; set; }
+        [JsonProperty("id")] public string ExternalId { get; set; }
+        [JsonProperty("urlForProductCatalog")] public string Url { get; set; }
+        [JsonProperty("priceCurrency")] public string Currency { get; set; }
+        [JsonProperty("keywords")] public string KeyWords { get; set; }
+        [JsonProperty("descriptionPlain")] public string Description { get; set; }
+        [JsonProperty("discountedPrice")] public string Price { get; set; }
+        [JsonProperty("priceUSD")] public string PriceUsd { get; set; }
+        [JsonProperty("sku")] public string ScuCode { get; set; }
+        [JsonProperty("price")] public string FullPrice { get; set; }
+        public PresenceData Presence { get; set; }
+        public string OptPrice { get; set; }
+        public List<string> ImageUrls { get; set; }
         public DateTime SyncDate { get; set; }
         public DateTime ExpirationDate { get; set; }
-        public string Description { get; set; }
-        public string Price { get; set; }
-        public string ScuCode { get; set; }
-        public string Presence { get; set; }
-        public string FullPrice { get; set; }
-        public string OptPrice { get; set; }
-        public string Currency { get; set; }
-        public string FullCurrency { get; set; }
-        public string OptCurrency { get; set; }
-        public string CompanyName { get; set; }
-        public string PositivePercent { get; set; }
-        public string RatingsPerLastYear { get; set; }
-        public List<string> ImageUrls { get; set; }
-        public ICollection<ProductAttribute> ProductAttribute { get; set; }
         public string JsonCategory { get; set; }
         public string StringCategory { get; set; }
         public string JsonCategorySchema { get; set; }
-        public string KeyWords { get; set; }
+        public ICollection<ProductAttribute> ProductAttribute { get; set; }
     }
 }

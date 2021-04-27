@@ -24,7 +24,7 @@ namespace ShopParserApi.Service.TimedHostedServices
         public BackgroundShopControllerWorker(ILogger<BackgroundProductControllerWorker> logger,
             IServiceProvider serviceProvider, IHubContext<ApiHub, IApiClient> shopHub)
         {
-            var config = Configuration.Default.WithDefaultLoader();
+            var config = Configuration.Default.WithDefaultLoader().WithJs();
             _context = BrowsingContext.New(config);
             _logger = logger;
             _serviceProvider = serviceProvider;

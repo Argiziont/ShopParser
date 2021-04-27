@@ -35,7 +35,7 @@ namespace ShopParserApi.Controllers
                 return Ok(categoryList.Select(c => new ResponseCategory
                 {
                     Id = c.Id,
-                    Href = c.Href,
+                    Href = c.Url,
                     Name = c.Name,
                     ProductsCount = _dbContext.Products.Count(cat => cat.Categories.Contains(c)).ToString()
                 }));
@@ -62,7 +62,7 @@ namespace ShopParserApi.Controllers
                 return Ok(categorySource.Select(c => new ResponseCategory
                 {
                     Id = c.Id,
-                    Href = c.Href,
+                    Href = c.Url,
                     Name = c.Name,
                     ProductsCount = _dbContext.Products.Count(cat => cat.Categories.Contains(c)).ToString()
                 }));
@@ -103,7 +103,7 @@ namespace ShopParserApi.Controllers
             {
                 Id = mainCategory.Id,
                 Name = mainCategory.Name,
-                Href = mainCategory.Href,
+                Href = mainCategory.Url,
                 ProductsCount = dbContext.Products.Count(cat => cat.Categories.Contains(mainCategory)).ToString(),
                 SubCategories = dbContext.Categories.Where(cat => cat.SupCategory == mainCategory)
                     .Select(cat => ReverseCategoryListRecursive(cat, dbContext)).ToList()

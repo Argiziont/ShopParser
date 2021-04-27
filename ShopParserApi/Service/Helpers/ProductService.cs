@@ -5,17 +5,14 @@ using System.Net;
 using System.Threading.Tasks;
 using AngleSharp;
 using AngleSharp.Dom;
-using AngleSharp.Html.Dom;
-using AngleSharp.Html.Parser;
 using Newtonsoft.Json;
 using NJsonSchema;
 using ShopParserApi.Models;
 using ShopParserApi.Models.Helpers;
 using ShopParserApi.Models.Json_DTO;
 using ShopParserApi.Service.Exceptions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
+using ShopParserApi.Service.Extensions;
 
 namespace ShopParserApi.Service.Helpers
 {
@@ -57,7 +54,7 @@ namespace ShopParserApi.Service.Helpers
                 if (currentProduct?.ProductAttribute.Count > 0)
                     foreach (var attribute in currentProduct.ProductAttribute)
                         attribute.Product = currentProduct;
-                // await dbContext.AddRangeAsync()
+                await dbContext.AddRangeAsync();
             }
 
             await dbContext.SaveChangesAsync();
@@ -66,219 +63,121 @@ namespace ShopParserApi.Service.Helpers
         public static async Task<ProductData> ParseSinglePage(IDocument page, string productUrl,
             ApplicationDb dbContext)
         {
-            var companyName = page.QuerySelector("*[data-qaid='company_name']")?.InnerHtml ?? "";
-            var shop = dbContext.Shops.FirstOrDefault(s => s.Name == companyName);
-            var title = page.QuerySelector("*[data-qaid='product_name']")?.InnerHtml ?? "";
-
-            var attributesBlock = page.QuerySelector("li[data-qaid='attributes']");
-            //var deliveryBlock =page.QuerySelectorAll("*[class='ek-list ek-list_indent_xs ek-list_color_indigo-500 ek-list_blackhole_circle']");
-            //var paymentsBlock =   page.QuerySelector("*[data-qaid='prom_payment_label']");
-
-            var currentSource = page.ToHtml(); // current serialization of the DOM
-            var button= (IHtmlSpanElement)page.QuerySelector("*[data-qaid='all_attributes']");
-            button.DoClick();
-            
             //External id from url
             var externalId = productUrl
-                .Split("/").Last().Split('-').First();
+                .Split("/").Last().Split('-').First().Replace("p", "");
             
             var jsonString = page.ToHtml().SubstringJson("window.ApolloCacheState =", "window.SPAConfig");
 
             var json=JObject.Parse(jsonString);
 
-
-
-            var product = json[$"Product:{externalId.Replace("p","")}"];
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            var attributesList = new List<ProductAttribute>();
-            if (attributesBlock != null)
-            {
-                var attributeNames = attributesBlock
-                    .QuerySelectorAll("span[class='ek-text ek-text_color_black-600 ek-text_wrap_break']")
-                    .Select(a => a.InnerHtml).ToList();
-                var attributeValues = attributesBlock.QuerySelectorAll("span[class='ek-text ek-text_wrap_break']")
-                    .Select(a => a.InnerHtml).ToList();
-
-                attributesList.AddRange(attributeNames.Select((t, i) => new ProductAttribute
-                    {AttributeName = t, AttributeValue = attributeValues[i]}));
-            }
-            //
-            //var deliveryList = new List<string>();
-            //if (deliveryBlock != null)
-            //{
-            //    var deliveryValues = deliveryBlock.QuerySelectorAll("div[class='ek-grid__item ek-grid__item_width_expand']")
-            //        .Select(a => a.InnerHtml).ToList();
-            //}
+            var product = json[$"Product:{externalId}"];
+            if (product == null)
+                throw new NullReferenceException(nameof(product));
             
-            //var paymentsList = new List<string>();
-            //if (deliveryBlock != null)
-            //{
-            //    var paymentsValues = paymentsBlock.QuerySelectorAll("li[class='ek-list__item']").Where(li=>li.Children==null)
-            //        .Select(a => a.InnerHtml).ToList();
-            //}
+            var productFromProm = JsonConvert.DeserializeObject<ProductJson>(product.ToString());
+
+            var images = JsonConvert.DeserializeObject<string[]>(product["images({\"height\":640,\"width\":640})"]?["json"]?.ToString()??"[]");//Getting images
+
+            productFromProm.ImageUrls = images.ToList();
+
+            var productPresence = json[$"$Product:{externalId}.presence"];
+            
+
+            if (productPresence!=null)
+                productFromProm.Presence = JsonConvert.DeserializeObject<PresenceData>(productPresence.ToString());
+
+           
 
 
-            var keyWordsBlock = page.QuerySelector("meta[name='keywords']") as IHtmlMetaElement;
-            var keyWords = keyWordsBlock?.Content;
-
-            var sku = page.QuerySelector("span[data-qaid='product-sku']")?.InnerHtml ?? "";
-            var presence =
-                page.QuerySelector("span[data-qaid='product_presence']")?.FirstElementChild?.InnerHtml ??
-                "";
-
-            //Parsing description 
-            var description = page.QuerySelector("div[data-qaid='descriptions']")?.Children?.Aggregate("",
-                (current, descriptionTag) => current + "\n" + ExtractContentFromHtml(descriptionTag.Html()));
-
-
-
-            var priceSelector = (IHtmlSpanElement) page.QuerySelector("span[data-qaid='product_price']");
-            var fullPriceSelector =
-                (IHtmlSpanElement) page.QuerySelector("span[data-qaid='price_without_discount']");
-            var optPriceSelector = (IHtmlSpanElement) page.QuerySelector("span[data-qaid='opt_price']");
-
-            var shortCompanyRating =
-                (IHtmlDivElement) page.QuerySelector("div[data-qaid='short_company_rating']");
-
-            var breadcrumbsSeo = (IHtmlDivElement) page.QuerySelector("div[data-qaid='breadcrumbs_seo']");
-
-            var fullCategory = UnScrubCategory(breadcrumbsSeo);
-
-            foreach (var category in fullCategory.Where(category =>
-                dbContext.Categories.FirstOrDefault(cat => cat.Name == category.Name) == null))
+            var attributesObjectsList = product["attributes"]?.Select(a=> a["id"].ToString());
+            if (attributesObjectsList != null)
             {
-                if (category.SupCategory?.SupCategory != null)
-                    category.SupCategory.SupCategory = null;
-
-                await dbContext.Categories.AddAsync(new Category
+                productFromProm.ProductAttribute =  new List<ProductAttribute>();
+                foreach (var attributeObject in attributesObjectsList)
                 {
-                    Href = category.Href,
-                    Name = category.Name,
-                    SupCategory = category.SupCategory == null
-                        ? null
-                        : dbContext.Categories.FirstOrDefault(c => c.Name == category.SupCategory.Name)
-                });
+                    var attributeRawObject = json[attributeObject]?.ToString();
+                    if (attributeRawObject == null)
+                        break;
 
-                await dbContext.SaveChangesAsync();
+                    var attribute =
+                        JsonConvert.DeserializeObject<ProductAttribute>(attributeRawObject);
+
+                    var values = "";
+                    var valuePathList = json[attributeObject]?["values"]?.Select(a => a["id"].ToString());
+                    if (valuePathList != null)
+                        values = valuePathList.Aggregate(values, (current, valuePath) => current + $"{json[valuePath]?["value"]},");
+
+                    values.Remove(values.Length - 2);//Deleting last comma
+
+                    attribute.AttributeValues = values;
+
+                    productFromProm.ProductAttribute.Add(attribute);
+                }
             }
 
-            var price = priceSelector?.Dataset["qaprice"] ?? "";
-            var currency = priceSelector?.Dataset["qacurrency"] ?? "";
+            var productBreadCrumbsObjectsList = json[$"$Product:{externalId}.breadCrumbs"]?["items"]?.Select(a => a["id"].ToString());
 
-            var fullPrice = fullPriceSelector?.Dataset["qaprice"] ?? "";
-            var fullCurrency = fullPriceSelector?.Dataset["qacurrency"] ?? "";
-
-            var optPrice = optPriceSelector?.Dataset["qaprice"] ?? "";
-            var optCurrency = optPriceSelector?.Dataset["qacurrency"] ?? "";
-
-            var posPercent = shortCompanyRating?.Dataset["qapositive"] + "%";
-            var lastYrReply = shortCompanyRating?.Dataset["qacount"] ?? "";
-
-
-            //Picking image list
-            var imageSrcList = page.QuerySelector("div[data-qaid='image_block']") //<Upper div>
-                ?.Children //<Lower divs>
-                ?.First(m => m.ClassList
-                    .Contains("ek-grid__item_width_expand") == false) //<Lower div with thumbnails>
-                ?.Children //<Ul>
-                ?.First()
-                ?.Children //<Li>
-                ?.Select(i => ((IHtmlImageElement) i //<Img>
-                    .QuerySelector("img[data-qaid='image_thumb']"))?.Source) //Src="Urls"
-                .ToList();
-
-
-            var fullCategorySchema = JsonSchema.FromType<Category>().ToJson();
-            var fullCategoryJson = JsonConvert.SerializeObject(fullCategory[0]);
-
-            var jsonProductDat = new ProductJson
+            //var fullCategory = UnScrubCategory(breadcrumbsSeo);
+            var categoryList = new List<Category>();
+            if (productBreadCrumbsObjectsList != null)
             {
-                Currency = currency,
-                Price = price,
-                FullCurrency = fullCurrency,
-                FullPrice = fullPrice,
-                OptCurrency = optCurrency,
-                OptPrice = optPrice,
-                Description = description,
-                Presence = presence,
-                ScuCode = sku,
-                Title = title,
-                CompanyName = companyName,
-                ImageUrls = imageSrcList,
-                PositivePercent = posPercent,
-                RatingsPerLastYear = lastYrReply,
-                SyncDate = DateTime.Now,
-                JsonCategory = fullCategoryJson,
-                JsonCategorySchema = fullCategorySchema,
-                StringCategory = CategoryToString(fullCategory),
-                Url = page.Url,
-                ExternalId = externalId,
-                KeyWords = keyWords,
-                ProductAttribute = attributesList
-            };
+                Category higherLevelCategory = null;
+                foreach (var productBreadCrumbsObject in productBreadCrumbsObjectsList)
+                {
+                    var categoryObject = json[productBreadCrumbsObject]?.ToString();
+                    if (categoryObject == null) continue;
+                    var category = JsonConvert.DeserializeObject<Category>(categoryObject);
+                    category.SupCategory = higherLevelCategory;
+                    higherLevelCategory = category;
+                    categoryList.Add(category);
 
+                }
+                categoryList.Remove(categoryList.Last());
+
+
+                foreach (var category in categoryList.Where(category =>
+                    dbContext.Categories.FirstOrDefault(cat => cat.Name == category.Name) == null))
+                {
+                    if (category.SupCategory?.SupCategory != null)
+                        category.SupCategory.SupCategory = null;
+
+                    await dbContext.Categories.AddAsync(new Category
+                    {
+                        Url = category.Url,
+                        Name = category.Name,
+                        SupCategory = category.SupCategory == null
+                            ? null
+                            : dbContext.Categories.FirstOrDefault(c => c.Name == category.SupCategory.Name)
+                    });
+
+                    await dbContext.SaveChangesAsync();
+                }
+
+            }
+
+            productFromProm.StringCategory = CategoryToString(categoryList);
+            productFromProm.JsonCategory = JsonConvert.SerializeObject(categoryList);
+            productFromProm.JsonCategorySchema = JsonSchema.FromType<Category>().ToJson();
+            productFromProm.SyncDate= DateTime.Now;
 
             var productSchema = JsonSchema.FromType<ProductJson>().ToJson();
-            var productJson = JsonConvert.SerializeObject(jsonProductDat);
+            var productJson = JsonConvert.SerializeObject(productFromProm);
             return new ProductData
             {
-                SyncDate = jsonProductDat.SyncDate,
-                Url = jsonProductDat.Url,
-                Description = jsonProductDat.Description,
-                ExternalId = jsonProductDat.ExternalId,
+                SyncDate = productFromProm.SyncDate,
+                Url = productFromProm.Url,
+                Description = productFromProm.Description,
+                ExternalId = productFromProm.ExternalId,
                 JsonData = productJson,
                 JsonDataSchema = productSchema,
-                Price = jsonProductDat.Price,
-                Title = jsonProductDat.Title,
-                Shop = shop,
+                Price = productFromProm.Price,
+                Title = productFromProm.Title,
                 ProductState = ProductState.Success,
-                Categories = fullCategory,
-                KeyWords = keyWords,
-                ProductAttribute = attributesList
+                Categories = categoryList,
+                ProductAttribute = productFromProm.ProductAttribute,
+                KeyWords = productFromProm.KeyWords
             };
-        }
-
-        private static List<Category> UnScrubCategory(IParentNode divElement)
-        {
-            var categories = new List<Category>();
-            Category higherLevelCategory = null;
-            for (var i = 0; i < divElement.Children.Length - 1; i++)
-            {
-                var childCategory = (IHtmlAnchorElement) divElement.Children[i].Children.First();
-                var currentCategory = new Category {SupCategory = higherLevelCategory};
-                higherLevelCategory = currentCategory;
-
-                currentCategory.Href = childCategory.Href;
-                currentCategory.Name = childCategory.Title;
-                categories.Add(currentCategory);
-            }
-
-            return categories;
         }
 
         private static string CategoryToString(IEnumerable<Category> categories)
@@ -287,19 +186,6 @@ namespace ShopParserApi.Service.Helpers
             return categoryString.Remove(categoryString.Length - 3);
         }
 
-        private static string ExtractContentFromHtml(string input)
-        {
-            var hp = new HtmlParser();
-            var hpResult = hp.ParseFragment(input, null);
-            return string.Concat(hpResult.Select(x => x.Text()));
-        }
-        public static string SubstringJson(this string value, string start, string end)
-        {
-            var startIndex = value.IndexOf(start, StringComparison.Ordinal) + start.Length;
-            var endIndex = value.IndexOf(end, StringComparison.Ordinal) - startIndex;
-
-            var result = value.Substring(startIndex, endIndex).Trim();
-            return result.Remove(result.Length - 1);
-        }
+       
     }
 }
