@@ -13,6 +13,9 @@ using ShopParserApi.Models;
 using ShopParserApi.Models.Helpers;
 using ShopParserApi.Models.Json_DTO;
 using ShopParserApi.Service.Exceptions;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
 
 namespace ShopParserApi.Service.Helpers
 {
@@ -67,11 +70,49 @@ namespace ShopParserApi.Service.Helpers
             var shop = dbContext.Shops.FirstOrDefault(s => s.Name == companyName);
             var title = page.QuerySelector("*[data-qaid='product_name']")?.InnerHtml ?? "";
 
-            var attributesBlock = page.QuerySelector("li[data-qaid='attributes']"); 
+            var attributesBlock = page.QuerySelector("li[data-qaid='attributes']");
             //var deliveryBlock =page.QuerySelectorAll("*[class='ek-list ek-list_indent_xs ek-list_color_indigo-500 ek-list_blackhole_circle']");
             //var paymentsBlock =   page.QuerySelector("*[data-qaid='prom_payment_label']");
 
-            var html = page.DocumentElement.OuterHtml;
+            var currentSource = page.ToHtml(); // current serialization of the DOM
+            var button= (IHtmlSpanElement)page.QuerySelector("*[data-qaid='all_attributes']");
+            button.DoClick();
+            
+            //External id from url
+            var externalId = productUrl
+                .Split("/").Last().Split('-').First();
+            
+            var jsonString = page.ToHtml().SubstringJson("window.ApolloCacheState =", "window.SPAConfig");
+
+            var json=JObject.Parse(jsonString);
+
+
+
+            var product = json[$"Product:{externalId.Replace("p","")}"];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
             var attributesList = new List<ProductAttribute>();
@@ -114,9 +155,7 @@ namespace ShopParserApi.Service.Helpers
             var description = page.QuerySelector("div[data-qaid='descriptions']")?.Children?.Aggregate("",
                 (current, descriptionTag) => current + "\n" + ExtractContentFromHtml(descriptionTag.Html()));
 
-            //External id from url
-            var externalId = productUrl
-                .Split("/").Last().Split('-').First();
+
 
             var priceSelector = (IHtmlSpanElement) page.QuerySelector("span[data-qaid='product_price']");
             var fullPriceSelector =
@@ -253,6 +292,14 @@ namespace ShopParserApi.Service.Helpers
             var hp = new HtmlParser();
             var hpResult = hp.ParseFragment(input, null);
             return string.Concat(hpResult.Select(x => x.Text()));
+        }
+        public static string SubstringJson(this string value, string start, string end)
+        {
+            var startIndex = value.IndexOf(start, StringComparison.Ordinal) + start.Length;
+            var endIndex = value.IndexOf(end, StringComparison.Ordinal) - startIndex;
+
+            var result = value.Substring(startIndex, endIndex).Trim();
+            return result.Remove(result.Length - 1);
         }
     }
 }
