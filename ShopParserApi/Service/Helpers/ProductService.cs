@@ -4,14 +4,15 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AngleSharp;
+using AngleSharp.Diffing.Extensions;
 using AngleSharp.Dom;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NJsonSchema;
 using ShopParserApi.Models;
 using ShopParserApi.Models.Helpers;
 using ShopParserApi.Models.Json_DTO;
 using ShopParserApi.Service.Exceptions;
-using Newtonsoft.Json.Linq;
 using ShopParserApi.Service.Extensions;
 
 namespace ShopParserApi.Service.Helpers
@@ -44,6 +45,9 @@ namespace ShopParserApi.Service.Helpers
                     currentProduct.Url = parsedProduct.Url;
                     currentProduct.KeyWords = parsedProduct.KeyWords;
                     currentProduct.ProductAttribute = parsedProduct.ProductAttribute;
+                    currentProduct.ProductDeliveryOptions = parsedProduct.ProductDeliveryOptions;
+                    currentProduct.ProductPaymentOptions = parsedProduct.ProductPaymentOptions;
+                    currentProduct.Presence = parsedProduct.Presence;
                 }
 
                 if (parsedProduct?.Categories != null)
@@ -51,10 +55,17 @@ namespace ShopParserApi.Service.Helpers
                         currentProduct.Categories.Add(
                             dbContext.Categories.FirstOrDefault(c => c.Name == currentCategory.Name));
 
-                if (currentProduct?.ProductAttribute.Count > 0)
+                if (currentProduct.ProductAttribute.Count > 0)
                     foreach (var attribute in currentProduct.ProductAttribute)
                         attribute.Product = currentProduct;
-                await dbContext.AddRangeAsync();
+
+                if (currentProduct.ProductDeliveryOptions.Count > 0)
+                    foreach (var deliveryOption in currentProduct.ProductDeliveryOptions)
+                        deliveryOption.Product = currentProduct;
+
+                if (currentProduct.ProductPaymentOptions.Count > 0)
+                    foreach (var paymentOption in currentProduct.ProductPaymentOptions)
+                        paymentOption.Product = currentProduct;
             }
 
             await dbContext.SaveChangesAsync();
@@ -66,34 +77,33 @@ namespace ShopParserApi.Service.Helpers
             //External id from url
             var externalId = productUrl
                 .Split("/").Last().Split('-').First().Replace("p", "");
-            
+
             var jsonString = page.ToHtml().SubstringJson("window.ApolloCacheState =", "window.SPAConfig");
 
-            var json=JObject.Parse(jsonString);
+            var json = JObject.Parse(jsonString);
 
             var product = json[$"Product:{externalId}"];
+
             if (product == null)
                 throw new NullReferenceException(nameof(product));
-            
+
             var productFromProm = JsonConvert.DeserializeObject<ProductJson>(product.ToString());
 
-            var images = JsonConvert.DeserializeObject<string[]>(product["images({\"height\":640,\"width\":640})"]?["json"]?.ToString()??"[]");//Getting images
+            var images =
+                JsonConvert.DeserializeObject<string[]>(
+                    product["images({\"height\":640,\"width\":640})"]?["json"]?.ToString() ?? "[]");
 
             productFromProm.ImageUrls = images.ToList();
 
             var productPresence = json[$"$Product:{externalId}.presence"];
-            
 
-            if (productPresence!=null)
+            if (productPresence != null)
                 productFromProm.Presence = JsonConvert.DeserializeObject<PresenceData>(productPresence.ToString());
 
-           
-
-
-            var attributesObjectsList = product["attributes"]?.Select(a=> a["id"].ToString());
+            var attributesObjectsList = product["attributes"]?.Select(a => a["id"].ToString());
             if (attributesObjectsList != null)
             {
-                productFromProm.ProductAttribute =  new List<ProductAttribute>();
+                productFromProm.ProductAttribute = new List<ProductAttribute>();
                 foreach (var attributeObject in attributesObjectsList)
                 {
                     var attributeRawObject = json[attributeObject]?.ToString();
@@ -106,9 +116,10 @@ namespace ShopParserApi.Service.Helpers
                     var values = "";
                     var valuePathList = json[attributeObject]?["values"]?.Select(a => a["id"].ToString());
                     if (valuePathList != null)
-                        values = valuePathList.Aggregate(values, (current, valuePath) => current + $"{json[valuePath]?["value"]},");
+                        values = valuePathList.Aggregate(values,
+                            (current, valuePath) => current + $"{json[valuePath]?["value"]},");
 
-                    values.Remove(values.Length - 2);//Deleting last comma
+                    values.Remove(values.Length - 2); //Deleting last comma
 
                     attribute.AttributeValues = values;
 
@@ -116,9 +127,9 @@ namespace ShopParserApi.Service.Helpers
                 }
             }
 
-            var productBreadCrumbsObjectsList = json[$"$Product:{externalId}.breadCrumbs"]?["items"]?.Select(a => a["id"].ToString());
+            var productBreadCrumbsObjectsList =
+                json[$"$Product:{externalId}.breadCrumbs"]?["items"]?.Select(a => a["id"].ToString());
 
-            //var fullCategory = UnScrubCategory(breadcrumbsSeo);
             var categoryList = new List<Category>();
             if (productBreadCrumbsObjectsList != null)
             {
@@ -131,8 +142,8 @@ namespace ShopParserApi.Service.Helpers
                     category.SupCategory = higherLevelCategory;
                     higherLevelCategory = category;
                     categoryList.Add(category);
-
                 }
+
                 categoryList.Remove(categoryList.Last());
 
 
@@ -153,13 +164,36 @@ namespace ShopParserApi.Service.Helpers
 
                     await dbContext.SaveChangesAsync();
                 }
+            }
 
+            var productDeliveryOptionsObjectsList = product["deliveryOptions"]?.Select(a => a["id"].ToString());
+
+
+            if (productDeliveryOptionsObjectsList != null)
+            {
+                productFromProm.ProductDeliveryOptions = new List<ProductDeliveryOption>();
+                productFromProm.ProductDeliveryOptions.AddRange(productDeliveryOptionsObjectsList
+                    .Select(productDeliveryOptionsObject => json[productDeliveryOptionsObject]?.ToString())
+                    .TakeWhile(productDeliveryOptionsRawObject => productDeliveryOptionsRawObject != null)
+                    .Select(JsonConvert.DeserializeObject<ProductDeliveryOption>));
+            }
+
+            var productPaymentOptionsObjectsList = product["paymentOptions"]?.Select(a => a["id"].ToString());
+
+
+            if (productPaymentOptionsObjectsList != null)
+            {
+                productFromProm.ProductPaymentOptions = new List<ProductPaymentOption>();
+                productFromProm.ProductPaymentOptions.AddRange(productPaymentOptionsObjectsList
+                    .Select(productPaymentOptionsObject => json[productPaymentOptionsObject]?.ToString())
+                    .TakeWhile(productPaymentOptionsRawObject => productPaymentOptionsRawObject != null)
+                    .Select(JsonConvert.DeserializeObject<ProductPaymentOption>));
             }
 
             productFromProm.StringCategory = CategoryToString(categoryList);
             productFromProm.JsonCategory = JsonConvert.SerializeObject(categoryList);
             productFromProm.JsonCategorySchema = JsonSchema.FromType<Category>().ToJson();
-            productFromProm.SyncDate= DateTime.Now;
+            productFromProm.SyncDate = DateTime.Now;
 
             var productSchema = JsonSchema.FromType<ProductJson>().ToJson();
             var productJson = JsonConvert.SerializeObject(productFromProm);
@@ -176,7 +210,10 @@ namespace ShopParserApi.Service.Helpers
                 ProductState = ProductState.Success,
                 Categories = categoryList,
                 ProductAttribute = productFromProm.ProductAttribute,
-                KeyWords = productFromProm.KeyWords
+                KeyWords = productFromProm.KeyWords,
+                Presence = productFromProm.Presence,
+                ProductPaymentOptions = productFromProm.ProductPaymentOptions,
+                ProductDeliveryOptions = productFromProm.ProductDeliveryOptions
             };
         }
 
@@ -185,7 +222,5 @@ namespace ShopParserApi.Service.Helpers
             var categoryString = categories.Aggregate("", (current, category) => current + category.Name + " > ");
             return categoryString.Remove(categoryString.Length - 3);
         }
-
-       
     }
 }

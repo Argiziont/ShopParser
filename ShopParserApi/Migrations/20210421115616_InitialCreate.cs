@@ -39,7 +39,7 @@ namespace ShopParserApi.Migrations
                 constraints: table => { table.PrimaryKey("PK_Sources", x => x.Id); });
 
             migrationBuilder.CreateTable(
-                "Shops",
+                "companies",
                 table => new
                 {
                     Id = table.Column<int>("int", nullable: false)
@@ -54,9 +54,9 @@ namespace ShopParserApi.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Shops", x => x.Id);
+                    table.PrimaryKey("PK_companies", x => x.Id);
                     table.ForeignKey(
-                        "FK_Shops_Sources_SourceId",
+                        "FK_companies_Sources_SourceId",
                         x => x.SourceId,
                         "Sources",
                         "Id",
@@ -69,7 +69,7 @@ namespace ShopParserApi.Migrations
                 {
                     Id = table.Column<int>("int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ShopId = table.Column<int>("int", nullable: true),
+                    companyId = table.Column<int>("int", nullable: true),
                     ExternalId = table.Column<string>("nvarchar(max)", nullable: true),
                     Title = table.Column<string>("nvarchar(max)", nullable: true),
                     Url = table.Column<string>("nvarchar(max)", nullable: true),
@@ -86,9 +86,9 @@ namespace ShopParserApi.Migrations
                 {
                     table.PrimaryKey("PK_Products", x => x.Id);
                     table.ForeignKey(
-                        "FK_Products_Shops_ShopId",
-                        x => x.ShopId,
-                        "Shops",
+                        "FK_Products_companies_companyId",
+                        x => x.companyId,
+                        "companies",
                         "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -154,13 +154,13 @@ namespace ShopParserApi.Migrations
                 "ProductId");
 
             migrationBuilder.CreateIndex(
-                "IX_Products_ShopId",
+                "IX_Products_companyId",
                 "Products",
-                "ShopId");
+                "companyId");
 
             migrationBuilder.CreateIndex(
-                "IX_Shops_SourceId",
-                "Shops",
+                "IX_companies_SourceId",
+                "companies",
                 "SourceId");
         }
 
@@ -179,7 +179,7 @@ namespace ShopParserApi.Migrations
                 "Products");
 
             migrationBuilder.DropTable(
-                "Shops");
+                "companies");
 
             migrationBuilder.DropTable(
                 "Sources");

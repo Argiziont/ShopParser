@@ -1,10 +1,10 @@
 ﻿namespace ShopParserApi.Models.Helpers
 {
-    public enum ShopState
+    public enum CompanyState
     {
         Idle = 0,
         Processing = 1,
         Success = 2,
-        Failed = 3,
+        Failed = 3
     }
 }

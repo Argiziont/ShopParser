@@ -2,7 +2,7 @@
 
 namespace ShopParserApi.Models.ResponseModels
 {
-    public class ResponseShop
+    public class ResponseCompany
     {
         public int Id { get; set; }
         public string ExternalId { get; set; }

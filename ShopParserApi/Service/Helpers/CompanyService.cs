@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,26 +13,26 @@ using ShopParserApi.Models.Json_DTO;
 
 namespace ShopParserApi.Service.Helpers
 {
-    public static class ShopService
+    public static class CompanyService
     {
-        public static async Task AddProductsFromSellerPageToDb(ShopData shop, IDocument sellerPage,
+        public static async Task AddProductsFromCompanyPageToDb(CompanyData company, IDocument companyPage,
             ApplicationDb dbContext)
         {
             var config = Configuration.Default.WithDefaultLoader();
             var context = BrowsingContext.New(config);
             //Number of pages   
-            shop.ShopState = ShopState.Processing;
-            
+            company.CompanyState = CompanyState.Processing;
+
             await dbContext.SaveChangesAsync();
 
             var counter = 1;
-            
-            var page = await context.OpenAsync(shop.Url.Replace(".html", $";{counter}.html"));
-            
-            //Get all pages for current seller
+
+            var page = await context.OpenAsync(company.Url.Replace(".html", $";{counter}.html"));
+
+            //Get all pages for current company
             while (page.Url.Contains(';'))
             {
-                page = await context.OpenAsync(shop.Url.Replace(".html", $";{counter}.html"));
+                page = await context.OpenAsync(company.Url.Replace(".html", $";{counter}.html"));
 
                 var linksSublistPage = page.QuerySelectorAll("*[data-qaid='product_link']").ToList()
                     .Cast<IHtmlAnchorElement>()
@@ -42,36 +41,36 @@ namespace ShopParserApi.Service.Helpers
                 var emptyProducts = linksSublistPage.Select(url => new ProductData
                 {
                     Url = url,
-                    Shop = shop,
+                    Company = company,
                     ProductState = ProductState.Idle
                 }).ToList();
 
-                foreach (var emptyProduct in emptyProducts) shop.Products.Add(emptyProduct);
+                foreach (var emptyProduct in emptyProducts) company.Products.Add(emptyProduct);
 
                 await dbContext.Products.AddRangeAsync(emptyProducts);
-                
+
                 counter++;
                 Thread.Sleep(5000);
             }
 
-            shop.ShopState = ShopState.Success;
-            shop.SyncDate = DateTime.Now;
+            company.CompanyState = CompanyState.Success;
+            company.SyncDate = DateTime.Now;
 
-            var jsonSellerDat = new ShopJson
+            var jsonCompanyDat = new CompanyJson
             {
-                ExternalId = shop.ExternalId,
-                Url = shop.Url,
-                SyncDate = shop.SyncDate,
-                Name = shop.Name
+                ExternalId = company.ExternalId,
+                PortalPageUrl = company.Url,
+                SyncDate = company.SyncDate,
+                Name = company.Name
             };
 
             var generator = new JSchemaGenerator();
-            var fullCategorySchema = generator.Generate(typeof(ShopJson)).ToString();
-            var fullCategoryJson = JsonConvert.SerializeObject(jsonSellerDat);
+            var fullCategorySchema = generator.Generate(typeof(CompanyJson)).ToString();
+            var fullCategoryJson = JsonConvert.SerializeObject(jsonCompanyDat);
 
 
-            shop.JsonData = fullCategoryJson;
-            shop.JsonDataSchema = fullCategorySchema;
+            company.JsonData = fullCategoryJson;
+            company.JsonDataSchema = fullCategorySchema;
         }
     }
 }

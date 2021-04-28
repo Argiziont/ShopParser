@@ -35,7 +35,7 @@ namespace ShopParserApi
 
             //Background workers for parsing data
             services.AddHostedService<BackgroundProductControllerWorker>();
-            services.AddHostedService<BackgroundShopControllerWorker>();
+            services.AddHostedService<BackgroundCompanyControllerWorker>();
 
             services.AddControllers();
             services.AddOpenApiDocument();

@@ -7,25 +7,25 @@ namespace ShopParserApi.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.RenameColumn(
-                name: "AttributeValue",
-                table: "ProductAttributes",
-                newName: "AttributeValues");
+                "AttributeValue",
+                "ProductAttributes",
+                "AttributeValues");
 
             migrationBuilder.RenameColumn(
-                name: "Href",
-                table: "Categories",
-                newName: "Url");
+                "Href",
+                "Categories",
+                "Url");
 
             migrationBuilder.AddColumn<string>(
-                name: "AttributeGroup",
-                table: "ProductAttributes",
-                type: "nvarchar(max)",
+                "AttributeGroup",
+                "ProductAttributes",
+                "nvarchar(max)",
                 nullable: true);
 
             migrationBuilder.AddColumn<int>(
-                name: "ExternalId",
-                table: "ProductAttributes",
-                type: "int",
+                "ExternalId",
+                "ProductAttributes",
+                "int",
                 nullable: false,
                 defaultValue: 0);
         }
@@ -33,22 +33,22 @@ namespace ShopParserApi.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "AttributeGroup",
-                table: "ProductAttributes");
+                "AttributeGroup",
+                "ProductAttributes");
 
             migrationBuilder.DropColumn(
-                name: "ExternalId",
-                table: "ProductAttributes");
+                "ExternalId",
+                "ProductAttributes");
 
             migrationBuilder.RenameColumn(
-                name: "AttributeValues",
-                table: "ProductAttributes",
-                newName: "AttributeValue");
+                "AttributeValues",
+                "ProductAttributes",
+                "AttributeValue");
 
             migrationBuilder.RenameColumn(
-                name: "Url",
-                table: "Categories",
-                newName: "Href");
+                "Url",
+                "Categories",
+                "Href");
         }
     }
 }

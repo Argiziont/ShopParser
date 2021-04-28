@@ -2,12 +2,12 @@
 
 namespace ShopParserApi.Models
 {
-    public class ShopSource
+    public class CompanySource
     {
         public int Id { get; set; }
         public string Name { get; set; }
 
         //Data base connections
-        public ICollection<ShopData> Shops { get; set; }
+        public ICollection<CompanyData> Companies { get; set; }
     }
 }

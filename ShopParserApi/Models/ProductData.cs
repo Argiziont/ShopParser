@@ -8,7 +8,7 @@ namespace ShopParserApi.Models
     {
         //Ids
         public int Id { get; set; }
-        public int? ShopId { get; set; }
+        public int? CompanyId { get; set; }
         public string ExternalId { get; set; }
 
 
@@ -27,9 +27,16 @@ namespace ShopParserApi.Models
         public string JsonData { get; set; }
         public string JsonDataSchema { get; set; }
 
+
         //Data base connections
-        public ShopData Shop { get; set; }
+        public CompanyData Company { get; set; }
+        public PresenceData Presence { get; set; }
         public ICollection<Category> Categories { get; set; } = new List<Category>();
+        public ICollection<ProductPaymentOption> ProductPaymentOptions { get; set; } = new List<ProductPaymentOption>();
+
+        public ICollection<ProductDeliveryOption> ProductDeliveryOptions { get; set; } =
+            new List<ProductDeliveryOption>();
+
         public ICollection<ProductAttribute> ProductAttribute { get; set; } = new List<ProductAttribute>();
     }
 }

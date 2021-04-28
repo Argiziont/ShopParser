@@ -53,16 +53,16 @@ namespace ShopParserApi.Controllers
         }
 
         [HttpPost]
-        [Route("ParseAllProductUrlsInsideSellerPage")]
+        [Route("ParseAllProductUrlsInsideCompanyPage")]
         [ProducesResponseType(typeof(ProductData), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesDefaultResponseType]
-        public async Task<IActionResult> ParseAllProductUrlsInsideSellerPageAsync(string shopName)
+        public async Task<IActionResult> ParseAllProductUrlsInsideCompanyPageAsync(string companyName)
         {
-            var seller = _dbContext.Shops.FirstOrDefault(s => s.Name == shopName);
-            if (seller == null) return BadRequest("This shop doesn't exist in database");
+            var company = _dbContext.Companies.FirstOrDefault(s => s.Name == companyName);
+            if (company == null) return BadRequest("This company doesn't exist in database");
 
-            var productsList = _dbContext.Products.Where(p => p.Shop.Id == seller.Id).ToArray();
+            var productsList = _dbContext.Products.Where(p => p.Company.Id == company.Id).ToArray();
             for (var i = 0; i < productsList.Length; i++)
             {
                 var productPage = await _context.OpenAsync(productsList[i].Url);
@@ -86,12 +86,12 @@ namespace ShopParserApi.Controllers
         }
 
         [HttpPost]
-        [Route("ParseSingleProductInsideSellerPage")]
+        [Route("ParseSingleProductInsideCompanyPage")]
         [ProducesResponseType(typeof(ProductData), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status202Accepted)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesDefaultResponseType]
-        public async Task<IActionResult> ParseSingleProductInsideSellerPageAsync(string productId)
+        public async Task<IActionResult> ParseSingleProductInsideCompanyPageAsync(string productId)
         {
             var currentProduct = _dbContext.Products.FirstOrDefault(s => s.Id == Convert.ToInt32(productId));
 
@@ -140,16 +140,16 @@ namespace ShopParserApi.Controllers
         }
 
         [HttpGet]
-        [Route("GetProductsByShopId")]
+        [Route("GetProductsByCompanyId")]
         [ProducesResponseType(typeof(IEnumerable<ResponseProduct>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
         [ProducesDefaultResponseType]
-        public async Task<IActionResult> GetProductsByShopIdAsync(int id)
+        public async Task<IActionResult> GetProductsByCompanyIdAsync(int id)
         {
             try
             {
                 var productList = await _dbContext.Products
-                    .Where(p => p.ShopId == id && p.ProductState == ProductState.Success).ToListAsync();
+                    .Where(p => p.CompanyId == id && p.ProductState == ProductState.Success).ToListAsync();
                 return Ok(productList.Select(p => new ResponseProduct
                 {
                     Description = p.Description,
@@ -202,20 +202,20 @@ namespace ShopParserApi.Controllers
         }
 
         [HttpGet]
-        [Route("GetPagedProductsByShopId")]
+        [Route("GetPagedProductsByCompanyId")]
         [ProducesResponseType(typeof(IEnumerable<ProductData>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesDefaultResponseType]
-        public async Task<IActionResult> GetPagedProductsByShopIdAsync(int id, int page, int rowsPerPage)
+        public async Task<IActionResult> GetPagedProductsByCompanyIdAsync(int id, int page, int rowsPerPage)
         {
             try
             {
                 var productSource = await _dbContext.Products
-                    .Where(p => p.ShopId == id &&
+                    .Where(p => p.CompanyId == id &&
                                 p.ProductState ==
                                 ProductState
-                                    .Success) //Take products which owned by current shop and was parsed successfully
+                                    .Success) //Take products which owned by current company and was parsed successfully
                     .OrderBy(p => p.Id) //Order by internal DB id
                     .Skip(page * rowsPerPage).Take(rowsPerPage).ToListAsync(); //Take products by page
 
@@ -257,7 +257,7 @@ namespace ShopParserApi.Controllers
                     .Where(p => p.Categories.Contains(currentCategory) &&
                                 p.ProductState ==
                                 ProductState
-                                    .Success) //Take products which owned by current shop and was parsed successfully
+                                    .Success) //Take products which owned by current company and was parsed successfully
                     .OrderBy(p => p.Id) //Order by internal DB id
                     .Skip(page * rowsPerPage).Take(rowsPerPage).ToListAsync(); //Take products by page
 

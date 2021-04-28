@@ -15,9 +15,12 @@ namespace ShopParserApi.Service
         }
 
         public DbSet<ProductData> Products { get; set; }
-        public DbSet<ShopData> Shops { get; set; }
-        public DbSet<ShopSource> Sources { get; set; }
+        public DbSet<CompanyData> Companies { get; set; }
+        public DbSet<CompanySource> Sources { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<ProductAttribute> ProductAttributes { get; set; }
+        public DbSet<ProductPaymentOption> ProductPaymentOptions { get; set; }
+        public DbSet<ProductDeliveryOption> ProductDeliveryOptions { get; set; }
+        public DbSet<PresenceData> Presence { get; set; }
     }
 }

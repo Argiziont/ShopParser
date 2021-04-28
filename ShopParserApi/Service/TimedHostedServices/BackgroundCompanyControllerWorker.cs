@@ -1,34 +1,29 @@
-﻿using AngleSharp;
-using Microsoft.AspNetCore.SignalR;
+﻿using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using AngleSharp;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using ShopParserApi.Models.Hubs;
-using ShopParserApi.Models.Hubs.Clients;
 using ShopParserApi.Service.Helpers;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace ShopParserApi.Service.TimedHostedServices
 {
-    public class BackgroundShopControllerWorker : IHostedService, IDisposable
+    public class BackgroundCompanyControllerWorker : IHostedService, IDisposable
     {
         private readonly IBrowsingContext _context;
         private readonly ILogger<BackgroundProductControllerWorker> _logger;
         private readonly IServiceProvider _serviceProvider;
-        private readonly IHubContext<ApiHub, IApiClient> _shopHub;
 
-        public BackgroundShopControllerWorker(ILogger<BackgroundProductControllerWorker> logger,
-            IServiceProvider serviceProvider, IHubContext<ApiHub, IApiClient> shopHub)
+        public BackgroundCompanyControllerWorker(ILogger<BackgroundProductControllerWorker> logger,
+            IServiceProvider serviceProvider)
         {
             var config = Configuration.Default.WithDefaultLoader().WithJs();
             _context = BrowsingContext.New(config);
             _logger = logger;
             _serviceProvider = serviceProvider;
-            _shopHub = shopHub;
         }
 
         public void Dispose()
@@ -43,7 +38,7 @@ namespace ShopParserApi.Service.TimedHostedServices
             var ct = cts.Token;
 
             Task.Run(() => DoWork(ct), ct);
-            
+
             return Task.CompletedTask;
         }
 
@@ -66,15 +61,15 @@ namespace ShopParserApi.Service.TimedHostedServices
                 {
                     if (context == null) throw new NullReferenceException(nameof(context));
 
-                    var shop = context.Shops.FirstOrDefault(p => p.Products.Count == 0);
-                    if (shop == null) continue;
+                    var company = context.Companies.FirstOrDefault(p => p.Products.Count == 0);
+                    if (company == null) continue;
 
-                    var sellerPage = await _context.OpenAsync(shop.Url, ct);
+                    var companyPage = await _context.OpenAsync(company.Url, ct);
 
-                    await ShopService.AddProductsFromSellerPageToDb(shop, sellerPage, context);
+                    await CompanyService.AddProductsFromCompanyPageToDb(company, companyPage, context);
 
 
-                    context.Entry(shop).State = EntityState.Modified;
+                    context.Entry(company).State = EntityState.Modified;
 
                     await context.SaveChangesAsync(ct);
                 }

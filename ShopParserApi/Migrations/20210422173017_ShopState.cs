@@ -2,14 +2,14 @@
 
 namespace ShopParserApi.Migrations
 {
-    public partial class ShopState : Migration
+    public partial class CompanyState : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<int>(
-                name: "ShopState",
-                table: "Shops",
-                type: "int",
+                "companyState",
+                "companies",
+                "int",
                 nullable: false,
                 defaultValue: 0);
         }
@@ -17,8 +17,8 @@ namespace ShopParserApi.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "ShopState",
-                table: "Shops");
+                "companyState",
+                "companies");
         }
     }
 }

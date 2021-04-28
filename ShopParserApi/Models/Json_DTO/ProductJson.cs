@@ -8,7 +8,7 @@ namespace ShopParserApi.Models.Json_DTO
     public class ProductJson
     {
         //Internal data
-        [JsonProperty("nameForCatalog")]public string Title { get; set; }
+        [JsonProperty("nameForCatalog")] public string Title { get; set; }
         [JsonProperty("id")] public string ExternalId { get; set; }
         [JsonProperty("urlForProductCatalog")] public string Url { get; set; }
         [JsonProperty("priceCurrency")] public string Currency { get; set; }
@@ -18,6 +18,8 @@ namespace ShopParserApi.Models.Json_DTO
         [JsonProperty("priceUSD")] public string PriceUsd { get; set; }
         [JsonProperty("sku")] public string ScuCode { get; set; }
         [JsonProperty("price")] public string FullPrice { get; set; }
+        [JsonProperty("hasDiscount")] public bool IsDiscounted { get; set; }
+        [JsonProperty("discountPercent")] public int? DiscountPercent { get; set; }
         public PresenceData Presence { get; set; }
         public string OptPrice { get; set; }
         public List<string> ImageUrls { get; set; }
@@ -27,5 +29,9 @@ namespace ShopParserApi.Models.Json_DTO
         public string StringCategory { get; set; }
         public string JsonCategorySchema { get; set; }
         public ICollection<ProductAttribute> ProductAttribute { get; set; }
+        public ICollection<ProductPaymentOption> ProductPaymentOptions { get; set; }
+
+        public ICollection<ProductDeliveryOption> ProductDeliveryOptions { get; set; } =
+            new List<ProductDeliveryOption>();
     }
 }

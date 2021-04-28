@@ -1,4 +1,9 @@
-﻿using AngleSharp;
+﻿using System;
+using System.Linq;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
+using AngleSharp;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -8,12 +13,6 @@ using ShopParserApi.Models.Hubs;
 using ShopParserApi.Models.Hubs.Clients;
 using ShopParserApi.Service.Exceptions;
 using ShopParserApi.Service.Helpers;
-using System;
-using System.Linq;
-using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
-using AngleSharp.Io;
 
 namespace ShopParserApi.Service.TimedHostedServices
 {
@@ -70,7 +69,8 @@ namespace ShopParserApi.Service.TimedHostedServices
 
                     if (context.Products.Count(p => p.ProductState == ProductState.Idle) == 0)
                         continue;
-                    if (context.Shops.Count(s => s.ShopState == ShopState.Processing&& s.ShopState == ShopState.Idle) != 0)
+                    if (context.Companies.Count(s =>
+                        s.CompanyState == CompanyState.Processing && s.CompanyState == CompanyState.Idle) != 0)
                         continue;
 
                     //first product with idle state
@@ -84,8 +84,8 @@ namespace ShopParserApi.Service.TimedHostedServices
 
                     try
                     {
-                        var productPage = await _context.OpenAsync(product.Url, cancellation: ct);
-                        
+                        var productPage = await _context.OpenAsync(product.Url, ct);
+
                         if (productPage.StatusCode == HttpStatusCode.TooManyRequests)
                             throw new TooManyRequestsException();
 

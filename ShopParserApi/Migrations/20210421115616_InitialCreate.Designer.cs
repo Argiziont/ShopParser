@@ -113,7 +113,7 @@ namespace ShopParserApi.Migrations
                     b.Property<int>("ProductState")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ShopId")
+                    b.Property<int?>("companyId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("SyncDate")
@@ -127,12 +127,12 @@ namespace ShopParserApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ShopId");
+                    b.HasIndex("companyId");
 
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("PrjModule25_Parser.Models.ShopData", b =>
+            modelBuilder.Entity("PrjModule25_Parser.Models.companyData", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -164,10 +164,10 @@ namespace ShopParserApi.Migrations
 
                     b.HasIndex("SourceId");
 
-                    b.ToTable("Shops");
+                    b.ToTable("companys");
                 });
 
-            modelBuilder.Entity("PrjModule25_Parser.Models.ShopSource", b =>
+            modelBuilder.Entity("PrjModule25_Parser.Models.companySource", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -217,17 +217,17 @@ namespace ShopParserApi.Migrations
 
             modelBuilder.Entity("PrjModule25_Parser.Models.ProductData", b =>
                 {
-                    b.HasOne("PrjModule25_Parser.Models.ShopData", "Shop")
+                    b.HasOne("PrjModule25_Parser.Models.companyData", "company")
                         .WithMany("Products")
-                        .HasForeignKey("ShopId");
+                        .HasForeignKey("companyId");
 
-                    b.Navigation("Shop");
+                    b.Navigation("company");
                 });
 
-            modelBuilder.Entity("PrjModule25_Parser.Models.ShopData", b =>
+            modelBuilder.Entity("PrjModule25_Parser.Models.companyData", b =>
                 {
-                    b.HasOne("PrjModule25_Parser.Models.ShopSource", "Source")
-                        .WithMany("Shops")
+                    b.HasOne("PrjModule25_Parser.Models.companySource", "Source")
+                        .WithMany("companys")
                         .HasForeignKey("SourceId");
 
                     b.Navigation("Source");
@@ -238,14 +238,14 @@ namespace ShopParserApi.Migrations
                     b.Navigation("ProductAttribute");
                 });
 
-            modelBuilder.Entity("PrjModule25_Parser.Models.ShopData", b =>
+            modelBuilder.Entity("PrjModule25_Parser.Models.companyData", b =>
                 {
                     b.Navigation("Products");
                 });
 
-            modelBuilder.Entity("PrjModule25_Parser.Models.ShopSource", b =>
+            modelBuilder.Entity("PrjModule25_Parser.Models.companySource", b =>
                 {
-                    b.Navigation("Shops");
+                    b.Navigation("companys");
                 });
 #pragma warning restore 612, 618
         }
