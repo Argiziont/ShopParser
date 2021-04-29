@@ -88,10 +88,10 @@ namespace ShopParserApi.Service.Helpers
 
             var productFromProm = JsonConvert.DeserializeObject<ProductJson>(product.ToString());
 
+            //Parsing images 
             var images =
                 JsonConvert.DeserializeObject<string[]>(
                     product["images({\"height\":640,\"width\":640})"]?["json"]?.ToString() ?? "[]");
-
             productFromProm.ImageUrls = images.ToList();
 
             var productPresence = json[$"$Product:{externalId}.presence"];
@@ -99,6 +99,7 @@ namespace ShopParserApi.Service.Helpers
             if (productPresence != null)
                 productFromProm.Presence = JsonConvert.DeserializeObject<PresenceData>(productPresence.ToString());
 
+            //Parsing Attributes 
             var attributesObjectsList = product["attributes"]?.Select(a => a["id"].ToString());
             if (attributesObjectsList != null)
             {
@@ -126,9 +127,9 @@ namespace ShopParserApi.Service.Helpers
                 }
             }
 
+            //Parsing categories 
             var productBreadCrumbsObjectsList =
                 json[$"$Product:{externalId}.breadCrumbs"]?["items"]?.Select(a => a["id"].ToString());
-
             var categoryList = new List<Category>();
             if (productBreadCrumbsObjectsList != null)
             {
@@ -165,6 +166,7 @@ namespace ShopParserApi.Service.Helpers
                 }
             }
 
+            //Parsing delivery options
             var productDeliveryOptionsObjectsList = product["deliveryOptions"]?.Select(a => a["id"].ToString());
             if (productDeliveryOptionsObjectsList != null)
             {
@@ -175,6 +177,7 @@ namespace ShopParserApi.Service.Helpers
                     .Select(JsonConvert.DeserializeObject<ProductDeliveryOption>));
             }
 
+            //Parsing payment options
             var productPaymentOptionsObjectsList = product["paymentOptions"]?.Select(a => a["id"].ToString());
             if (productPaymentOptionsObjectsList != null)
             {
