@@ -2,7 +2,7 @@
 using ShopParserApi.Models;
 using ShopParserApi.Models.Helpers;
 
-namespace ShopParserApi.Service
+namespace ShopParserApi.Services
 {
     public sealed class ApplicationDb : DbContext
     {

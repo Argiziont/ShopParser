@@ -7,9 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using ShopParserApi.Service.Helpers;
+using ShopParserApi.Services.Helpers;
 
-namespace ShopParserApi.Service.TimedHostedServices
+namespace ShopParserApi.Services.TimedHostedServices
 {
     public class BackgroundCompanyControllerWorker : IHostedService, IDisposable
     {

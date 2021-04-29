@@ -4,7 +4,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using ShopParserApi.Service;
+using ShopParserApi.Services;
 
 namespace ShopParserApi.Migrations
 {

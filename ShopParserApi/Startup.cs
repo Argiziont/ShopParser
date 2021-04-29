@@ -5,8 +5,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ShopParserApi.Models.Hubs;
-using ShopParserApi.Service;
-using ShopParserApi.Service.TimedHostedServices;
+using ShopParserApi.Services;
+using ShopParserApi.Services.TimedHostedServices;
 
 namespace ShopParserApi
 {
@@ -32,6 +32,8 @@ namespace ShopParserApi
 
             //SignalR connection
             services.AddSignalR();
+
+            services.AddScoped<ProductService>();
 
             //Background workers for parsing data
             services.AddHostedService<BackgroundProductControllerWorker>();

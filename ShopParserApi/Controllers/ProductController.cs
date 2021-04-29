@@ -15,9 +15,9 @@ using ShopParserApi.Models.Hubs;
 using ShopParserApi.Models.Hubs.Clients;
 using ShopParserApi.Models.Json_DTO;
 using ShopParserApi.Models.ResponseModels;
-using ShopParserApi.Service;
-using ShopParserApi.Service.Exceptions;
-using ShopParserApi.Service.Helpers;
+using ShopParserApi.Services;
+using ShopParserApi.Services.Exceptions;
+using ShopParserApi.Services.Helpers;
 
 namespace ShopParserApi.Controllers
 {
@@ -28,13 +28,15 @@ namespace ShopParserApi.Controllers
         private readonly IBrowsingContext _context;
         private readonly ApplicationDb _dbContext;
         private readonly IHubContext<ApiHub, IApiClient> _productsHub;
+        private readonly ProductService _productService;
 
-        public ProductController(ApplicationDb db, IHubContext<ApiHub, IApiClient> productsHub)
+        public ProductController(ApplicationDb db, IHubContext<ApiHub, IApiClient> productsHub, ProductService productService)
         {
             var config = Configuration.Default.WithDefaultLoader();
             _context = BrowsingContext.New(config);
             _dbContext = db;
             _productsHub = productsHub;
+            _productService = productService;
         }
 
         [HttpGet]
@@ -47,7 +49,7 @@ namespace ShopParserApi.Controllers
             if (productPage.StatusCode == HttpStatusCode.TooManyRequests)
                 throw new TooManyRequestsException();
 
-            var parsedProduct = await ProductService.ParseSinglePage(productPage, productUrl, _dbContext);
+            var parsedProduct = await _productService.InsertPageIntoDb(productUrl);
 
             return Ok(parsedProduct);
         }
@@ -69,7 +71,7 @@ namespace ShopParserApi.Controllers
                 if (productPage.StatusCode == HttpStatusCode.TooManyRequests)
                     throw new TooManyRequestsException();
 
-                var parsedProduct = await ProductService.ParseSinglePage(productPage, productsList[i].Url, _dbContext);
+                var parsedProduct = await _productService.InsertPageIntoDb(productsList[i].Url);
 
                 if (parsedProduct != null)
                 {
@@ -105,7 +107,7 @@ namespace ShopParserApi.Controllers
                 if (productPage.StatusCode == HttpStatusCode.TooManyRequests)
                     throw new TooManyRequestsException();
 
-                await ProductService.ParseSinglePageAndInsertToDb(productPage, currentProduct.Url, _dbContext);
+                await _productService.InsertPageIntoDb(currentProduct.Url); 
             }
             catch (TooManyRequestsException)
             {

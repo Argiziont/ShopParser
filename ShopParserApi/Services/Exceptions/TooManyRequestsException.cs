@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ShopParserApi.Service.Exceptions
+namespace ShopParserApi.Services.Exceptions
 {
     public class TooManyRequestsException : Exception
     {

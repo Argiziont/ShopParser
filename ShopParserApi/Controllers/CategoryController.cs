@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ShopParserApi.Models;
 using ShopParserApi.Models.ResponseModels;
-using ShopParserApi.Service;
+using ShopParserApi.Services;
 
 namespace ShopParserApi.Controllers
 {

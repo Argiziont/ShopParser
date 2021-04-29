@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using ShopParserApi.Models;
 
-namespace ShopParserApi.Service.Extensions
+namespace ShopParserApi.Services.Extensions
 {
     public static class StringExtensions
     {
@@ -11,6 +14,11 @@ namespace ShopParserApi.Service.Extensions
 
             var result = value.Substring(startIndex, endIndex).Trim();
             return result.Remove(result.Length - 1);
+        }
+        private static string CategoryToString(this IEnumerable<Category> categories)
+        {
+            var categoryString = categories.Aggregate("", (current, category) => current + category.Name + " > ");
+            return categoryString.Remove(categoryString.Length - 3);
         }
     }
 }

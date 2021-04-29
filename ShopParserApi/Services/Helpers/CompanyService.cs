@@ -11,7 +11,7 @@ using ShopParserApi.Models;
 using ShopParserApi.Models.Helpers;
 using ShopParserApi.Models.Json_DTO;
 
-namespace ShopParserApi.Service.Helpers
+namespace ShopParserApi.Services.Helpers
 {
     public static class CompanyService
     {

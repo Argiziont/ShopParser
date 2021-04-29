@@ -13,9 +13,9 @@ using ShopParserApi.Models;
 using ShopParserApi.Models.Helpers;
 using ShopParserApi.Models.Json_DTO;
 using ShopParserApi.Models.ResponseModels;
-using ShopParserApi.Service;
-using ShopParserApi.Service.Extensions;
-using ShopParserApi.Service.Helpers;
+using ShopParserApi.Services;
+using ShopParserApi.Services.Extensions;
+using ShopParserApi.Services.Helpers;
 
 namespace ShopParserApi.Controllers
 {

@@ -11,10 +11,9 @@ using Microsoft.Extensions.Logging;
 using ShopParserApi.Models.Helpers;
 using ShopParserApi.Models.Hubs;
 using ShopParserApi.Models.Hubs.Clients;
-using ShopParserApi.Service.Exceptions;
-using ShopParserApi.Service.Helpers;
+using ShopParserApi.Services.Exceptions;
 
-namespace ShopParserApi.Service.TimedHostedServices
+namespace ShopParserApi.Services.TimedHostedServices
 {
     public class BackgroundProductControllerWorker : IHostedService, IDisposable
     {
@@ -63,9 +62,11 @@ namespace ShopParserApi.Service.TimedHostedServices
                 await Task.Delay(TimeSpan.FromSeconds(5), ct);
                 using var scope = _serviceProvider.CreateScope();
                 var context = scope.ServiceProvider.GetService<ApplicationDb>();
+                var productService = scope.ServiceProvider.GetService<ProductService>();
                 try
                 {
                     if (context == null) throw new NullReferenceException(nameof(context));
+                    if (productService == null) throw new NullReferenceException(nameof(productService));
 
                     if (context.Products.Count(p => p.ProductState == ProductState.Idle) == 0)
                         continue;
@@ -84,12 +85,12 @@ namespace ShopParserApi.Service.TimedHostedServices
 
                     try
                     {
-                        var productPage = await _context.OpenAsync(product.Url, ct);
+                        //var productPage = await _context.OpenAsync(product.Url, ct);
 
-                        if (productPage.StatusCode == HttpStatusCode.TooManyRequests)
-                            throw new TooManyRequestsException();
+                        //if (productPage.StatusCode == HttpStatusCode.TooManyRequests)
+                        //    throw new TooManyRequestsException();
 
-                        await ProductService.ParseSinglePageAndInsertToDb(productPage, product.Url, context);
+                        await productService.InsertPageIntoDb(product);
                     }
                     catch (TooManyRequestsException)
                     {
