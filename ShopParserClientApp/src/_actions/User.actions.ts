@@ -1,38 +1,38 @@
 import {
   UserService
 } from "../_services";
-import { IResponseShop, IProductJson,IResponseNestedCategory } from "./ClientActions";
+import { IResponseCompany, IProductJson,IResponseNestedCategory } from "./ClientActions";
 
 export const UserActions = {
-  GetAllShops,
-  GetAllProductInShop,
+  GetAllCompanys,
+  GetAllProductInCompany,
   GetProductById,
-  AddShopByUrl,
-  GetProductByShopIdAndPage,
+  AddCompanyByUrl,
+  GetProductByCompanyIdAndPage,
   GetSubCategories,
   GetProductByCategoryIdAndPage
 };
-async function GetAllShops(): Promise<IResponseShop[]|undefined> {
+async function GetAllCompanys(): Promise<IResponseCompany[]|undefined> {
   try {
-    const response = await  UserService.GetAllShops();
+    const response = await  UserService.GetAllCompanys();
     return response;
   } 
   catch(error) {
     console.error(error);
   }
 }
-async function GetAllProductInShop(id:number): Promise<IResponseShop[]|undefined> {
+async function GetAllProductInCompany(id:number): Promise<IResponseCompany[]|undefined> {
   try {
-    const response = await  UserService.GetAllProductInShop(id);
+    const response = await  UserService.GetAllProductInCompany(id);
     return response;
   } 
   catch(error) {
     console.error(error);
   }
 }
-async function GetProductByShopIdAndPage(id:number,page:number,rows:number): Promise<IResponseShop[]|undefined> {
+async function GetProductByCompanyIdAndPage(id:number,page:number,rows:number): Promise<IResponseCompany[]|undefined> {
   try {
-    const response = await  UserService.GetProductByShopIdAndPage(id,page,rows);
+    const response = await  UserService.GetProductByCompanyIdAndPage(id,page,rows);
     return response;
   } 
   catch(error) {
@@ -66,9 +66,9 @@ async function GetSubCategories(): Promise<IResponseNestedCategory|undefined> {
     console.error(error);
   }
 }
-async function AddShopByUrl(url: string): Promise<IResponseShop | undefined> {
+async function AddCompanyByUrl(url: string): Promise<IResponseCompany | undefined> {
   try {
-    const response = await  UserService.AddShopByUrl(url);
+    const response = await  UserService.AddCompanyByUrl(url);
     return response;
   } 
   catch(error) {

@@ -1,5 +1,5 @@
 import {
-  ShopClient,
+  CompanyClient,
   ProductClient,
   CategoryClient
 } from "../../_actions";
@@ -8,8 +8,8 @@ import {
   ApiUrl,
 } from "..";
 
-export const ShopApi = (): ShopClient => {
-  return new ShopClient(ApiUrl);
+export const CompanyApi = (): CompanyClient => {
+  return new CompanyClient(ApiUrl);
 };
 export const ProductApi = (): ProductClient => {
   return new ProductClient(ApiUrl);

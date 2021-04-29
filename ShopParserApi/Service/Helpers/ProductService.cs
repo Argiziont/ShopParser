@@ -79,7 +79,6 @@ namespace ShopParserApi.Service.Helpers
                 .Split("/").Last().Split('-').First().Replace("p", "");
 
             var jsonString = page.ToHtml().SubstringJson("window.ApolloCacheState =", "window.SPAConfig");
-
             var json = JObject.Parse(jsonString);
 
             var product = json[$"Product:{externalId}"];
@@ -167,8 +166,6 @@ namespace ShopParserApi.Service.Helpers
             }
 
             var productDeliveryOptionsObjectsList = product["deliveryOptions"]?.Select(a => a["id"].ToString());
-
-
             if (productDeliveryOptionsObjectsList != null)
             {
                 productFromProm.ProductDeliveryOptions = new List<ProductDeliveryOption>();
@@ -179,8 +176,6 @@ namespace ShopParserApi.Service.Helpers
             }
 
             var productPaymentOptionsObjectsList = product["paymentOptions"]?.Select(a => a["id"].ToString());
-
-
             if (productPaymentOptionsObjectsList != null)
             {
                 productFromProm.ProductPaymentOptions = new List<ProductPaymentOption>();

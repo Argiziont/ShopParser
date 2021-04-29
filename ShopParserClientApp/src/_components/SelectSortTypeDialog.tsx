@@ -19,7 +19,7 @@ export interface SelectSortTypeDialogProps {
   selectedValue: string;
   onClose: (value: string) => void;
 }
-export const SortTypes = ["Shops", "Categories"];
+export const SortTypes = ["Companies", "Categories"];
 const useStyles = makeStyles({
   avatar: {
     backgroundColor: blue[100],

@@ -28,7 +28,7 @@ import {
   IProductJson,
   IResponseNestedCategory,
   IResponseProduct,
-  IResponseShop,
+  IResponseCompany,
   UserActions,
 } from "../_actions";
 import { ApiUrl, SnackbarMessage } from "../_services";
@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.primary.main,
     padding: "0 30px",
   },
-  shopItem: {
+  companyItem: {
     maxWidth: "320px",
     minWidth: "300px",
     background: "#D3D3D3",
@@ -62,10 +62,10 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: 16,
     padding: "15px 15px",
   },
-  shopInput: {
+  companyInput: {
     maxWidth: "150px",
   },
-  shopOuterItem: {
+  companyOuterItem: {
     border: 0,
     borderRadius: 16,
     //minWidth: "250px",
@@ -77,7 +77,7 @@ const useStyles = makeStyles((theme) => ({
   divDefault: {
     cursor: "default",
   },
-  shopListRoot: {
+  companyListRoot: {
     width: "100%",
     maxWidth: 360,
   },
@@ -100,10 +100,10 @@ export const ParseDataSegment: React.FC = () => {
   >();
   const [currentProductListId, setCurrentProductListId] = useState<number>();
 
-  //Shop states
-  const [shopList, setShopList] = useState<IResponseShop[]>();
-  const [isShopsLodaing, setIsShopsLodaing] = useState<boolean>(false);
-  const [shopUrl, setShopUrl] = useState<string>("");
+  //Company states
+  const [companyList, setCompanyList] = useState<IResponseCompany[]>();
+  const [isCompaniesLodaing, setIsCompanysLodaing] = useState<boolean>(false);
+  const [companyUrl, setCompanyUrl] = useState<string>("");
 
   //Products Pagination states
   const [productPage, setProductPage] = React.useState(0);
@@ -133,7 +133,7 @@ export const ParseDataSegment: React.FC = () => {
   //SignalR and page loading effect
   useEffect(() => {
     let isMounted = true;
-    setIsShopsLodaing(true);
+    setIsCompanysLodaing(true);
 
     const connection = new HubConnectionBuilder()
       .withUrl(ApiUrl + "/hubs/DataFetchHub")
@@ -149,16 +149,16 @@ export const ParseDataSegment: React.FC = () => {
       })
 
       .catch((e) => console.log("Connection failed: ", e));
-    UserActions.GetAllShops().then((shopList) => {
+    UserActions.GetAllCompanys().then((companyList) => {
       UserActions.GetSubCategories().then((categoryList) => {
         if (isMounted) {
-          setShopList(shopList);
+          setCompanyList(companyList);
           if (categoryList != undefined) {
             const nestedArray: IResponseNestedCategory[] = new Array(1);
             nestedArray[0] = categoryList;
             setCategoriesList(nestedArray);
           }
-          setIsShopsLodaing(false);
+          setIsCompanysLodaing(false);
         }
       });
     });
@@ -187,7 +187,7 @@ export const ParseDataSegment: React.FC = () => {
   ) => {
     setProductPage(pageNumber);
     setCheckedProduct(undefined);
-    const result = await handleGetProductRequestByShops(
+    const result = await handleGetProductRequestByCompanys(
       currentProductListId,
       pageNumber,
       rowsCount
@@ -213,7 +213,7 @@ export const ParseDataSegment: React.FC = () => {
     setRowsPerProductPage(rowsPerPageParsed);
     handleSetProductPage(0, rowsPerPageParsed);
   };
-  const handleGetProductRequestByShops = async (
+  const handleGetProductRequestByCompanys = async (
     id: number | undefined,
     page: number | undefined,
     rowsCount: number | undefined
@@ -223,7 +223,7 @@ export const ParseDataSegment: React.FC = () => {
         setCurrentProductListId(id);
         setCheckedProduct(undefined);
         setIsProductsLodaing(true);
-        const response = await UserActions.GetProductByShopIdAndPage(
+        const response = await UserActions.GetProductByCompanyIdAndPage(
           id,
           page,
           rowsCount
@@ -322,8 +322,8 @@ export const ParseDataSegment: React.FC = () => {
     return 0;
   };
 
-  //Shop Actions
-  const handleShopShowProductsClick = (
+  //Company Actions
+  const handleCompanyShowProductsClick = (
     id: number | undefined,
     productCount: number | undefined
   ) => {
@@ -331,35 +331,35 @@ export const ParseDataSegment: React.FC = () => {
       const products = handlesetNumberOfProductsInTotal(productCount);
 
       setProductPage(0);
-      handleGetProductRequestByShops(id, productPage, products);
+      handleGetProductRequestByCompanys(id, productPage, products);
       handlesetNumberOfProductsInTotal(
         productCount != undefined ? productCount : 0
       );
     }
   };
   const handleProductsUpdate = () => {
-    setIsShopsLodaing(true);
-    UserActions.GetAllShops().then((shopList) => {
+    setIsCompanysLodaing(true);
+    UserActions.GetAllCompanys().then((companyList) => {
       UserActions.GetSubCategories().then((categoryList) => {
-        if (categoryList != undefined && shopList != undefined) {
+        if (categoryList != undefined && companyList != undefined) {
           const nestedArray: IResponseNestedCategory[] = new Array(1);
           nestedArray[0] = categoryList;
           setCategoriesList(nestedArray);
-          setShopList(shopList);
-          setIsShopsLodaing(false);
+          setCompanyList(companyList);
+          setIsCompanysLodaing(false);
           setCheckedProduct(undefined);
           setProductList(undefined);
         }
       });
     });
   };
-  const handleShopUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setShopUrl(event.target.value);
+  const handleCompanyUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCompanyUrl(event.target.value);
   };
-  const handleShopUrlUploadClick = async () => {
+  const handleCompanyUrlUploadClick = async () => {
     try {
-      if (shopUrl != undefined) {
-        const response = await UserActions.AddShopByUrl(shopUrl);
+      if (companyUrl != undefined) {
+        const response = await UserActions.AddCompanyByUrl(companyUrl);
 
         if (response != undefined) {
           handleProductsUpdate();
@@ -451,76 +451,69 @@ export const ParseDataSegment: React.FC = () => {
     </Snackbar>
   );
 
-  //Shop list component
-  const shopsBlocks = (
+  //Company list component
+  const companiesBlocks = (
     <>
-      {() => {
-        if (shopList != undefined) {
-          if (shopList?.length > 0) {
-            return (
-              <List
-                component="nav"
-                aria-labelledby="nested-list-subheader"
-                className={classes.shopListRoot}
-              >
-                {shopList?.map((shop, i) => {
-                  return (
-                    <div key={i}>
-                      {Number(shop.productCount) > 0 ? (
-                        <ListItem
-                          button
-                          onClick={() =>
-                            handleShopShowProductsClick(
-                              shop.id,
-                              shop.productCount
-                            )
-                          }
-                        >
-                          <ListItemText
-                            disableTypography
-                            primary={
-                              <>
-                                <Typography variant="h6" gutterBottom>
-                                  {shop.name}
-                                </Typography>
-                                <Typography variant="body1" gutterBottom>
-                                  {"Shop Id: " + shop.externalId}
-                                </Typography>
-                                <Typography variant="body2" gutterBottom>
-                                  {"Products updated: " + shop.productCount}
-                                </Typography>
-                              </>
-                            }
-                          />
-                        </ListItem>
-                      ) : (
-                        <ListItem>
-                          <ListItemText
-                            disableTypography
-                            primary={
-                              <>
-                                <Typography variant="h6" gutterBottom>
-                                  {shop.name}
-                                </Typography>
-                                <Typography variant="body1" gutterBottom>
-                                  {"Shop Id: " + shop.externalId}
-                                </Typography>
-                                <Typography variant="body2" gutterBottom>
-                                  {"Products updated: " + shop.productCount}
-                                </Typography>
-                              </>
-                            }
-                          />
-                        </ListItem>
-                      )}
-                    </div>
-                  );
-                })}
-              </List>
-            );
-          }
-        }
-      }}
+      {companyList != undefined ? companyList?.length > 0 ? <List
+        component="nav"
+        aria-labelledby="nested-list-subheader"
+        className={classes.companyListRoot}
+      >
+        {companyList?.map((company, i) => {
+          return (
+            <div key={i}>
+              {Number(company.productCount) > 0 ? (
+                <ListItem
+                  button
+                  onClick={() =>
+                    handleCompanyShowProductsClick(
+                      company.id,
+                      company.productCount
+                    )
+                  }
+                >
+                  <ListItemText
+                    disableTypography
+                    primary={
+                      <>
+                        <Typography variant="h6" gutterBottom>
+                          {company.name}
+                        </Typography>
+                        <Typography variant="body1" gutterBottom>
+                          {"Company Id: " + company.externalId}
+                        </Typography>
+                        <Typography variant="body2" gutterBottom>
+                          {"Products updated: " + company.productCount}
+                        </Typography>
+                      </>
+                    }
+                  />
+                </ListItem>
+              ) : (
+                <ListItem>
+                  <ListItemText
+                    disableTypography
+                    primary={
+                      <>
+                        <Typography variant="h6" gutterBottom>
+                          {company.name}
+                        </Typography>
+                        <Typography variant="body1" gutterBottom>
+                          {"Company Id: " + company.externalId}
+                        </Typography>
+                        <Typography variant="body2" gutterBottom>
+                          {"Products updated: " + company.productCount}
+                        </Typography>
+                      </>
+                    }
+                  />
+                </ListItem>
+              )}
+            </div>
+          );
+        })}
+      </List> : <></> : <></>
+      }
     </>
   );
 
@@ -530,7 +523,7 @@ export const ParseDataSegment: React.FC = () => {
       <div></div>
     ) : (
       <Grid item>
-        <div className={classes.shopItem} style={{ width: "100%" }}>
+        <div className={classes.companyItem} style={{ width: "100%" }}>
           <TablePagination
             component="div"
             count={numberOfProductsInTotal}
@@ -549,7 +542,7 @@ export const ParseDataSegment: React.FC = () => {
     return (
       <Grid item key={product.id}>
         <div
-          className={`${classes.shopItem} ${classes.divPointer}`}
+          className={`${classes.companyItem} ${classes.divPointer}`}
           onClick={() => handleProductClick(product.id)}
         >
           <Typography variant="h6" gutterBottom noWrap>
@@ -573,14 +566,11 @@ export const ParseDataSegment: React.FC = () => {
           <Typography variant="h5" gutterBottom>
             {checkedProduct.title}
           </Typography>
-          <Typography variant="h6" gutterBottom>
-            {checkedProduct.companyName}
-          </Typography>
           <Typography variant="body1" gutterBottom>
             {checkedProduct.stringCategory}
           </Typography>
           <Typography variant="body2" gutterBottom>
-            {checkedProduct.presence}
+            {checkedProduct.presence?.title}
           </Typography>
           <Typography variant="body2" gutterBottom>
             {checkedProduct.scuCode}
@@ -636,7 +626,7 @@ export const ParseDataSegment: React.FC = () => {
           width: "100%",
         }}
       >
-        {isShopsLodaing ? (
+        {isCompaniesLodaing ? (
           <Grid item xs={3} container justify="center" direction="row">
             <Grid>
               <CircularProgress color="inherit" />
@@ -653,7 +643,7 @@ export const ParseDataSegment: React.FC = () => {
             alignItems="flex-start"
           >
             <Grid item>
-              <div className={classes.shopItem}>
+              <div className={classes.companyItem}>
                 <Grid
                   item
                   container
@@ -669,8 +659,8 @@ export const ParseDataSegment: React.FC = () => {
                       value={selectedSortByValue}
                       color="secondary"
                       size="small"
-                      className={classes.shopInput}
-                      onChange={handleShopUrlChange}
+                      className={classes.companyInput}
+                      onChange={handleCompanyUrlChange}
                     />
                   </Grid>
                   <Grid item>
@@ -690,10 +680,10 @@ export const ParseDataSegment: React.FC = () => {
                 </Grid>
               </div>
             </Grid>
-            {selectedSortByValue == "Shops" ? (
+            {selectedSortByValue == "Companies" ? (
               <>
                 <Grid item>
-                  <div className={classes.shopItem}>
+                  <div className={classes.companyItem}>
                     <Grid
                       item
                       container
@@ -704,19 +694,19 @@ export const ParseDataSegment: React.FC = () => {
                     >
                       <Grid item>
                         <TextField
-                          label="Shop URL"
+                          label="Company URL"
                           variant="outlined"
-                          value={shopUrl}
+                          value={companyUrl}
                           size="small"
-                          className={classes.shopInput}
-                          onChange={handleShopUrlChange}
+                          className={classes.companyInput}
+                          onChange={handleCompanyUrlChange}
                         />
                       </Grid>
                       <Grid item>
                         <Button
                           variant="contained"
                           endIcon={<CloudUploadIcon />}
-                          onClick={handleShopUrlUploadClick}
+                          onClick={handleCompanyUrlUploadClick}
                         >
                           {"Submit"}
                         </Button>
@@ -725,7 +715,9 @@ export const ParseDataSegment: React.FC = () => {
                   </div>
                 </Grid>
                 <Grid item>
-                  <div className={classes.shopItem}>{shopsBlocks}</div>
+                    <div className={classes.companyItem}>
+                      {companiesBlocks}
+                    </div>
                 </Grid>
               </>
             ) : (
@@ -734,9 +726,9 @@ export const ParseDataSegment: React.FC = () => {
                   <></>
                 ) : (
                   <Grid item>
-                    <div className={classes.shopItem}>
+                    <div className={classes.companyItem}>
                       <NestedCategoryList
-                        setCurrentShopId={handleCategoryClick}
+                        setCurrentCompanyId={handleCategoryClick}
                         padding={5}
                         list={categoriesList}
                       ></NestedCategoryList>
@@ -797,17 +789,17 @@ export const ParseDataSegment: React.FC = () => {
   );
 };
 
-//Shops Block Old
-//const [isShopDivExtended, setIsShopDivExtended] = useState<number>(-1);
-// const shopsBlocksOld = shopList?.map((shop, i) => {
+//Companys Block Old
+//const [isCompanyDivExtended, setIsCompanyDivExtended] = useState<number>(-1);
+// const companysBlocksOld = companyList?.map((company, i) => {
 //   return (
-//     <Grid item key={shop.id}>
+//     <Grid item key={company.id}>
 //       <div
-//         className={`${classes.shopOuterItem} ${classes.divPointer}`}
-//         onMouseEnter={() => setIsShopDivExtended(i)}
-//         onMouseLeave={() => setIsShopDivExtended(-1)}
+//         className={`${classes.companyOuterItem} ${classes.divPointer}`}
+//         onMouseEnter={() => setIsCompanyDivExtended(i)}
+//         onMouseLeave={() => setIsCompanyDivExtended(-1)}
 //         style={
-//           isShopDivExtended == i
+//           isCompanyDivExtended == i
 //             ? {
 //                 borderRadius: 18,
 //                 padding: "0px 10px 0px 0px",
@@ -823,19 +815,19 @@ export const ParseDataSegment: React.FC = () => {
 //         }
 //       >
 //         <div
-//           className={`${classes.shopItem} ${classes.divPointer}`}
+//           className={`${classes.companyItem} ${classes.divPointer}`}
 //           onClick={() =>
-//             handleShopShowProductsClick(shop.id, shop.productCount)
+//             handleCompanyShowProductsClick(company.id, company.productCount)
 //           }
 //         >
 //           <Typography variant="h6" gutterBottom>
-//             {shop.name}
+//             {company.name}
 //           </Typography>
 //           <Typography variant="body1" gutterBottom>
-//             {"Shop Id: " + shop.externalId}
+//             {"Company Id: " + company.externalId}
 //           </Typography>
 //           <Typography variant="body2" gutterBottom>
-//             {"Products updated: " + shop.productCount}
+//             {"Products updated: " + company.productCount}
 //           </Typography>
 //         </div>
 //       </div>

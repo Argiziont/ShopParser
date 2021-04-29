@@ -20,7 +20,7 @@ import { IResponseNestedCategory } from "../_actions";
 export interface NestedCategoryListProps {
   list: IResponseNestedCategory[];
   padding: number;
-  setCurrentShopId: (
+  setCurrentCompanyId: (
     id: number | undefined,
     pagesCount: number | undefined
   ) => Promise<void>;
@@ -68,7 +68,7 @@ export const NestedCategoryList: React.FC<NestedCategoryListProps> = (
     id: number | undefined,
     products: string | undefined
   ) => {
-    props.setCurrentShopId(id, Number(products));
+    props.setCurrentCompanyId(id, Number(products));
   };
 
   return (
@@ -134,7 +134,7 @@ export const NestedCategoryList: React.FC<NestedCategoryListProps> = (
             ) : (
               <Collapse in={openedCategoryId == i} timeout="auto" unmountOnExit>
                 <NestedCategoryList
-                  setCurrentShopId={props.setCurrentShopId}
+                  setCurrentCompanyId={props.setCurrentCompanyId}
                   list={element.subCategories}
                   padding={props.padding + 10}
                 ></NestedCategoryList>

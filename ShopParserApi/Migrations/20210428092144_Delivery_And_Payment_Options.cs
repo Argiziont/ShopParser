@@ -73,7 +73,7 @@ namespace ShopParserApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                "ProductDeliveryOption",
+                "ProductDeliveryOptions",
                 table => new
                 {
                     Id = table.Column<int>("int", nullable: false)
@@ -95,7 +95,7 @@ namespace ShopParserApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                "ProductPaymentOption",
+                "ProductPaymentOptions",
                 table => new
                 {
                     Id = table.Column<int>("int", nullable: false)
@@ -124,12 +124,12 @@ namespace ShopParserApi.Migrations
 
             migrationBuilder.CreateIndex(
                 "IX_ProductDeliveryOptions_ProductId",
-                "ProductDeliveryOption",
+                "ProductDeliveryOptions",
                 "ProductId");
 
             migrationBuilder.CreateIndex(
                 "IX_ProductPaymentOptions_ProductId",
-                "ProductPaymentOption",
+                "ProductPaymentOptions",
                 "ProductId");
 
             migrationBuilder.AddForeignKey(
@@ -163,10 +163,10 @@ namespace ShopParserApi.Migrations
                 "Presence");
 
             migrationBuilder.DropTable(
-                "ProductDeliveryOption");
+                "ProductDeliveryOptions");
 
             migrationBuilder.DropTable(
-                "ProductPaymentOption");
+                "ProductPaymentOptions");
 
             migrationBuilder.DropPrimaryKey(
                 "PK_Companies",
