@@ -1,15 +1,11 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using AngleSharp;
 using AngleSharp.Dom;
-using Newtonsoft.Json;
 using ShopParserApi.Models;
-using ShopParserApi.Models.Helpers;
 using ShopParserApi.Services.Exceptions;
 using ShopParserApi.Services.Helpers;
 
@@ -28,20 +24,16 @@ namespace ShopParserApi.Services
 
         public async Task<ProductData> InsertPageIntoDb(string productUrl)
         {
-            var product= _dbContext.Products.FirstOrDefault(p => p.ProductState == ProductState.Idle);
+            var product= _dbContext.Products.FirstOrDefault(p => p.Url == productUrl);
             return await InsertPageIntoDb(product);
         }
         public async Task<ProductData> InsertPageIntoDb(ProductData product)
         {
             IDocument productPage=null;
             if (Uri.IsWellFormedUriString(product.Url, UriKind.Absolute))
-            {
                 productPage = await _browsingContext.OpenAsync(product.Url);
-            }
             if (product.Url ==HttpUtility.HtmlEncode(product.Url))
-            {
                 productPage = await _browsingContext.OpenAsync(req => req.Content(product.Url));
-            }
 
             if (productPage==null)
                 throw new NullReferenceException(nameof(productPage));

@@ -17,6 +17,7 @@ using ShopParserApi.Models.Json_DTO;
 using ShopParserApi.Models.ResponseModels;
 using ShopParserApi.Services;
 using ShopParserApi.Services.Exceptions;
+using ShopParserApi.Services.Extensions;
 using ShopParserApi.Services.Helpers;
 
 namespace ShopParserApi.Controllers
@@ -129,10 +130,12 @@ namespace ShopParserApi.Controllers
         {
             try
             {
-                var jsonData = _dbContext.Products.FirstOrDefault(p => p.Id == id)?.JsonData;
+                var product = _dbContext.Products.Include(db=>db.Categories).FirstOrDefault(p => p.Id == id);
+
+                var jsonData = product?.JsonData;
                 var deserializeJson =
                     JsonConvert.DeserializeObject<ProductJson>(jsonData ?? throw new InvalidOperationException());
-
+                deserializeJson.StringCategory = product.Categories.CategoryToString();
                 return Ok(deserializeJson);
             }
             catch (Exception e)

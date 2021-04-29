@@ -15,7 +15,7 @@ namespace ShopParserApi.Services.Extensions
             var result = value.Substring(startIndex, endIndex).Trim();
             return result.Remove(result.Length - 1);
         }
-        private static string CategoryToString(this IEnumerable<Category> categories)
+        public static string CategoryToString(this IEnumerable<Category> categories)
         {
             var categoryString = categories.Aggregate("", (current, category) => current + category.Name + " > ");
             return categoryString.Remove(categoryString.Length - 3);
