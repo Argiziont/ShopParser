@@ -51,12 +51,13 @@ namespace ShopParserApi.Services.TimedHostedServices
 
         private async Task DoWork(CancellationToken ct)
         {
+            using var scope = _serviceProvider.CreateScope();
+            var context = scope.ServiceProvider.GetService<ApplicationDb>();
             while (!ct.IsCancellationRequested)
             {
                 await Task.Delay(TimeSpan.FromSeconds(5), ct);
 
-                using var scope = _serviceProvider.CreateScope();
-                var context = scope.ServiceProvider.GetService<ApplicationDb>();
+                
                 try
                 {
                     if (context == null) throw new NullReferenceException(nameof(context));
@@ -66,7 +67,7 @@ namespace ShopParserApi.Services.TimedHostedServices
 
                     var companyPage = await _context.OpenAsync(company.Url, ct);
 
-                    await CompanyService.AddProductsFromCompanyPageToDb(company, companyPage, context);
+                    await CompanyParsingService.AddProductsFromCompanyPageToDb(company, companyPage, context);
 
 
                     context.Entry(company).State = EntityState.Modified;

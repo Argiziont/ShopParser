@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Linq;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using AngleSharp;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -17,7 +15,6 @@ namespace ShopParserApi.Services.TimedHostedServices
 {
     public class BackgroundProductControllerWorker : IHostedService, IDisposable
     {
-        private readonly IBrowsingContext _context;
         private readonly ILogger<BackgroundProductControllerWorker> _logger;
         private readonly IHubContext<ApiHub, IApiClient> _productsHub;
         private readonly IServiceProvider _serviceProvider;
@@ -25,8 +22,6 @@ namespace ShopParserApi.Services.TimedHostedServices
         public BackgroundProductControllerWorker(ILogger<BackgroundProductControllerWorker> logger,
             IServiceProvider serviceProvider, IHubContext<ApiHub, IApiClient> productsHub)
         {
-            var config = Configuration.Default.WithDefaultLoader().WithJs().WithCss();
-            _context = BrowsingContext.New(config);
             _logger = logger;
             _serviceProvider = serviceProvider;
             _productsHub = productsHub;
@@ -57,12 +52,13 @@ namespace ShopParserApi.Services.TimedHostedServices
 
         private async Task DoWork(CancellationToken ct)
         {
+            using var scope = _serviceProvider.CreateScope();
+            var context = scope.ServiceProvider.GetService<ApplicationDb>();
+            var productService = scope.ServiceProvider.GetService<ProductService>();
             while (!ct.IsCancellationRequested)
             {
                 await Task.Delay(TimeSpan.FromSeconds(5), ct);
-                using var scope = _serviceProvider.CreateScope();
-                var context = scope.ServiceProvider.GetService<ApplicationDb>();
-                var productService = scope.ServiceProvider.GetService<ProductService>();
+               
                 try
                 {
                     if (context == null) throw new NullReferenceException(nameof(context));
@@ -74,8 +70,7 @@ namespace ShopParserApi.Services.TimedHostedServices
                         s.CompanyState == CompanyState.Processing && s.CompanyState == CompanyState.Idle) != 0)
                         continue;
 
-                    //first product with idle state
-
+                    
                     var product = context.Products.FirstOrDefault(p => p.ProductState == ProductState.Idle);
                     if (product == null)
                     {
@@ -85,17 +80,12 @@ namespace ShopParserApi.Services.TimedHostedServices
 
                     try
                     {
-                        //var productPage = await _context.OpenAsync(product.Url, ct);
-
-                        //if (productPage.StatusCode == HttpStatusCode.TooManyRequests)
-                        //    throw new TooManyRequestsException();
-
                         await productService.InsertPageIntoDb(product);
                     }
                     catch (TooManyRequestsException)
                     {
                         product.ProductState = ProductState.Failed;
-                        _logger.LogError($"Product with id \"{product.Id}\" couldn't be updated");
+                        _logger.LogError($"Product with id \"{product.Id}\" couldn't be updated. Blocked by service provider.");
                     }
 
                     await _productsHub.Clients.All.ReceiveMessage(

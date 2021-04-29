@@ -13,7 +13,7 @@ using ShopParserApi.Models.Json_DTO;
 
 namespace ShopParserApi.Services.Helpers
 {
-    public static class CompanyService
+    public static class CompanyParsingService
     {
         public static async Task AddProductsFromCompanyPageToDb(CompanyData company, IDocument companyPage,
             ApplicationDb dbContext)

@@ -49,7 +49,7 @@ namespace ShopParserApi.Controllers
                 var companyUrl = _dbContext.Companies.FirstOrDefault(u => u.Name == companyName)?.Url;
                 var companyPage = await _context.OpenAsync(companyUrl);
 
-                await CompanyService.AddProductsFromCompanyPageToDb(company, companyPage, _dbContext);
+                await CompanyParsingService.AddProductsFromCompanyPageToDb(company, companyPage, _dbContext);
 
 
                 _dbContext.Entry(company).State = EntityState.Modified;

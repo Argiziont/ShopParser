@@ -18,7 +18,6 @@ using ShopParserApi.Models.ResponseModels;
 using ShopParserApi.Services;
 using ShopParserApi.Services.Exceptions;
 using ShopParserApi.Services.Extensions;
-using ShopParserApi.Services.Helpers;
 
 namespace ShopParserApi.Controllers
 {
