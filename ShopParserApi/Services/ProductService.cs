@@ -2,11 +2,10 @@
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using System.Web;
 using AngleSharp;
-using AngleSharp.Dom;
 using ShopParserApi.Models;
 using ShopParserApi.Services.Exceptions;
+using ShopParserApi.Services.Extensions;
 using ShopParserApi.Services.Helpers;
 using ShopParserApi.Services.Interfaces;
 
@@ -30,11 +29,7 @@ namespace ShopParserApi.Services
         }
         public async Task<ProductData> InsertProductPageIntoDb(ProductData product)
         {
-            IDocument productPage=null;
-            if (Uri.IsWellFormedUriString(product.Url, UriKind.Absolute))
-                productPage = await _browsingContext.OpenAsync(product.Url);
-            if (product.Url ==HttpUtility.HtmlEncode(product.Url))
-                productPage = await _browsingContext.OpenAsync(req => req.Content(product.Url));
+            var productPage= await _browsingContext.OpenPageAsync(product.Url);
 
             if (productPage==null)
                 throw new NullReferenceException(nameof(productPage));

@@ -22,14 +22,14 @@ namespace ShopParserApi.Controllers
     [ApiController]
     public class CompanyController : ControllerBase
     {
-        private readonly IBrowsingContext _context;
+        private readonly IBrowsingContext _browsingContext;
         private readonly ICompanyService _companyService;
         private readonly ApplicationDb _dbContext;
 
         public CompanyController(ApplicationDb db, ICompanyService companyService)
         {
             var config = Configuration.Default.WithDefaultLoader().WithJs();
-            _context = BrowsingContext.New(config);
+            _browsingContext = BrowsingContext.New(config);
             _dbContext = db;
             _companyService = companyService;
         }
@@ -37,10 +37,10 @@ namespace ShopParserApi.Controllers
         [HttpPost]
         [Route("ParseCompanyPageProducts")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(List<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<ProductData>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
         [ProducesDefaultResponseType]
-        public async Task<IActionResult> AddProductsListFromCompanyAsync(string companyName)
+        public async Task<IActionResult> ParseCompanyPageProducts(string companyName)
         {
             try
             {
@@ -58,19 +58,20 @@ namespace ShopParserApi.Controllers
         }
 
         [HttpPost]
-        [Route("AddCompanyByUrl")]
+        [Route("AddByUrl")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ResponseCompany), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
         [ProducesDefaultResponseType]
-        public async Task<IActionResult> AddCompanyByUrlAsync(
+        public async Task<IActionResult> AddByUrlAsync(
             string companyUrl)
         {
+           
             try
             {
-                var companyPage = await _context.OpenAsync(companyUrl);
+                var companyPage = await _browsingContext.OpenPageAsync(companyUrl);
 
-                var externalId = companyUrl.Split("/").Last().Split('-').First().Replace("c", "");
+                var externalId = companyUrl.SplitCompanyUrl();
 
                 var jsonString = companyPage.ToHtml().SubstringJson("window.ApolloCacheState =", "window.SPAConfig");
                 var json = JObject.Parse(jsonString);
@@ -114,11 +115,11 @@ namespace ShopParserApi.Controllers
         }
 
         [HttpGet]
-        [Route("GetCompanyById")]
+        [Route("GetById")]
         [ProducesResponseType(typeof(ResponseCompany), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
         [ProducesDefaultResponseType]
-        public IActionResult GetCompanyById(int id)
+        public IActionResult GetById(int id)
         {
             try
             {
@@ -144,11 +145,11 @@ namespace ShopParserApi.Controllers
         }
 
         [HttpGet]
-        [Route("GetCompanies")]
+        [Route("GetAll")]
         [ProducesResponseType(typeof(IEnumerable<ResponseCompany>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
         [ProducesDefaultResponseType]
-        public IActionResult GetCompanies()
+        public IActionResult GetAll()
         {
             try
             {

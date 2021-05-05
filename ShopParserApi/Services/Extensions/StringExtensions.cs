@@ -20,5 +20,6 @@ namespace ShopParserApi.Services.Extensions
             var categoryString = categories.Aggregate("", (current, category) => current + category.Name + " > ");
             return categoryString.Remove(categoryString.Length - 3);
         }
+        public static string SplitCompanyUrl(this string value) => value.Split("/").Last().Split('-').First().Replace("c", "");
     }
 }

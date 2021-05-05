@@ -23,11 +23,11 @@ namespace ShopParserApi.Controllers
         }
 
         [HttpGet]
-        [Route("GetCategories")]
+        [Route("GetAll")]
         [ProducesResponseType(typeof(IEnumerable<ResponseCategory>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
         [ProducesDefaultResponseType]
-        public async Task<IActionResult> GetCategoriesAsync()
+        public async Task<IActionResult> GetAllAsync()
         {
             try
             {
@@ -47,11 +47,11 @@ namespace ShopParserApi.Controllers
         }
 
         [HttpGet]
-        [Route("GetPagedCategories")]
+        [Route("GetPaged")]
         [ProducesResponseType(typeof(IEnumerable<ResponseCategory>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
         [ProducesDefaultResponseType]
-        public async Task<IActionResult> GetPagedCategoriesAsync(int page, int rowsPerPage)
+        public async Task<IActionResult> GetPagedAsync(int page, int rowsPerPage)
         {
             try
             {
@@ -74,16 +74,16 @@ namespace ShopParserApi.Controllers
         }
 
         [HttpGet]
-        [Route("GetSubCategories")]
+        [Route("GetAllNested")]
         [ProducesResponseType(typeof(ResponseNestedCategory), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesDefaultResponseType]
-        public async Task<IActionResult> GetSubCategoriesAsync()
+        public async Task<IActionResult> GetAllNestedAsync()
         {
             try
             {
-                var currentCategory = await _dbContext.Categories.FirstOrDefaultAsync(cat => cat.Name == "Prom.ua");
+                var currentCategory = await _dbContext.Categories.FirstOrDefaultAsync(cat => cat.SupCategory == null);
                 if (currentCategory == null)
                     return NotFound();
 

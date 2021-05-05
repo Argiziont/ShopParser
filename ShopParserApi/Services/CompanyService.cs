@@ -8,6 +8,7 @@ using Newtonsoft.Json.Schema.Generation;
 using ShopParserApi.Models;
 using ShopParserApi.Models.Helpers;
 using ShopParserApi.Models.Json_DTO;
+using ShopParserApi.Services.Extensions;
 using ShopParserApi.Services.Helpers;
 using ShopParserApi.Services.Interfaces;
 
@@ -32,16 +33,14 @@ namespace ShopParserApi.Services
 
             var counter = 1;
 
-            var page = await _browsingContext.OpenAsync(company.Url.Replace(".html", $";{counter}.html"));
+            var page = await _browsingContext.OpenPageAsync(company.Url.Replace(".html", $";{counter}.html"));
 
             //Get all pages for current company
             while (page.Url.Contains(';'))
             {
-                page = await _browsingContext.OpenAsync(company.Url.Replace(".html", $";{counter}.html"));
+                page = await _browsingContext.OpenPageAsync(company.Url.Replace(".html", $";{counter}.html"));
 
                 company.Products.AddRange(CompanyParsingService.ParseCompanyProducts(company, page));
-
-                //await _dbContext.Products.AddRangeAsync(emptyProducts);
 
                 counter++;
                 Thread.Sleep(5000);
