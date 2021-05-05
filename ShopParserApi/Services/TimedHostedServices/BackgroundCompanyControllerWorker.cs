@@ -2,26 +2,21 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using AngleSharp;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using ShopParserApi.Services.Helpers;
+using ShopParserApi.Services.Interfaces;
 
 namespace ShopParserApi.Services.TimedHostedServices
 {
     public class BackgroundCompanyControllerWorker : IHostedService, IDisposable
     {
-        private readonly IBrowsingContext _context;
         private readonly ILogger<BackgroundProductControllerWorker> _logger;
         private readonly IServiceProvider _serviceProvider;
 
         public BackgroundCompanyControllerWorker(ILogger<BackgroundProductControllerWorker> logger,
             IServiceProvider serviceProvider)
         {
-            var config = Configuration.Default.WithDefaultLoader().WithJs();
-            _context = BrowsingContext.New(config);
             _logger = logger;
             _serviceProvider = serviceProvider;
         }
@@ -53,6 +48,7 @@ namespace ShopParserApi.Services.TimedHostedServices
         {
             using var scope = _serviceProvider.CreateScope();
             var context = scope.ServiceProvider.GetService<ApplicationDb>();
+            var companyService = scope.ServiceProvider.GetService<ICompanyService>();
             while (!ct.IsCancellationRequested)
             {
                 await Task.Delay(TimeSpan.FromSeconds(5), ct);
@@ -61,18 +57,12 @@ namespace ShopParserApi.Services.TimedHostedServices
                 try
                 {
                     if (context == null) throw new NullReferenceException(nameof(context));
+                    if (companyService == null) throw new NullReferenceException(nameof(companyService));
 
                     var company = context.Companies.FirstOrDefault(p => p.Products.Count == 0);
                     if (company == null) continue;
-
-                    var companyPage = await _context.OpenAsync(company.Url, ct);
-
-                    await CompanyParsingService.AddProductsFromCompanyPageToDb(company, companyPage, context);
-
-
-                    context.Entry(company).State = EntityState.Modified;
-
-                    await context.SaveChangesAsync(ct);
+                    
+                    await companyService.InsertCompanyIntoDb(company);
                 }
                 catch (Exception e)
                 {

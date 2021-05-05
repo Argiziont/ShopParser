@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using AngleSharp;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
@@ -15,7 +14,7 @@ using ShopParserApi.Models.Json_DTO;
 using ShopParserApi.Models.ResponseModels;
 using ShopParserApi.Services;
 using ShopParserApi.Services.Extensions;
-using ShopParserApi.Services.Helpers;
+using ShopParserApi.Services.Interfaces;
 
 namespace ShopParserApi.Controllers
 {
@@ -24,13 +23,15 @@ namespace ShopParserApi.Controllers
     public class CompanyController : ControllerBase
     {
         private readonly IBrowsingContext _context;
+        private readonly ICompanyService _companyService;
         private readonly ApplicationDb _dbContext;
 
-        public CompanyController(ApplicationDb db)
+        public CompanyController(ApplicationDb db, ICompanyService companyService)
         {
             var config = Configuration.Default.WithDefaultLoader().WithJs();
             _context = BrowsingContext.New(config);
             _dbContext = db;
+            _companyService = companyService;
         }
 
         [HttpPost]
@@ -46,14 +47,7 @@ namespace ShopParserApi.Controllers
                 var company = _dbContext.Companies.FirstOrDefault(s => s.Name == companyName);
                 if (company == null) return BadRequest("Database doesn't contains this company");
 
-                var companyUrl = _dbContext.Companies.FirstOrDefault(u => u.Name == companyName)?.Url;
-                var companyPage = await _context.OpenAsync(companyUrl);
-
-                await CompanyParsingService.AddProductsFromCompanyPageToDb(company, companyPage, _dbContext);
-
-
-                _dbContext.Entry(company).State = EntityState.Modified;
-                await _dbContext.SaveChangesAsync();
+                await _companyService.InsertCompanyIntoDb(company);
 
                 return Ok(company.Products);
             }

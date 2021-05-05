@@ -18,6 +18,7 @@ using ShopParserApi.Models.ResponseModels;
 using ShopParserApi.Services;
 using ShopParserApi.Services.Exceptions;
 using ShopParserApi.Services.Extensions;
+using ShopParserApi.Services.Interfaces;
 
 namespace ShopParserApi.Controllers
 {
@@ -28,9 +29,9 @@ namespace ShopParserApi.Controllers
         private readonly IBrowsingContext _context;
         private readonly ApplicationDb _dbContext;
         private readonly IHubContext<ApiHub, IApiClient> _productsHub;
-        private readonly ProductService _productService;
+        private readonly IProductService _productService;
 
-        public ProductController(ApplicationDb db, IHubContext<ApiHub, IApiClient> productsHub, ProductService productService)
+        public ProductController(ApplicationDb db, IHubContext<ApiHub, IApiClient> productsHub, IProductService productService)
         {
             var config = Configuration.Default.WithDefaultLoader();
             _context = BrowsingContext.New(config);
@@ -49,7 +50,7 @@ namespace ShopParserApi.Controllers
             if (productPage.StatusCode == HttpStatusCode.TooManyRequests)
                 throw new TooManyRequestsException();
 
-            var parsedProduct = await _productService.InsertPageIntoDb(productUrl);
+            var parsedProduct = await _productService.InsertProductPageIntoDb(productUrl);
 
             return Ok(parsedProduct);
         }
@@ -71,7 +72,7 @@ namespace ShopParserApi.Controllers
                 if (productPage.StatusCode == HttpStatusCode.TooManyRequests)
                     throw new TooManyRequestsException();
 
-                var parsedProduct = await _productService.InsertPageIntoDb(productsList[i].Url);
+                var parsedProduct = await _productService.InsertProductPageIntoDb(productsList[i].Url);
 
                 if (parsedProduct != null)
                 {
@@ -107,7 +108,7 @@ namespace ShopParserApi.Controllers
                 if (productPage.StatusCode == HttpStatusCode.TooManyRequests)
                     throw new TooManyRequestsException();
 
-                await _productService.InsertPageIntoDb(currentProduct.Url); 
+                await _productService.InsertProductPageIntoDb(currentProduct.Url); 
             }
             catch (TooManyRequestsException)
             {

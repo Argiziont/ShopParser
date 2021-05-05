@@ -10,6 +10,7 @@ using ShopParserApi.Models.Helpers;
 using ShopParserApi.Models.Hubs;
 using ShopParserApi.Models.Hubs.Clients;
 using ShopParserApi.Services.Exceptions;
+using ShopParserApi.Services.Interfaces;
 
 namespace ShopParserApi.Services.TimedHostedServices
 {
@@ -54,7 +55,7 @@ namespace ShopParserApi.Services.TimedHostedServices
         {
             using var scope = _serviceProvider.CreateScope();
             var context = scope.ServiceProvider.GetService<ApplicationDb>();
-            var productService = scope.ServiceProvider.GetService<ProductService>();
+            var productService = scope.ServiceProvider.GetService<IProductService>();
             while (!ct.IsCancellationRequested)
             {
                 await Task.Delay(TimeSpan.FromSeconds(5), ct);
@@ -63,7 +64,6 @@ namespace ShopParserApi.Services.TimedHostedServices
                 {
                     if (context == null) throw new NullReferenceException(nameof(context));
                     if (productService == null) throw new NullReferenceException(nameof(productService));
-
                     if (context.Products.Count(p => p.ProductState == ProductState.Idle) == 0)
                         continue;
                     if (context.Companies.Count(s =>
@@ -80,7 +80,7 @@ namespace ShopParserApi.Services.TimedHostedServices
 
                     try
                     {
-                        await productService.InsertPageIntoDb(product);
+                        await productService.InsertProductPageIntoDb(product);
                     }
                     catch (TooManyRequestsException)
                     {

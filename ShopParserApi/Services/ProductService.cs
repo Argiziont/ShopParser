@@ -8,10 +8,11 @@ using AngleSharp.Dom;
 using ShopParserApi.Models;
 using ShopParserApi.Services.Exceptions;
 using ShopParserApi.Services.Helpers;
+using ShopParserApi.Services.Interfaces;
 
 namespace ShopParserApi.Services
 {
-    public class ProductService
+    public class ProductService: IProductService
     {
         private readonly ApplicationDb _dbContext;
         private readonly IBrowsingContext _browsingContext;
@@ -22,12 +23,12 @@ namespace ShopParserApi.Services
             _dbContext = dbContext;
         }
 
-        public async Task<ProductData> InsertPageIntoDb(string productUrl)
+        public async Task<ProductData> InsertProductPageIntoDb(string productUrl)
         {
             var product= _dbContext.Products.FirstOrDefault(p => p.Url == productUrl);
-            return await InsertPageIntoDb(product);
+            return await InsertProductPageIntoDb(product);
         }
-        public async Task<ProductData> InsertPageIntoDb(ProductData product)
+        public async Task<ProductData> InsertProductPageIntoDb(ProductData product)
         {
             IDocument productPage=null;
             if (Uri.IsWellFormedUriString(product.Url, UriKind.Absolute))
