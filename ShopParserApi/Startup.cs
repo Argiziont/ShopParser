@@ -37,6 +37,7 @@ namespace ShopParserApi
             //Services scopes
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<ICompanyService, CompanyService>();
+
             services.AddScoped<IBrowsingContextService, BrowsingContextService>();
             
             //Background workers for parsing data

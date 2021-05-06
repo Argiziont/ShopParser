@@ -3,13 +3,9 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace ShopParserApi.Models.Hubs.Clients
 {
-    public interface IApiClient<T>
+    public interface IApiClient
     {
         Task ReceiveMessage(string message);
-
-        T All { get; }
-}
-    public interface IApiClient: IApiClient<IClientProxy>
-    {
+        
     }
 }
