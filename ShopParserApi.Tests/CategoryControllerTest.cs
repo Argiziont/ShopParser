@@ -18,10 +18,8 @@ namespace ShopParserApi.Tests
         public CategoryControllerTest()
         {
             ContextOptions = new DbContextOptionsBuilder<ApplicationDb>()
-                .UseInMemoryDatabase("TestDatabase")
+                .UseInMemoryDatabase("TestDatabaseCategories")
                 .Options;
-
-            Seed();
         }
 
         private DbContextOptions<ApplicationDb> ContextOptions { get; }
@@ -31,9 +29,9 @@ namespace ShopParserApi.Tests
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
 
-            var category1 = new Category(){Name = "One"} ;
-            var category2 = new Category() { Name = "Two",SupCategory = category1};
-            var category3 = new Category() { Name = "Three",SupCategory = category2};
+            var category1 = new Category {Name = "One"} ;
+            var category2 = new Category { Name = "Two",SupCategory = category1};
+            var category3 = new Category { Name = "Three",SupCategory = category2};
             context.AddRange(category1, category2, category3);
             context.SaveChanges();
         }
@@ -45,6 +43,7 @@ namespace ShopParserApi.Tests
         {
             //Arrange
             await using var context = new ApplicationDb(ContextOptions);
+            Seed();
             var controller = new CategoryController(context);
 
             //Act
@@ -73,6 +72,7 @@ namespace ShopParserApi.Tests
         {
             //Arrange
             await using var context = new ApplicationDb(ContextOptions);
+            Seed();
             var controller = new CategoryController(context);
 
             //Act
@@ -99,6 +99,7 @@ namespace ShopParserApi.Tests
         {
             //Arrange
             await using var context = new ApplicationDb(ContextOptions);
+            Seed();
             var controller = new CategoryController(context);
 
             //Act

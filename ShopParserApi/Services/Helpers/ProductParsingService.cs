@@ -19,8 +19,7 @@ namespace ShopParserApi.Services.Helpers
         public static ProductData ParseSinglePage(ProductData product,IDocument productPage)
         {
 
-            var externalId = product.Url
-                .Split("/").Last().Split('-').First().Replace("p", "");
+            var externalId = product.Url.SplitProductUrl();
 
             var jsonString = productPage.ToHtml().SubstringJson("window.ApolloCacheState =", "window.SPAConfig");
             var json = JObject.Parse(jsonString);

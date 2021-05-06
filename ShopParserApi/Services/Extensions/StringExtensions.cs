@@ -21,5 +21,7 @@ namespace ShopParserApi.Services.Extensions
             return categoryString.Remove(categoryString.Length - 3);
         }
         public static string SplitCompanyUrl(this string value) => value.Split("/").Last().Split('-').First().Replace("c", "");
+
+        public static string SplitProductUrl(this string value) => value.Split("/").Last().Split('-').First().Replace("p", "");
     }
 }

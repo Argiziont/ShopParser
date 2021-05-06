@@ -21,7 +21,7 @@ namespace ShopParserApi.Tests
         public CompanyControllerTest()
         {
             ContextOptions = new DbContextOptionsBuilder<ApplicationDb>()
-                .UseInMemoryDatabase("TestDatabase")
+                .UseInMemoryDatabase("TestDatabaseCompanies")
                 .Options;
 
             Seed();
@@ -34,7 +34,7 @@ namespace ShopParserApi.Tests
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
 
-            var company1 = new CompanyData() { Name = "One", Url = "CompanyPageTest.html" };
+            var company1 = new CompanyData { Name = "One", Url = "CompanyPageTest.html" };
             context.Add(company1);
             context.SaveChanges();
 
@@ -157,9 +157,9 @@ namespace ShopParserApi.Tests
         #region snippet_Mocks
         private static CompanyData MockInsertCompanyIntoDb(CompanyData company)
         {
-            company.Products.Add(new ProductData() { Company = company, Title = "One" });
-            company.Products.Add(new ProductData() { Company = company, Title = "Two" });
-            company.Products.Add(new ProductData() { Company = company, Title = "Three" });
+            company.Products.Add(new ProductData { Company = company, Title = "One" });
+            company.Products.Add(new ProductData { Company = company, Title = "Two" });
+            company.Products.Add(new ProductData { Company = company, Title = "Three" });
 
 
             return company;

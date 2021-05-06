@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -25,17 +24,15 @@ namespace ShopParserApi.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
-        private readonly IBrowsingContextService _browsingContextService;
         private readonly ApplicationDb _dbContext;
         private readonly IHubContext<ApiHub, IApiClient> _productsHub;
         private readonly IProductService _productService;
 
-        public ProductController(ApplicationDb db, IHubContext<ApiHub, IApiClient> productsHub, IProductService productService, IBrowsingContextService browsingContextService)
+        public ProductController(ApplicationDb db, IHubContext<ApiHub, IApiClient> productsHub, IProductService productService)
         {
             _dbContext = db;
             _productsHub = productsHub;
             _productService = productService;
-            _browsingContextService = browsingContextService;
         }
 
         [HttpGet]
@@ -44,10 +41,6 @@ namespace ShopParserApi.Controllers
         [ProducesDefaultResponseType]
         public async Task<IActionResult> ParseDataInsideProductPageAsync(string productUrl)
         {
-            var productPage = await _browsingContextService.OpenPageAsync(productUrl);
-            if (productPage.StatusCode == HttpStatusCode.TooManyRequests)
-                throw new TooManyRequestsException();
-
             var parsedProduct = await _productService.InsertProductPageIntoDb(productUrl);
 
             return Ok(parsedProduct);
@@ -55,7 +48,7 @@ namespace ShopParserApi.Controllers
 
         [HttpPost]
         [Route("ParseAllProductUrlsInsideCompanyPage")]
-        [ProducesResponseType(typeof(ProductData), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProductData[]), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesDefaultResponseType]
         public async Task<IActionResult> ParseAllProductUrlsInsideCompanyPageAsync(string companyName)
@@ -66,10 +59,6 @@ namespace ShopParserApi.Controllers
             var productsList = _dbContext.Products.Where(p => p.Company.Id == company.Id).ToArray();
             for (var i = 0; i < productsList.Length; i++)
             {
-                var productPage = await _browsingContextService.OpenPageAsync(productsList[i].Url);
-                if (productPage.StatusCode == HttpStatusCode.TooManyRequests)
-                    throw new TooManyRequestsException();
-
                 var parsedProduct = await _productService.InsertProductPageIntoDb(productsList[i].Url);
 
                 if (parsedProduct != null)
@@ -102,10 +91,7 @@ namespace ShopParserApi.Controllers
                 return Accepted("This product already up to date");
             try
             {
-                var productPage = await _browsingContextService.OpenPageAsync(currentProduct.Url);
-                if (productPage.StatusCode == HttpStatusCode.TooManyRequests)
-                    throw new TooManyRequestsException();
-
+             
                 await _productService.InsertProductPageIntoDb(currentProduct.Url); 
             }
             catch (TooManyRequestsException)
