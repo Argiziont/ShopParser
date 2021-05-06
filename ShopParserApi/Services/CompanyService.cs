@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using AngleSharp;
 using AngleSharp.Diffing.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Schema.Generation;
 using ShopParserApi.Models;
 using ShopParserApi.Models.Helpers;
 using ShopParserApi.Models.Json_DTO;
-using ShopParserApi.Services.Extensions;
 using ShopParserApi.Services.Helpers;
 using ShopParserApi.Services.Interfaces;
 
@@ -17,12 +15,11 @@ namespace ShopParserApi.Services
     public class CompanyService:ICompanyService
     {
         private readonly ApplicationDb _dbContext;
-        private readonly IBrowsingContext _browsingContext;
-        public CompanyService(ApplicationDb dbContext)
+        private readonly IBrowsingContextService _browsingContextService;
+        public CompanyService(ApplicationDb dbContext, IBrowsingContextService browsingContextService)
         {
             _dbContext = dbContext;
-            var config = Configuration.Default.WithDefaultLoader().WithJs().WithCss();
-            _browsingContext = BrowsingContext.New(config);
+            _browsingContextService = browsingContextService;
         }
         public async Task<CompanyData> InsertCompanyIntoDb(CompanyData company)
         {
@@ -33,12 +30,12 @@ namespace ShopParserApi.Services
 
             var counter = 1;
 
-            var page = await _browsingContext.OpenPageAsync(company.Url.Replace(".html", $";{counter}.html"));
+            var page = await _browsingContextService.OpenPageAsync(company.Url.Replace(".html", $";{counter}.html"));
 
             //Get all pages for current company
             while (page.Url.Contains(';'))
             {
-                page = await _browsingContext.OpenPageAsync(company.Url.Replace(".html", $";{counter}.html"));
+                page = await _browsingContextService.OpenPageAsync(company.Url.Replace(".html", $";{counter}.html"));
 
                 company.Products.AddRange(CompanyParsingService.ParseCompanyProducts(company, page));
 

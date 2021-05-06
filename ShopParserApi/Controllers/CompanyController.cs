@@ -22,16 +22,15 @@ namespace ShopParserApi.Controllers
     [ApiController]
     public class CompanyController : ControllerBase
     {
-        private readonly IBrowsingContext _browsingContext;
+        private readonly IBrowsingContextService _browsingContextService;
         private readonly ICompanyService _companyService;
         private readonly ApplicationDb _dbContext;
 
-        public CompanyController(ApplicationDb db, ICompanyService companyService)
+        public CompanyController(ApplicationDb db, ICompanyService companyService, IBrowsingContextService browsingContextService)
         {
-            var config = Configuration.Default.WithDefaultLoader().WithJs();
-            _browsingContext = BrowsingContext.New(config);
-            _dbContext = db;
+          _dbContext = db;
             _companyService = companyService;
+            _browsingContextService = browsingContextService;
         }
 
         [HttpPost]
@@ -69,7 +68,7 @@ namespace ShopParserApi.Controllers
            
             try
             {
-                var companyPage = await _browsingContext.OpenPageAsync(companyUrl);
+                var companyPage = await _browsingContextService.OpenPageAsync(companyUrl);
 
                 var externalId = companyUrl.SplitCompanyUrl();
 

@@ -2,10 +2,8 @@
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using AngleSharp;
 using ShopParserApi.Models;
 using ShopParserApi.Services.Exceptions;
-using ShopParserApi.Services.Extensions;
 using ShopParserApi.Services.Helpers;
 using ShopParserApi.Services.Interfaces;
 
@@ -14,12 +12,11 @@ namespace ShopParserApi.Services
     public class ProductService: IProductService
     {
         private readonly ApplicationDb _dbContext;
-        private readonly IBrowsingContext _browsingContext;
-        public ProductService(ApplicationDb dbContext)
+        private readonly IBrowsingContextService _browsingContextService;
+        public ProductService(ApplicationDb dbContext, IBrowsingContextService browsingContextService)
         {
-            var config = Configuration.Default.WithDefaultLoader().WithJs().WithCss();
-            _browsingContext = BrowsingContext.New(config);
             _dbContext = dbContext;
+            _browsingContextService = browsingContextService;
         }
 
         public async Task<ProductData> InsertProductPageIntoDb(string productUrl)
@@ -29,7 +26,7 @@ namespace ShopParserApi.Services
         }
         public async Task<ProductData> InsertProductPageIntoDb(ProductData product)
         {
-            var productPage= await _browsingContext.OpenPageAsync(product.Url);
+            var productPage= await _browsingContextService.OpenPageAsync(product.Url);
 
             if (productPage==null)
                 throw new NullReferenceException(nameof(productPage));

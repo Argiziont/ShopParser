@@ -9,7 +9,7 @@ namespace ShopParserApi.Services.Helpers
 {
     public static class CompanyParsingService
     {
-        public static List<ProductData> ParseCompanyProducts(CompanyData company,IDocument companyPage)
+        public static IEnumerable<ProductData> ParseCompanyProducts(CompanyData company,IDocument companyPage)
         {
 
 

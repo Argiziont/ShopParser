@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using AngleSharp;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -26,18 +25,17 @@ namespace ShopParserApi.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
-        private readonly IBrowsingContext _context;
+        private readonly IBrowsingContextService _browsingContextService;
         private readonly ApplicationDb _dbContext;
         private readonly IHubContext<ApiHub, IApiClient> _productsHub;
         private readonly IProductService _productService;
 
-        public ProductController(ApplicationDb db, IHubContext<ApiHub, IApiClient> productsHub, IProductService productService)
+        public ProductController(ApplicationDb db, IHubContext<ApiHub, IApiClient> productsHub, IProductService productService, IBrowsingContextService browsingContextService)
         {
-            var config = Configuration.Default.WithDefaultLoader();
-            _context = BrowsingContext.New(config);
             _dbContext = db;
             _productsHub = productsHub;
             _productService = productService;
+            _browsingContextService = browsingContextService;
         }
 
         [HttpGet]
@@ -46,7 +44,7 @@ namespace ShopParserApi.Controllers
         [ProducesDefaultResponseType]
         public async Task<IActionResult> ParseDataInsideProductPageAsync(string productUrl)
         {
-            var productPage = await _context.OpenPageAsync(productUrl);
+            var productPage = await _browsingContextService.OpenPageAsync(productUrl);
             if (productPage.StatusCode == HttpStatusCode.TooManyRequests)
                 throw new TooManyRequestsException();
 
@@ -68,7 +66,7 @@ namespace ShopParserApi.Controllers
             var productsList = _dbContext.Products.Where(p => p.Company.Id == company.Id).ToArray();
             for (var i = 0; i < productsList.Length; i++)
             {
-                var productPage = await _context.OpenPageAsync(productsList[i].Url);
+                var productPage = await _browsingContextService.OpenPageAsync(productsList[i].Url);
                 if (productPage.StatusCode == HttpStatusCode.TooManyRequests)
                     throw new TooManyRequestsException();
 
@@ -104,7 +102,7 @@ namespace ShopParserApi.Controllers
                 return Accepted("This product already up to date");
             try
             {
-                var productPage = await _context.OpenPageAsync(currentProduct.Url);
+                var productPage = await _browsingContextService.OpenPageAsync(currentProduct.Url);
                 if (productPage.StatusCode == HttpStatusCode.TooManyRequests)
                     throw new TooManyRequestsException();
 
