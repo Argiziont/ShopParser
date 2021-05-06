@@ -65,7 +65,6 @@ namespace ShopParserApi.Controllers
         public async Task<IActionResult> AddByUrlAsync(
             string companyUrl)
         {
-           
             try
             {
                 var companyPage = await _browsingContextService.OpenPageAsync(companyUrl);
