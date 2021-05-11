@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="**/*.log" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AngleSharp" Version="0.14.0" />
     <PackageReference Include="AngleSharp.Diffing" Version="0.14.0" />
     <PackageReference Include="AngleSharp.Js" Version="0.14.0" />

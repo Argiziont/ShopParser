@@ -15,7 +15,7 @@ namespace ShopParserApi
                 .WriteTo.Console()
                 .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", Serilog.Events.LogEventLevel.Warning)
                 .WriteTo.Debug(outputTemplate: DateTime.Now.ToString(CultureInfo.InvariantCulture))
-                .WriteTo.File("log.txt", rollingInterval: RollingInterval.Day)
+                .WriteTo.File("log.log", rollingInterval: RollingInterval.Day)
                 .CreateLogger();
             CreateHostBuilder(args).Build().Run();
         }
