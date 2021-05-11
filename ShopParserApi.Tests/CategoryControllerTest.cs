@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Moq;
 using ShopParserApi.Controllers;
 using ShopParserApi.Models;
 using ShopParserApi.Models.ResponseModels;
@@ -21,8 +23,10 @@ namespace ShopParserApi.Tests
         {
             //Arrange
             await using var context = new ApplicationDb(ContextOptions);
+            var logger = Mock.Of<ILogger<CategoryController>>();
             Seed();
-            var controller = new CategoryController(context);
+
+            var controller = new CategoryController(context, logger);
 
             //Act
             var result = await controller.GetAllAsync();
@@ -52,8 +56,10 @@ namespace ShopParserApi.Tests
         {
             //Arrange
             await using var context = new ApplicationDb(ContextOptions);
+            var logger = Mock.Of<ILogger<CategoryController>>();
             Seed();
-            var controller = new CategoryController(context);
+
+            var controller = new CategoryController(context,logger);
 
             //Act
             var result = await controller.GetPagedAsync(1, 1);
@@ -81,8 +87,10 @@ namespace ShopParserApi.Tests
         {
             //Arrange
             await using var context = new ApplicationDb(ContextOptions);
+            var logger = Mock.Of<ILogger<CategoryController>>();
             Seed();
-            var controller = new CategoryController(context);
+
+            var controller = new CategoryController(context, logger);
 
             //Act
             var result = await controller.GetAllNestedAsync();

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
 using ShopParserApi.Controllers;
@@ -29,11 +30,12 @@ namespace ShopParserApi.Tests
         {
             //Arrange
             var productServiceMock = new Mock<IProductService>();
+            var logger = Mock.Of<ILogger<ProductController>>();
 
             productServiceMock.Setup(service => service.InsertProductPageIntoDb("Url"))
                 .ReturnsAsync(() => new ProductData {Id = 1, Title = "One"});
 
-            var controller = new ProductController(null, null, productServiceMock.Object);
+            var controller = new ProductController(null, null, productServiceMock.Object, logger);
 
             //Act
             var result = await controller.ParseDataInsideProductPageAsync("Url");
@@ -59,6 +61,7 @@ namespace ShopParserApi.Tests
         {
             //Arrange
             await using var context = new ApplicationDb(ContextOptions);
+            var logger = Mock.Of<ILogger<ProductController>>();
             Seed();
 
             var productServiceMock = new Mock<IProductService>();
@@ -70,7 +73,7 @@ namespace ShopParserApi.Tests
             productServiceMock.Setup(service => service.InsertProductPageIntoDb("Url3"))
                 .ReturnsAsync(() => context.Products.FirstOrDefault(p => p.Url == "Url3"));
 
-            var controller = new ProductController(context, null, productServiceMock.Object);
+            var controller = new ProductController(context, null, productServiceMock.Object, logger);
 
             //Act
             var result = await controller.ParseAllProductUrlsInsideCompanyPageAsync("One");
@@ -98,6 +101,7 @@ namespace ShopParserApi.Tests
             var mockHubContext = new Mock<IHubContext<ApiHub, IApiClient>>();
             var mockClients = new Mock<IHubClients<IApiClient>>();
             var mockClient = new Mock<IApiClient>();
+            var logger = Mock.Of<ILogger<ProductController>>();
 
 
             await using var context = new ApplicationDb(ContextOptions);
@@ -112,7 +116,7 @@ namespace ShopParserApi.Tests
             mockClients.Setup(service => service.All).Returns(mockClient.Object);
             mockClient.Setup(service => service.ReceiveMessage("Product with name id: 2 was updated successfully"));
 
-            var controller = new ProductController(context, mockHubContext.Object, productServiceMock.Object);
+            var controller = new ProductController(context, mockHubContext.Object, productServiceMock.Object, logger);
 
             //Act
             var result = await controller.ParseSingleProductInsideCompanyPageAsync("2");
@@ -138,9 +142,10 @@ namespace ShopParserApi.Tests
         {
             //Arrange
             await using var context = new ApplicationDb(ContextOptions);
+            var logger = Mock.Of<ILogger<ProductController>>();
             Seed();
 
-            var controller = new ProductController(context, null, null);
+            var controller = new ProductController(context, null, null, logger);
 
             //Act
             var result = controller.GetFullProductsById(2);
@@ -165,9 +170,10 @@ namespace ShopParserApi.Tests
         {
             //Arrange
             await using var context = new ApplicationDb(ContextOptions);
+            var logger = Mock.Of<ILogger<ProductController>>();
             Seed();
 
-            var controller = new ProductController(context, null, null);
+            var controller = new ProductController(context, null, null, logger);
 
             //Act
             var result = await controller.GetProductsByCompanyIdAsync(1);
@@ -195,9 +201,10 @@ namespace ShopParserApi.Tests
         {
             //Arrange
             await using var context = new ApplicationDb(ContextOptions);
+            var logger = Mock.Of<ILogger<ProductController>>();
             Seed();
 
-            var controller = new ProductController(context, null, null);
+            var controller = new ProductController(context, null, null, logger);
 
             //Act
             var result = await controller.GetProductsByCategoryIdAsync(1);
@@ -225,9 +232,10 @@ namespace ShopParserApi.Tests
         {
             //Arrange
             await using var context = new ApplicationDb(ContextOptions);
+            var logger = Mock.Of<ILogger<ProductController>>();
             Seed();
 
-            var controller = new ProductController(context, null, null);
+            var controller = new ProductController(context, null, null, logger);
 
             //Act
             var result = await controller.GetPagedProductsByCompanyIdAsync(1, 0, 1);
@@ -255,9 +263,10 @@ namespace ShopParserApi.Tests
         {
             //Arrange
             await using var context = new ApplicationDb(ContextOptions);
+            var logger = Mock.Of<ILogger<ProductController>>();
             Seed();
 
-            var controller = new ProductController(context, null, null);
+            var controller = new ProductController(context, null, null, logger);
 
             //Act
             var result = await controller.GetPagedProductsByCategoryIdAsync(1, 0, 1);

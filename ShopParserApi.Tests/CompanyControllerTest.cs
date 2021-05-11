@@ -5,6 +5,7 @@ using AngleSharp.Dom;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Moq;
 using ShopParserApi.Controllers;
 using ShopParserApi.Models;
@@ -26,13 +27,14 @@ namespace ShopParserApi.Tests
             await using var context = new ApplicationDb(ContextOptions);
             var companyServiceMock = new Mock<ICompanyService>();
             var browsingContextServiceMock = new Mock<IBrowsingContextService>();
+            var logger = Mock.Of<ILogger<CompanyController>>();
 
             var fistCompany = context.Companies.First();
             companyServiceMock.Setup(service => service.InsertCompanyIntoDb(fistCompany))
                 .ReturnsAsync(MockInsertCompanyIntoDb(fistCompany));
 
             var controller =
-                new CompanyController(context, companyServiceMock.Object, browsingContextServiceMock.Object);
+                new CompanyController(context, companyServiceMock.Object, browsingContextServiceMock.Object, logger);
 
             //Act
             var result = await controller.ParseCompanyPageProducts("One");
@@ -63,12 +65,13 @@ namespace ShopParserApi.Tests
             //Arrange
             await using var context = new ApplicationDb(ContextOptions);
             var browsingContextServiceMock = new Mock<IBrowsingContextService>();
+            var logger = Mock.Of<ILogger<CompanyController>>();
 
             browsingContextServiceMock
                 .Setup(service => service.OpenPageAsync("https://prom.ua/c3502019-toppoint-tvoj-internet.html"))
                 .ReturnsAsync(await MockOpenPageAsync());
 
-            var controller = new CompanyController(context, null, new BrowsingContextService());
+            var controller = new CompanyController(context, null, new BrowsingContextService(), logger);
 
             //Act
             var result = await controller.AddByUrlAsync("https://prom.ua/c3502019-toppoint-tvoj-internet.html");
@@ -93,8 +96,9 @@ namespace ShopParserApi.Tests
         {
             //Arrange
             await using var context = new ApplicationDb(ContextOptions);
+            var logger = Mock.Of<ILogger<CompanyController>>();
 
-            var controller = new CompanyController(context, null, null);
+            var controller = new CompanyController(context, null, null, logger);
 
             //Act
             var result = controller.GetById(1);
@@ -120,8 +124,9 @@ namespace ShopParserApi.Tests
         {
             //Arrange
             await using var context = new ApplicationDb(ContextOptions);
+            var logger = Mock.Of<ILogger<CompanyController>>();
 
-            var controller = new CompanyController(context, null, null);
+            var controller = new CompanyController(context, null, null, logger);
 
             //Act
             var result = controller.GetAll();

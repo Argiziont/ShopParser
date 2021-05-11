@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using AngleSharp.Dom;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Moq;
 using ShopParserApi.Models;
 using ShopParserApi.Services;
@@ -19,7 +20,9 @@ namespace ShopParserApi.Tests
         {
             //Arrange
             await using var context = new ApplicationDb(ContextOptions);
+            
             Seed();
+
             var browsingContextServiceMock = new Mock<IBrowsingContextService>();
 
             browsingContextServiceMock.Setup(service => service.OpenPageAsync("CompanyPageTest;1.html"))
