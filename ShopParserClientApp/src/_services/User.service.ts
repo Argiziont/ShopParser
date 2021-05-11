@@ -24,7 +24,7 @@ export const UserService = {
 
 async function GetAllCompanys(): Promise<ResponseCompany[]> {
 
-  return CompanyApi().getCompanies().then((companyResponse) => {
+  return CompanyApi().getAll().then((companyResponse) => {
     return companyResponse;
     //Ok
   }, async (error) => {
@@ -34,7 +34,7 @@ async function GetAllCompanys(): Promise<ResponseCompany[]> {
 }
 async function GetAllCategories(): Promise<ResponseCategory[]> {
 
-  return CategoryApi().getCategories().then((categoryResponse) => {
+  return CategoryApi().getAll().then((categoryResponse) => {
     return categoryResponse;
     //Ok
   }, async (error) => {
@@ -44,7 +44,7 @@ async function GetAllCategories(): Promise<ResponseCategory[]> {
 }
 async function GetAllCategoriesByPage(page:number,rows:number): Promise<ResponseCategory[]> {
 
-  return CategoryApi().getPagedCategories(page,rows).then((categoryResponse) => {
+  return CategoryApi().getPaged(page,rows).then((categoryResponse) => {
     return categoryResponse;
     //Ok
   }, async (error) => {
@@ -54,7 +54,7 @@ async function GetAllCategoriesByPage(page:number,rows:number): Promise<Response
 }
 async function GetSubCategories(): Promise<ResponseNestedCategory> {
 
-  return CategoryApi().getSubCategories().then((categoryResponse) => {
+  return CategoryApi().getAllNested().then((categoryResponse) => {
     return categoryResponse;
     //Ok
   }, async (error) => {
@@ -105,7 +105,7 @@ async function GetProductByCategoryIdAndPage(id:number,page:number,rows:number):
 }
 async function AddCompanyByUrl(url:string): Promise<ResponseCompany> {
 
-  return CompanyApi().addCompanyByUrl(url).then((companyResponse) => {
+  return CompanyApi().addByUrl(url).then((companyResponse) => {
     return companyResponse;
     //Ok
   }, async (error) => {

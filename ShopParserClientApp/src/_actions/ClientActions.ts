@@ -17,8 +17,8 @@ export class CategoryClient {
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "https://localhost:5001";
     }
 
-    getCategories(): Promise<ResponseCategory[]> {
-        let url_ = this.baseUrl + "/Category/GetCategories";
+    getAll(): Promise<ResponseCategory[]> {
+        let url_ = this.baseUrl + "/Category/GetAll";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ = <RequestInit>{
@@ -29,11 +29,11 @@ export class CategoryClient {
         };
 
         return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processGetCategories(_response);
+            return this.processGetAll(_response);
         });
     }
 
-    protected processGetCategories(response: Response): Promise<ResponseCategory[]> {
+    protected processGetAll(response: Response): Promise<ResponseCategory[]> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -64,8 +64,8 @@ export class CategoryClient {
         }
     }
 
-    getPagedCategories(page: number | undefined, rowsPerPage: number | undefined): Promise<ResponseCategory[]> {
-        let url_ = this.baseUrl + "/Category/GetPagedCategories?";
+    getPaged(page: number | undefined, rowsPerPage: number | undefined): Promise<ResponseCategory[]> {
+        let url_ = this.baseUrl + "/Category/GetPaged?";
         if (page === null)
             throw new Error("The parameter 'page' cannot be null.");
         else if (page !== undefined)
@@ -84,11 +84,11 @@ export class CategoryClient {
         };
 
         return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processGetPagedCategories(_response);
+            return this.processGetPaged(_response);
         });
     }
 
-    protected processGetPagedCategories(response: Response): Promise<ResponseCategory[]> {
+    protected processGetPaged(response: Response): Promise<ResponseCategory[]> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -119,8 +119,8 @@ export class CategoryClient {
         }
     }
 
-    getSubCategories(): Promise<ResponseNestedCategory> {
-        let url_ = this.baseUrl + "/Category/GetSubCategories";
+    getAllNested(): Promise<ResponseNestedCategory> {
+        let url_ = this.baseUrl + "/Category/GetAllNested";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ = <RequestInit>{
@@ -131,11 +131,11 @@ export class CategoryClient {
         };
 
         return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processGetSubCategories(_response);
+            return this.processGetAllNested(_response);
         });
     }
 
-    protected processGetSubCategories(response: Response): Promise<ResponseNestedCategory> {
+    protected processGetAllNested(response: Response): Promise<ResponseNestedCategory> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -180,7 +180,7 @@ export class CompanyClient {
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "https://localhost:5001";
     }
 
-    addProductsListFromCompany(companyName: string | null | undefined): Promise<string[]> {
+    parseCompanyPageProducts(companyName: string | null | undefined): Promise<ProductData[]> {
         let url_ = this.baseUrl + "/Company/ParseCompanyPageProducts?";
         if (companyName !== undefined && companyName !== null)
             url_ += "companyName=" + encodeURIComponent("" + companyName) + "&";
@@ -194,11 +194,11 @@ export class CompanyClient {
         };
 
         return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processAddProductsListFromCompany(_response);
+            return this.processParseCompanyPageProducts(_response);
         });
     }
 
-    protected processAddProductsListFromCompany(response: Response): Promise<string[]> {
+    protected processParseCompanyPageProducts(response: Response): Promise<ProductData[]> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -208,7 +208,7 @@ export class CompanyClient {
             if (Array.isArray(resultData200)) {
                 result200 = [] as any;
                 for (let item of resultData200)
-                    result200!.push(item);
+                    result200!.push(ProductData.fromJS(item));
             }
             return result200;
             });
@@ -229,8 +229,8 @@ export class CompanyClient {
         }
     }
 
-    addCompanyByUrl(companyUrl: string | null | undefined): Promise<ResponseCompany> {
-        let url_ = this.baseUrl + "/Company/AddCompanyByUrl?";
+    addByUrl(companyUrl: string | null | undefined): Promise<ResponseCompany> {
+        let url_ = this.baseUrl + "/Company/AddByUrl?";
         if (companyUrl !== undefined && companyUrl !== null)
             url_ += "companyUrl=" + encodeURIComponent("" + companyUrl) + "&";
         url_ = url_.replace(/[?&]$/, "");
@@ -243,11 +243,11 @@ export class CompanyClient {
         };
 
         return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processAddCompanyByUrl(_response);
+            return this.processAddByUrl(_response);
         });
     }
 
-    protected processAddCompanyByUrl(response: Response): Promise<ResponseCompany> {
+    protected processAddByUrl(response: Response): Promise<ResponseCompany> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -274,8 +274,8 @@ export class CompanyClient {
         }
     }
 
-    getCompanyById(id: number | undefined): Promise<ResponseCompany> {
-        let url_ = this.baseUrl + "/Company/GetCompanyById?";
+    getById(id: number | undefined): Promise<ResponseCompany> {
+        let url_ = this.baseUrl + "/Company/GetById?";
         if (id === null)
             throw new Error("The parameter 'id' cannot be null.");
         else if (id !== undefined)
@@ -290,11 +290,11 @@ export class CompanyClient {
         };
 
         return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processGetCompanyById(_response);
+            return this.processGetById(_response);
         });
     }
 
-    protected processGetCompanyById(response: Response): Promise<ResponseCompany> {
+    protected processGetById(response: Response): Promise<ResponseCompany> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -321,8 +321,8 @@ export class CompanyClient {
         }
     }
 
-    getCompanies(): Promise<ResponseCompany[]> {
-        let url_ = this.baseUrl + "/Company/GetCompanies";
+    getAll(): Promise<ResponseCompany[]> {
+        let url_ = this.baseUrl + "/Company/GetAll";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ = <RequestInit>{
@@ -333,11 +333,11 @@ export class CompanyClient {
         };
 
         return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processGetCompanies(_response);
+            return this.processGetAll(_response);
         });
     }
 
-    protected processGetCompanies(response: Response): Promise<ResponseCompany[]> {
+    protected processGetAll(response: Response): Promise<ResponseCompany[]> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -417,7 +417,7 @@ export class ProductClient {
         }
     }
 
-    parseAllProductUrlsInsideCompanyPage(companyName: string | null | undefined): Promise<ProductData> {
+    parseAllProductUrlsInsideCompanyPage(companyName: string | null | undefined): Promise<ProductData[]> {
         let url_ = this.baseUrl + "/Product/ParseAllProductUrlsInsideCompanyPage?";
         if (companyName !== undefined && companyName !== null)
             url_ += "companyName=" + encodeURIComponent("" + companyName) + "&";
@@ -435,14 +435,18 @@ export class ProductClient {
         });
     }
 
-    protected processParseAllProductUrlsInsideCompanyPage(response: Response): Promise<ProductData> {
+    protected processParseAllProductUrlsInsideCompanyPage(response: Response): Promise<ProductData[]> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
             return response.text().then((_responseText) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = ProductData.fromJS(resultData200);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(ProductData.fromJS(item));
+            }
             return result200;
             });
         } else if (status === 400) {
@@ -990,62 +994,6 @@ export class ResponseNestedCategory extends ResponseCategory implements IRespons
 
 export interface IResponseNestedCategory extends IResponseCategory {
     subCategories?: ResponseNestedCategory[] | undefined;
-}
-
-export class ResponseCompany implements IResponseCompany {
-    id?: number;
-    externalId?: string | undefined;
-    productCount?: number;
-    name?: string | undefined;
-    url?: string | undefined;
-    syncDate?: Date;
-
-    constructor(data?: IResponseCompany) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.externalId = _data["externalId"];
-            this.productCount = _data["productCount"];
-            this.name = _data["name"];
-            this.url = _data["url"];
-            this.syncDate = _data["syncDate"] ? new Date(_data["syncDate"].toString()) : <any>undefined;
-        }
-    }
-
-    static fromJS(data: any): ResponseCompany {
-        data = typeof data === 'object' ? data : {};
-        let result = new ResponseCompany();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["externalId"] = this.externalId;
-        data["productCount"] = this.productCount;
-        data["name"] = this.name;
-        data["url"] = this.url;
-        data["syncDate"] = this.syncDate ? this.syncDate.toISOString() : <any>undefined;
-        return data; 
-    }
-}
-
-export interface IResponseCompany {
-    id?: number;
-    externalId?: string | undefined;
-    productCount?: number;
-    name?: string | undefined;
-    url?: string | undefined;
-    syncDate?: Date;
 }
 
 export class ProductData implements IProductData {
@@ -1635,6 +1583,62 @@ export interface IProductAttribute {
     attributeGroup?: string | undefined;
     attributeValues?: string | undefined;
     product?: ProductData | undefined;
+}
+
+export class ResponseCompany implements IResponseCompany {
+    id?: number;
+    externalId?: string | undefined;
+    productCount?: number;
+    name?: string | undefined;
+    url?: string | undefined;
+    syncDate?: Date;
+
+    constructor(data?: IResponseCompany) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.externalId = _data["externalId"];
+            this.productCount = _data["productCount"];
+            this.name = _data["name"];
+            this.url = _data["url"];
+            this.syncDate = _data["syncDate"] ? new Date(_data["syncDate"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): ResponseCompany {
+        data = typeof data === 'object' ? data : {};
+        let result = new ResponseCompany();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["externalId"] = this.externalId;
+        data["productCount"] = this.productCount;
+        data["name"] = this.name;
+        data["url"] = this.url;
+        data["syncDate"] = this.syncDate ? this.syncDate.toISOString() : <any>undefined;
+        return data; 
+    }
+}
+
+export interface IResponseCompany {
+    id?: number;
+    externalId?: string | undefined;
+    productCount?: number;
+    name?: string | undefined;
+    url?: string | undefined;
+    syncDate?: Date;
 }
 
 export class ProductJson implements IProductJson {
