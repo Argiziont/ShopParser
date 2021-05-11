@@ -33,9 +33,11 @@ namespace ShopParserApi.Services
             var page = await _browsingContextService.OpenPageAsync(company.Url.Replace(".html", $";{counter}.html"));
 
             //Get all pages for current company
-            while (page.Url.Contains(';'))
+            while (page.Url!= company.Url)
             {
                 page = await _browsingContextService.OpenPageAsync(company.Url.Replace(".html", $";{counter}.html"));
+                if (page==null)
+                    break;
 
                 company.Products.AddRange(CompanyParsingService.ParseCompanyProducts(company, page));
 

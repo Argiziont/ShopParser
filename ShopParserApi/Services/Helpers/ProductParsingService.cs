@@ -25,7 +25,6 @@ namespace ShopParserApi.Services.Helpers
             var json = JObject.Parse(jsonString);
 
             return ParseSinglePage(json, externalId);
-
          }
 
         private static ProductData ParseSinglePage(JObject productJson, string externalId)

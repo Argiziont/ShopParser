@@ -39,6 +39,7 @@ namespace ShopParserApi.Services
 
             var categories = CategoryParsingService.ParseCategories(product, productPage);
             var enumerableCategories = categories as Category[] ?? categories.ToArray();
+
             parsedProduct.Categories = enumerableCategories.ToList();
 
             foreach (var category in enumerableCategories.Where(category =>
@@ -91,6 +92,7 @@ namespace ShopParserApi.Services
                 foreach (var currentCategory in parsedProduct.Categories)
                     product.Categories.Add(
                         _dbContext.Categories.FirstOrDefault(c => c.Name == currentCategory.Name));
+
             await _dbContext.SaveChangesAsync();
             return product;
         }
