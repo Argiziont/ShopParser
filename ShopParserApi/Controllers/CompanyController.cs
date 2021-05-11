@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AngleSharp;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
@@ -24,14 +25,16 @@ namespace ShopParserApi.Controllers
     {
         private readonly IBrowsingContextService _browsingContextService;
         private readonly ICompanyService _companyService;
+        private readonly ILogger<CompanyController> _logger;
         private readonly ApplicationDb _dbContext;
 
         public CompanyController(ApplicationDb db, ICompanyService companyService,
-            IBrowsingContextService browsingContextService)
+            IBrowsingContextService browsingContextService, ILogger<CompanyController> logger)
         {
             _dbContext = db;
             _companyService = companyService;
             _browsingContextService = browsingContextService;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -49,10 +52,12 @@ namespace ShopParserApi.Controllers
 
                 await _companyService.InsertCompanyIntoDb(company);
 
+                _logger.LogInformation("ParseCompanyPageProducts method inside CompanyController was called successfully");
                 return Ok(company.Products);
             }
             catch (Exception e)
             {
+                _logger.LogError(e.Message);
                 return BadRequest(e);
             }
         }
@@ -98,6 +103,7 @@ namespace ShopParserApi.Controllers
                 await _dbContext.Companies.AddAsync(companyData);
                 await _dbContext.SaveChangesAsync();
 
+                _logger.LogInformation("AddByUrlAsync method inside CompanyController was called successfully");
                 return Ok(new ResponseCompany
                 {
                     ExternalId = companyData.ExternalId,
@@ -109,6 +115,7 @@ namespace ShopParserApi.Controllers
             }
             catch (Exception e)
             {
+                _logger.LogError(e.Message);
                 return BadRequest(e);
             }
         }
@@ -125,6 +132,8 @@ namespace ShopParserApi.Controllers
                 var company = _dbContext.Companies.FirstOrDefault(s => s.Id == id);
 
                 if (company != null)
+                {
+                    _logger.LogInformation("GetById method inside CompanyController was called successfully");
                     return Ok(new ResponseCompany
                     {
                         ExternalId = company.ExternalId,
@@ -135,10 +144,14 @@ namespace ShopParserApi.Controllers
                         ProductCount = _dbContext.Products.Count(p =>
                             p.CompanyId == company.Id && p.ProductState == ProductState.Success)
                     });
+                }
+
+                _logger.LogWarning("GetById method inside CompanyController returned NotFound");
                 return NotFound();
             }
             catch (Exception e)
             {
+                _logger.LogError(e.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, e);
             }
         }
@@ -154,6 +167,8 @@ namespace ShopParserApi.Controllers
             {
                 var company = _dbContext.Companies.ToList();
                 if (company.Count > 0)
+                {
+                    _logger.LogInformation("GetAll method inside CompanyController was called successfully");
                     return Ok(company.Select(s => new ResponseCompany
                     {
                         ExternalId = s.ExternalId,
@@ -164,11 +179,14 @@ namespace ShopParserApi.Controllers
                         ProductCount = _dbContext.Products.Count(p =>
                             p.CompanyId == s.Id && p.ProductState == ProductState.Success)
                     }));
+                }
 
+                _logger.LogWarning("GetAll method inside CompanyController returned NotFound");
                 return NotFound();
             }
             catch (Exception e)
             {
+                _logger.LogError(e.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, e);
             }
         }

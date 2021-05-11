@@ -23,11 +23,12 @@ namespace ShopParserApi.Services.TimedHostedServices
 
         public void Dispose()
         {
+            _logger.LogInformation("Company Hosted Service stopped.");
         }
 
         public Task StartAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("Product Hosted Service running.");
+            _logger.LogInformation("Company Hosted Service running.");
 
             var cts = new CancellationTokenSource();
             var ct = cts.Token;
@@ -39,7 +40,7 @@ namespace ShopParserApi.Services.TimedHostedServices
 
         public Task StopAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("Product Hosted Service is stopping.");
+            _logger.LogInformation("Company Hosted Service is stopping.");
 
             return Task.CompletedTask;
         }
@@ -62,7 +63,8 @@ namespace ShopParserApi.Services.TimedHostedServices
                     var company = context.Companies.FirstOrDefault(p => p.Products.Count == 0);
                     if (company == null) continue;
 
-                    await companyService.InsertCompanyIntoDb(company);
+                    var result=await companyService.InsertCompanyIntoDb(company);
+                    _logger.LogInformation($"Company with name {result.Name} was updated successfully");
                 }
                 catch (Exception e)
                 {

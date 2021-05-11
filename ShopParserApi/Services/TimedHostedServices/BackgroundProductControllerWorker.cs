@@ -30,6 +30,7 @@ namespace ShopParserApi.Services.TimedHostedServices
 
         public void Dispose()
         {
+            _logger.LogInformation("Product Hosted Service stopped.");
         }
 
         public Task StartAsync(CancellationToken stoppingToken)
@@ -90,6 +91,8 @@ namespace ShopParserApi.Services.TimedHostedServices
                     }
 
                     await _productsHub.Clients.All.ReceiveMessage(
+                        $"Product with name id: {product.ExternalId} was updated successfully");
+                    _logger.LogInformation(
                         $"Product with name id: {product.ExternalId} was updated successfully");
                 }
                 catch (Exception e)

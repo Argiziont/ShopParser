@@ -42,3 +42,24 @@
 2021-05-11 14:14:29.933 +03:00 [INF] Product with name id: 1367020632 was updated successfully
 2021-05-11 14:14:36.317 +03:00 [INF] Product with name id: 1367020624 was updated successfully
 2021-05-11 14:14:43.324 +03:00 [INF] Product with name id: 1367020623 was updated successfully
+2021-05-11 14:33:42.326 +03:00 [INF] Product Hosted Service running.
+2021-05-11 14:33:42.362 +03:00 [INF] Company Hosted Service running.
+2021-05-11 14:33:42.499 +03:00 [INF] Now listening on: https://localhost:5001
+2021-05-11 14:33:42.503 +03:00 [INF] Application started. Press Ctrl+C to shut down.
+2021-05-11 14:33:42.504 +03:00 [INF] Hosting environment: Development
+2021-05-11 14:33:42.505 +03:00 [INF] Content root path: C:\Users\Argiziont\source\repos\ShopParser\ShopParserApi
+2021-05-11 14:33:42.829 +03:00 [INF] Request starting HTTP/2 GET https://localhost:5001/swagger/index.html  
+2021-05-11 14:33:42.921 +03:00 [INF] Request finished in 93.7839ms 200 text/html; charset=utf-8
+2021-05-11 14:33:43.313 +03:00 [INF] Request starting HTTP/2 GET https://localhost:5001/swagger/v1/swagger.json  
+2021-05-11 14:33:43.976 +03:00 [INF] Request finished in 663.887ms 200 application/json; charset=utf-8
+2021-05-11 14:33:48.379 +03:00 [INF] Entity Framework Core 5.0.4 initialized 'ApplicationDb' using provider 'Microsoft.EntityFrameworkCore.SqlServer' with options: None
+2021-05-11 14:33:48.379 +03:00 [INF] Entity Framework Core 5.0.4 initialized 'ApplicationDb' using provider 'Microsoft.EntityFrameworkCore.SqlServer' with options: None
+2021-05-11 14:33:52.593 +03:00 [INF] Product with name id: 1367020611 was updated successfully
+2021-05-11 14:33:59.427 +03:00 [INF] Product with name id: 1367020596 was updated successfully
+2021-05-11 14:34:06.425 +03:00 [INF] Product with name id: 1367020589 was updated successfully
+2021-05-11 14:34:13.560 +03:00 [INF] Product with name id: 1367020588 was updated successfully
+2021-05-11 14:34:15.461 +03:00 [INF] Application is shutting down...
+2021-05-11 14:34:15.471 +03:00 [INF] Company Hosted Service is stopping.
+2021-05-11 14:34:15.473 +03:00 [INF] Product Hosted Service is stopping.
+2021-05-11 14:34:15.477 +03:00 [INF] Company Hosted Service stopped.
+2021-05-11 14:34:15.478 +03:00 [INF] Product Hosted Service stopped.

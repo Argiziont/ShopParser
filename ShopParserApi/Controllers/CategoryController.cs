@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using ShopParserApi.Models;
 using ShopParserApi.Models.ResponseModels;
 using ShopParserApi.Services;
@@ -16,10 +17,12 @@ namespace ShopParserApi.Controllers
     public class CategoryController : ControllerBase
     {
         private readonly ApplicationDb _dbContext;
+        private readonly ILogger<CategoryController> _logger;
 
-        public CategoryController(ApplicationDb dbContext)
+        public CategoryController(ApplicationDb dbContext, ILogger<CategoryController> logger)
         {
             _dbContext = dbContext;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -32,6 +35,9 @@ namespace ShopParserApi.Controllers
             try
             {
                 var categoryList = await _dbContext.Categories.ToListAsync();
+
+                _logger.LogInformation("GetAll method inside CategoryController was called successfully");
+
                 return Ok(categoryList.Select(c => new ResponseCategory
                 {
                     Id = c.Id,
@@ -42,7 +48,9 @@ namespace ShopParserApi.Controllers
             }
             catch (Exception e)
             {
+                _logger.LogError(e.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, e);
+                
             }
         }
 
@@ -59,6 +67,8 @@ namespace ShopParserApi.Controllers
                     .OrderBy(p => p.Id)
                     .Skip(page * rowsPerPage).Take(rowsPerPage).ToListAsync();
 
+                _logger.LogInformation("GetPagedAsync method inside CategoryController was called successfully");
+
                 return Ok(categorySource.Select(c => new ResponseCategory
                 {
                     Id = c.Id,
@@ -69,6 +79,7 @@ namespace ShopParserApi.Controllers
             }
             catch (Exception e)
             {
+                _logger.LogError(e.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, e);
             }
         }
@@ -88,10 +99,13 @@ namespace ShopParserApi.Controllers
                     return NotFound();
 
                 var reversedCategory = ReverseCategoryListRecursive(currentCategory, _dbContext);
+                _logger.LogInformation("GetAllNestedAsync method inside CategoryController was called successfully");
+
                 return Ok(reversedCategory);
             }
             catch (Exception e)
             {
+                _logger.LogError(e.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, e);
             }
         }
