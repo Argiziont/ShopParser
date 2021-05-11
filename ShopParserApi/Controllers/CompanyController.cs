@@ -26,9 +26,10 @@ namespace ShopParserApi.Controllers
         private readonly ICompanyService _companyService;
         private readonly ApplicationDb _dbContext;
 
-        public CompanyController(ApplicationDb db, ICompanyService companyService, IBrowsingContextService browsingContextService)
+        public CompanyController(ApplicationDb db, ICompanyService companyService,
+            IBrowsingContextService browsingContextService)
         {
-          _dbContext = db;
+            _dbContext = db;
             _companyService = companyService;
             _browsingContextService = browsingContextService;
         }

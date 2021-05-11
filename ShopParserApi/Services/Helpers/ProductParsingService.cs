@@ -1,5 +1,9 @@
-﻿using AngleSharp;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using AngleSharp;
 using AngleSharp.Diffing.Extensions;
+using AngleSharp.Dom;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
@@ -7,25 +11,20 @@ using ShopParserApi.Models;
 using ShopParserApi.Models.Helpers;
 using ShopParserApi.Models.Json_DTO;
 using ShopParserApi.Services.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using AngleSharp.Dom;
 
 namespace ShopParserApi.Services.Helpers
 {
     public static class ProductParsingService
     {
-        public static ProductData ParseSinglePage(ProductData product,IDocument productPage)
+        public static ProductData ParseSinglePage(ProductData product, IDocument productPage)
         {
-
             var externalId = product.Url.SplitProductUrl();
 
             var jsonString = productPage.ToHtml().SubstringJson("window.ApolloCacheState =", "window.SPAConfig");
             var json = JObject.Parse(jsonString);
 
             return ParseSinglePage(json, externalId);
-         }
+        }
 
         private static ProductData ParseSinglePage(JObject productJson, string externalId)
         {
@@ -97,7 +96,7 @@ namespace ShopParserApi.Services.Helpers
                     .Select(JsonConvert.DeserializeObject<ProductPaymentOption>));
             }
 
-           
+
             productFromProm.JsonCategorySchema = JsonSchema.FromType<Category>().ToJson();
             productFromProm.SyncDate = DateTime.Now;
 
@@ -118,10 +117,8 @@ namespace ShopParserApi.Services.Helpers
                 KeyWords = productFromProm.KeyWords,
                 Presence = productFromProm.Presence,
                 ProductPaymentOptions = productFromProm.ProductPaymentOptions,
-                ProductDeliveryOptions = productFromProm.ProductDeliveryOptions,
+                ProductDeliveryOptions = productFromProm.ProductDeliveryOptions
             };
         }
-
-       
     }
 }

@@ -59,7 +59,7 @@ namespace ShopParserApi.Services.TimedHostedServices
             while (!ct.IsCancellationRequested)
             {
                 await Task.Delay(TimeSpan.FromSeconds(5), ct);
-               
+
                 try
                 {
                     if (context == null) throw new NullReferenceException(nameof(context));
@@ -70,7 +70,7 @@ namespace ShopParserApi.Services.TimedHostedServices
                         s.CompanyState == CompanyState.Processing && s.CompanyState == CompanyState.Idle) != 0)
                         continue;
 
-                    
+
                     var product = context.Products.FirstOrDefault(p => p.ProductState == ProductState.Idle);
                     if (product == null)
                     {
@@ -85,7 +85,8 @@ namespace ShopParserApi.Services.TimedHostedServices
                     catch (TooManyRequestsException)
                     {
                         product.ProductState = ProductState.Failed;
-                        _logger.LogError($"Product with id \"{product.Id}\" couldn't be updated. Blocked by service provider.");
+                        _logger.LogError(
+                            $"Product with id \"{product.Id}\" couldn't be updated. Blocked by service provider.");
                     }
 
                     await _productsHub.Clients.All.ReceiveMessage(

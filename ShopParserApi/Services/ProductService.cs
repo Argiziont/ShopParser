@@ -9,10 +9,11 @@ using ShopParserApi.Services.Interfaces;
 
 namespace ShopParserApi.Services
 {
-    public class ProductService: IProductService
+    public class ProductService : IProductService
     {
-        private readonly ApplicationDb _dbContext;
         private readonly IBrowsingContextService _browsingContextService;
+        private readonly ApplicationDb _dbContext;
+
         public ProductService(ApplicationDb dbContext, IBrowsingContextService browsingContextService)
         {
             _dbContext = dbContext;
@@ -21,14 +22,15 @@ namespace ShopParserApi.Services
 
         public async Task<ProductData> InsertProductPageIntoDb(string productUrl)
         {
-            var product= _dbContext.Products.FirstOrDefault(p => p.Url == productUrl);
+            var product = _dbContext.Products.FirstOrDefault(p => p.Url == productUrl);
             return await InsertProductPageIntoDb(product);
         }
+
         public async Task<ProductData> InsertProductPageIntoDb(ProductData product)
         {
-            var productPage= await _browsingContextService.OpenPageAsync(product.Url);
+            var productPage = await _browsingContextService.OpenPageAsync(product.Url);
 
-            if (productPage==null)
+            if (productPage == null)
                 throw new NullReferenceException(nameof(productPage));
 
 

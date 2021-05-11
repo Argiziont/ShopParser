@@ -1,59 +1,38 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Moq;
-using ShopParserApi.Controllers;
-using ShopParserApi.Models;
-using ShopParserApi.Services;
-using ShopParserApi.Services.Interfaces;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AngleSharp.Dom;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Moq;
+using ShopParserApi.Controllers;
+using ShopParserApi.Models;
 using ShopParserApi.Models.ResponseModels;
+using ShopParserApi.Services;
+using ShopParserApi.Services.Interfaces;
 using Xunit;
 
 namespace ShopParserApi.Tests
 {
     public class CompanyControllerTest
     {
-        #region Seeding
-        public CompanyControllerTest()
-        {
-            ContextOptions = new DbContextOptionsBuilder<ApplicationDb>()
-                .UseInMemoryDatabase("TestDatabaseCompanies")
-                .Options;
-
-            Seed();
-        }
-
-        private DbContextOptions<ApplicationDb> ContextOptions { get; }
-        private void Seed()
-        {
-            using var context = new ApplicationDb(ContextOptions);
-            context.Database.EnsureDeleted();
-            context.Database.EnsureCreated();
-
-            var company1 = new CompanyData { Name = "One", Url = "CompanyPageTest.html" };
-            context.Add(company1);
-            context.SaveChanges();
-
-        }
-        #endregion
-
         #region CanParseCompanyPageProductsProducts
+
         [Fact]
         public async Task Can_parseCompanyPageProducts_products()
         {
             //Arrange
-            await using  var context = new ApplicationDb(ContextOptions);
+            await using var context = new ApplicationDb(ContextOptions);
             var companyServiceMock = new Mock<ICompanyService>();
             var browsingContextServiceMock = new Mock<IBrowsingContextService>();
 
             var fistCompany = context.Companies.First();
-            companyServiceMock.Setup(service => service.InsertCompanyIntoDb(fistCompany)).ReturnsAsync(MockInsertCompanyIntoDb(fistCompany));
+            companyServiceMock.Setup(service => service.InsertCompanyIntoDb(fistCompany))
+                .ReturnsAsync(MockInsertCompanyIntoDb(fistCompany));
 
-            var controller = new CompanyController(context, companyServiceMock.Object, browsingContextServiceMock.Object);
+            var controller =
+                new CompanyController(context, companyServiceMock.Object, browsingContextServiceMock.Object);
 
             //Act
             var result = await controller.ParseCompanyPageProducts("One");
@@ -73,9 +52,11 @@ namespace ShopParserApi.Tests
             Assert.Equal("Two", responseProducts[1].Title);
             Assert.Equal("Three", responseProducts[2].Title);
         }
+
         #endregion
 
         #region CanAddByUrlAsyncResponseCompany
+
         [Fact]
         public async Task Can_addByUrlAsync_responseCompany()
         {
@@ -83,7 +64,9 @@ namespace ShopParserApi.Tests
             await using var context = new ApplicationDb(ContextOptions);
             var browsingContextServiceMock = new Mock<IBrowsingContextService>();
 
-            browsingContextServiceMock.Setup(service => service.OpenPageAsync("https://prom.ua/c3502019-toppoint-tvoj-internet.html")).ReturnsAsync(await MockOpenPageAsync());
+            browsingContextServiceMock
+                .Setup(service => service.OpenPageAsync("https://prom.ua/c3502019-toppoint-tvoj-internet.html"))
+                .ReturnsAsync(await MockOpenPageAsync());
 
             var controller = new CompanyController(context, null, new BrowsingContextService());
 
@@ -97,12 +80,14 @@ namespace ShopParserApi.Tests
 
             var okResultValue = okResult.Value as ResponseCompany;
             Assert.NotNull(okResultValue);
-            
+
             Assert.Equal("3502019", okResultValue.ExternalId);
         }
+
         #endregion
 
         #region CanGetByIdResponseCompany
+
         [Fact]
         public async Task Can_getById_responseCompany()
         {
@@ -121,13 +106,15 @@ namespace ShopParserApi.Tests
 
             var okResultValue = okResult.Value as ResponseCompany;
             Assert.NotNull(okResultValue);
-            
+
 
             Assert.Equal("One", okResultValue.Name);
         }
+
         #endregion
 
         #region CanGetAllResponseCompanyList
+
         [Fact]
         public async Task Can_getAll_responseCompanyList()
         {
@@ -152,24 +139,54 @@ namespace ShopParserApi.Tests
             Assert.Single(responseCompanies);
             Assert.Equal("One", responseCompanies.First().Name);
         }
+
+        #endregion
+
+        #region Seeding
+
+        public CompanyControllerTest()
+        {
+            ContextOptions = new DbContextOptionsBuilder<ApplicationDb>()
+                .UseInMemoryDatabase("TestDatabaseCompanies")
+                .Options;
+
+            Seed();
+        }
+
+        private DbContextOptions<ApplicationDb> ContextOptions { get; }
+
+        private void Seed()
+        {
+            using var context = new ApplicationDb(ContextOptions);
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
+
+            var company1 = new CompanyData {Name = "One", Url = "CompanyPageTest.html"};
+            context.Add(company1);
+            context.SaveChanges();
+        }
+
         #endregion
 
         #region snippet_Mocks
+
         private static CompanyData MockInsertCompanyIntoDb(CompanyData company)
         {
-            company.Products.Add(new ProductData { Company = company, Title = "One" });
-            company.Products.Add(new ProductData { Company = company, Title = "Two" });
-            company.Products.Add(new ProductData { Company = company, Title = "Three" });
+            company.Products.Add(new ProductData {Company = company, Title = "One"});
+            company.Products.Add(new ProductData {Company = company, Title = "Two"});
+            company.Products.Add(new ProductData {Company = company, Title = "Three"});
 
 
             return company;
         }
+
         private static async Task<IDocument> MockOpenPageAsync()
         {
             var browsingContext = new BrowsingContextService();
 
             return await browsingContext.OpenPageAsync("CompanyPageTest.html");
         }
+
         #endregion
     }
 }

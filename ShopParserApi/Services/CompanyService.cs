@@ -12,15 +12,17 @@ using ShopParserApi.Services.Interfaces;
 
 namespace ShopParserApi.Services
 {
-    public class CompanyService:ICompanyService
+    public class CompanyService : ICompanyService
     {
-        private readonly ApplicationDb _dbContext;
         private readonly IBrowsingContextService _browsingContextService;
+        private readonly ApplicationDb _dbContext;
+
         public CompanyService(ApplicationDb dbContext, IBrowsingContextService browsingContextService)
         {
             _dbContext = dbContext;
             _browsingContextService = browsingContextService;
         }
+
         public async Task<CompanyData> InsertCompanyIntoDb(CompanyData company)
         {
             //Number of pages   
@@ -33,10 +35,10 @@ namespace ShopParserApi.Services
             var page = await _browsingContextService.OpenPageAsync(company.Url.Replace(".html", $";{counter}.html"));
 
             //Get all pages for current company
-            while (page.Url!= company.Url)
+            while (page.Url != company.Url)
             {
                 page = await _browsingContextService.OpenPageAsync(company.Url.Replace(".html", $";{counter}.html"));
-                if (page==null)
+                if (page == null)
                     break;
 
                 company.Products.AddRange(CompanyParsingService.ParseCompanyProducts(company, page));

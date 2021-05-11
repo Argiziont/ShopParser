@@ -22,56 +22,16 @@ namespace ShopParserApi.Tests
 {
     public class ProductControllerTest
     {
-        #region Seeding
-        public ProductControllerTest()
-        {
-            ContextOptions = new DbContextOptionsBuilder<ApplicationDb>()
-                .UseInMemoryDatabase("TestDatabaseProducts")
-                .Options;
-        }
-
-        private DbContextOptions<ApplicationDb> ContextOptions { get; }
-        private void Seed()
-        {
-            using var context = new ApplicationDb(ContextOptions);
-            context.Database.EnsureDeleted();
-            context.Database.EnsureCreated();
-
-            var company1 = new CompanyData() { Name = "One" };
-
-            var productJson1 = new ProductJson { Title = "One" };
-            var productJson2 = new ProductJson { Title = "Two" };
-            var productJson3 = new ProductJson { Title = "Three" };
-
-            var product1 = new ProductData { Title = "One", JsonData = JsonConvert.SerializeObject(productJson1),Url = "Url1",ExternalId = "1",ProductState = ProductState.Success};
-            var product2 = new ProductData { Title = "Two", JsonData = JsonConvert.SerializeObject(productJson2), Url = "Url2", ExternalId = "2" };
-            var product3 = new ProductData { Title = "Three", JsonData = JsonConvert.SerializeObject(productJson3), Url = "Url3", ExternalId = "3" };
-
-            var category1 = new Category { Name = "One" };
-            var category2 = new Category { Name = "Two", SupCategory = category1 };
-            var category3 = new Category { Name = "Three", SupCategory = category2 };
-
-            product1.Categories= new List<Category> { category1, category2, category3 };
-            product2.Categories = new List<Category> { category1, category2 };
-            product3.Categories = new List<Category> { category1 };
-
-            company1.Products = new List<ProductData> {product1, product2, product3};
-
-            context.Add(company1);
-            
-            context.SaveChanges();
-
-        }
-        #endregion
-
         #region CanGetParsedProductPageProductData
+
         [Fact]
         public async Task Can_getParsedProductPage_productData()
         {
             //Arrange
             var productServiceMock = new Mock<IProductService>();
 
-            productServiceMock.Setup(service => service.InsertProductPageIntoDb("Url")).ReturnsAsync((() => new ProductData {Id = 1,Title = "One"}));
+            productServiceMock.Setup(service => service.InsertProductPageIntoDb("Url"))
+                .ReturnsAsync(() => new ProductData {Id = 1, Title = "One"});
 
             var controller = new ProductController(null, null, productServiceMock.Object);
 
@@ -89,9 +49,11 @@ namespace ShopParserApi.Tests
             Assert.Equal("One", okResultValue.Title);
             Assert.Equal(1, okResultValue.Id);
         }
+
         #endregion
 
         #region CanParseAllProductUrlsInsideCompanyPageAsyncProductData
+
         [Fact]
         public async Task Can_parseAllProductUrlsInsideCompanyPageAsync_productData()
         {
@@ -101,9 +63,12 @@ namespace ShopParserApi.Tests
 
             var productServiceMock = new Mock<IProductService>();
 
-            productServiceMock.Setup(service => service.InsertProductPageIntoDb("Url1")).ReturnsAsync(() =>  context.Products.FirstOrDefault(p=>p.Url== "Url1"));
-            productServiceMock.Setup(service => service.InsertProductPageIntoDb("Url2")).ReturnsAsync((() => context.Products.FirstOrDefault(p => p.Url == "Url2")));
-            productServiceMock.Setup(service => service.InsertProductPageIntoDb("Url3")).ReturnsAsync((() => context.Products.FirstOrDefault(p => p.Url == "Url3")));
+            productServiceMock.Setup(service => service.InsertProductPageIntoDb("Url1"))
+                .ReturnsAsync(() => context.Products.FirstOrDefault(p => p.Url == "Url1"));
+            productServiceMock.Setup(service => service.InsertProductPageIntoDb("Url2"))
+                .ReturnsAsync(() => context.Products.FirstOrDefault(p => p.Url == "Url2"));
+            productServiceMock.Setup(service => service.InsertProductPageIntoDb("Url3"))
+                .ReturnsAsync(() => context.Products.FirstOrDefault(p => p.Url == "Url3"));
 
             var controller = new ProductController(context, null, productServiceMock.Object);
 
@@ -121,9 +86,11 @@ namespace ShopParserApi.Tests
             Assert.Equal("One", okResultValue[0].Title);
             Assert.Equal(1, okResultValue[0].Id);
         }
+
         #endregion
 
         #region CanParseSingleProductInsideCompanyPageAsyncProductData
+
         [Fact]
         public async Task Can_parseSingleProductInsideCompanyPageAsync_productData()
         {
@@ -138,7 +105,8 @@ namespace ShopParserApi.Tests
 
             var productServiceMock = new Mock<IProductService>();
 
-            productServiceMock.Setup(service => service.InsertProductPageIntoDb("Url2")).ReturnsAsync(() => context.Products.FirstOrDefault(p => p.Url == "Url2"));
+            productServiceMock.Setup(service => service.InsertProductPageIntoDb("Url2"))
+                .ReturnsAsync(() => context.Products.FirstOrDefault(p => p.Url == "Url2"));
 
             mockHubContext.Setup(service => service.Clients).Returns(mockClients.Object);
             mockClients.Setup(service => service.All).Returns(mockClient.Object);
@@ -160,9 +128,11 @@ namespace ShopParserApi.Tests
             Assert.Equal("Two", okResultValue.Title);
             Assert.Equal(2, okResultValue.Id);
         }
+
         #endregion
 
         #region CanGetFullProductsByIdProductJson
+
         [Fact]
         public async Task Can_getFullProductsById_productJson()
         {
@@ -185,9 +155,11 @@ namespace ShopParserApi.Tests
 
             Assert.Equal("Two", okResultValue.Title);
         }
+
         #endregion
 
         #region CanGetProductsByCompanyIdAsyncResponseProductList
+
         [Fact]
         public async Task Can_getProductsByCompanyIdAsync_responseProductList()
         {
@@ -211,11 +183,13 @@ namespace ShopParserApi.Tests
             var responseProducts = okResultValue as ResponseProduct[] ?? okResultValue.ToArray();
 
             Assert.Single(responseProducts);
-            Assert.Equal("One",responseProducts.First().Title);
+            Assert.Equal("One", responseProducts.First().Title);
         }
+
         #endregion
 
         #region CanGetProductsByCategoryIdAsyncResponseProductList
+
         [Fact]
         public async Task Can_getProductsByCategoryIdAsync_responseProductList()
         {
@@ -241,9 +215,11 @@ namespace ShopParserApi.Tests
             Assert.Single(responseProducts);
             Assert.Equal("One", responseProducts.First().Title);
         }
+
         #endregion
 
         #region CanGetPagedProductsByCompanyIdAsyncResponseProductList
+
         [Fact]
         public async Task Can_getPagedProductsByCompanyIdAsync_responseProductList()
         {
@@ -254,7 +230,7 @@ namespace ShopParserApi.Tests
             var controller = new ProductController(context, null, null);
 
             //Act
-            var result = await controller.GetPagedProductsByCompanyIdAsync(1,0,1);
+            var result = await controller.GetPagedProductsByCompanyIdAsync(1, 0, 1);
             var okResult = result as OkObjectResult;
 
             //Assert
@@ -269,9 +245,11 @@ namespace ShopParserApi.Tests
             Assert.Single(responseProducts);
             Assert.Equal("One", responseProducts.First().Title);
         }
+
         #endregion
 
         #region CanGetPagedProductsByCategoryIdAsyncResponseProductList
+
         [Fact]
         public async Task Can_getPagedProductsByCategoryIdAsync_responseProductList()
         {
@@ -282,7 +260,7 @@ namespace ShopParserApi.Tests
             var controller = new ProductController(context, null, null);
 
             //Act
-            var result = await controller.GetPagedProductsByCategoryIdAsync(1,0,1);
+            var result = await controller.GetPagedProductsByCategoryIdAsync(1, 0, 1);
             var okResult = result as OkObjectResult;
 
             //Assert
@@ -297,7 +275,57 @@ namespace ShopParserApi.Tests
             Assert.Single(responseProducts);
             Assert.Equal("One", responseProducts.First().Title);
         }
+
         #endregion
 
+        #region Seeding
+
+        public ProductControllerTest()
+        {
+            ContextOptions = new DbContextOptionsBuilder<ApplicationDb>()
+                .UseInMemoryDatabase("TestDatabaseProducts")
+                .Options;
+        }
+
+        private DbContextOptions<ApplicationDb> ContextOptions { get; }
+
+        private void Seed()
+        {
+            using var context = new ApplicationDb(ContextOptions);
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
+
+            var company1 = new CompanyData {Name = "One"};
+
+            var productJson1 = new ProductJson {Title = "One"};
+            var productJson2 = new ProductJson {Title = "Two"};
+            var productJson3 = new ProductJson {Title = "Three"};
+
+            var product1 = new ProductData
+            {
+                Title = "One", JsonData = JsonConvert.SerializeObject(productJson1), Url = "Url1", ExternalId = "1",
+                ProductState = ProductState.Success
+            };
+            var product2 = new ProductData
+                {Title = "Two", JsonData = JsonConvert.SerializeObject(productJson2), Url = "Url2", ExternalId = "2"};
+            var product3 = new ProductData
+                {Title = "Three", JsonData = JsonConvert.SerializeObject(productJson3), Url = "Url3", ExternalId = "3"};
+
+            var category1 = new Category {Name = "One"};
+            var category2 = new Category {Name = "Two", SupCategory = category1};
+            var category3 = new Category {Name = "Three", SupCategory = category2};
+
+            product1.Categories = new List<Category> {category1, category2, category3};
+            product2.Categories = new List<Category> {category1, category2};
+            product3.Categories = new List<Category> {category1};
+
+            company1.Products = new List<ProductData> {product1, product2, product3};
+
+            context.Add(company1);
+
+            context.SaveChanges();
+        }
+
+        #endregion
     }
 }

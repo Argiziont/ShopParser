@@ -15,13 +15,21 @@ namespace ShopParserApi.Services.Extensions
             var result = value.Substring(startIndex, endIndex).Trim();
             return result.Remove(result.Length - 1);
         }
+
         public static string CategoryToString(this IEnumerable<Category> categories)
         {
             var categoryString = categories.Aggregate("", (current, category) => current + category.Name + " > ");
             return categoryString.Remove(categoryString.Length - 3);
         }
-        public static string SplitCompanyUrl(this string value) => value.Split("/").Last().Split('-').First().Replace("c", "");
 
-        public static string SplitProductUrl(this string value) => value.Split("/").Last().Split('-').First().Replace("p", "");
+        public static string SplitCompanyUrl(this string value)
+        {
+            return value.Split("/").Last().Split('-').First().Replace("c", "");
+        }
+
+        public static string SplitProductUrl(this string value)
+        {
+            return value.Split("/").Last().Split('-').First().Replace("p", "");
+        }
     }
 }

@@ -25,10 +25,11 @@ namespace ShopParserApi.Controllers
     public class ProductController : ControllerBase
     {
         private readonly ApplicationDb _dbContext;
-        private readonly IHubContext<ApiHub, IApiClient> _productsHub;
         private readonly IProductService _productService;
+        private readonly IHubContext<ApiHub, IApiClient> _productsHub;
 
-        public ProductController(ApplicationDb db, IHubContext<ApiHub, IApiClient> productsHub, IProductService productService)
+        public ProductController(ApplicationDb db, IHubContext<ApiHub, IApiClient> productsHub,
+            IProductService productService)
         {
             _dbContext = db;
             _productsHub = productsHub;
@@ -91,8 +92,7 @@ namespace ShopParserApi.Controllers
                 return Accepted("This product already up to date");
             try
             {
-             
-                await _productService.InsertProductPageIntoDb(currentProduct.Url); 
+                await _productService.InsertProductPageIntoDb(currentProduct.Url);
             }
             catch (TooManyRequestsException)
             {
@@ -114,7 +114,7 @@ namespace ShopParserApi.Controllers
         {
             try
             {
-                var product = _dbContext.Products.Include(db=>db.Categories).FirstOrDefault(p => p.Id == id);
+                var product = _dbContext.Products.Include(db => db.Categories).FirstOrDefault(p => p.Id == id);
 
                 var jsonData = product?.JsonData;
                 var deserializeJson =

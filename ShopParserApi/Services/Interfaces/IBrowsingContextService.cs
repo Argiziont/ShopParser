@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using AngleSharp;
 using AngleSharp.Dom;
 
 namespace ShopParserApi.Services.Interfaces

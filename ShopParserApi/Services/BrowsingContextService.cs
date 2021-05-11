@@ -6,16 +6,19 @@ using ShopParserApi.Services.Interfaces;
 
 namespace ShopParserApi.Services
 {
-    public class BrowsingContextService: IBrowsingContextService
+    public class BrowsingContextService : IBrowsingContextService
     {
+        private readonly IBrowsingContext _browsingContext;
+
         public BrowsingContextService()
         {
             var config = Configuration.Default.WithDefaultLoader().WithJs().WithCss();
-            _browsingContext= BrowsingContext.New(config);
+            _browsingContext = BrowsingContext.New(config);
         }
 
-        private readonly IBrowsingContext _browsingContext;
-
-        public async Task<IDocument> OpenPageAsync(string path) => await _browsingContext.OpenPageAsync(path);
+        public async Task<IDocument> OpenPageAsync(string path)
+        {
+            return await _browsingContext.OpenPageAsync(path);
+        }
     }
 }

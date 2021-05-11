@@ -53,7 +53,7 @@ namespace ShopParserApi.Services.TimedHostedServices
             {
                 await Task.Delay(TimeSpan.FromSeconds(5), ct);
 
-                
+
                 try
                 {
                     if (context == null) throw new NullReferenceException(nameof(context));
@@ -61,7 +61,7 @@ namespace ShopParserApi.Services.TimedHostedServices
 
                     var company = context.Companies.FirstOrDefault(p => p.Products.Count == 0);
                     if (company == null) continue;
-                    
+
                     await companyService.InsertCompanyIntoDb(company);
                 }
                 catch (Exception e)

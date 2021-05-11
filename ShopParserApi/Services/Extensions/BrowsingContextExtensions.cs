@@ -1,7 +1,5 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
-using System.Web;
 using AngleSharp;
 using AngleSharp.Dom;
 
@@ -18,6 +16,10 @@ namespace ShopParserApi.Services.Extensions
 
             return await browsingContext.OpenAsync(path);
         }
-        private static bool IsLocalPath(string p) => File.Exists(p);
+
+        private static bool IsLocalPath(string p)
+        {
+            return File.Exists(p);
+        }
     }
 }

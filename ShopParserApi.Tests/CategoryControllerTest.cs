@@ -14,30 +14,8 @@ namespace ShopParserApi.Tests
 {
     public class CategoryControllerTest
     {
-        #region Seeding
-        public CategoryControllerTest()
-        {
-            ContextOptions = new DbContextOptionsBuilder<ApplicationDb>()
-                .UseInMemoryDatabase("TestDatabaseCategories")
-                .Options;
-        }
-
-        private DbContextOptions<ApplicationDb> ContextOptions { get; }
-        private void Seed()
-        {
-            using var context = new ApplicationDb(ContextOptions);
-            context.Database.EnsureDeleted();
-            context.Database.EnsureCreated();
-
-            var category1 = new Category {Name = "One"} ;
-            var category2 = new Category { Name = "Two",SupCategory = category1};
-            var category3 = new Category { Name = "Three",SupCategory = category2};
-            context.AddRange(category1, category2, category3);
-            context.SaveChanges();
-        }
-        #endregion
-        
         #region CanGetAllCategories
+
         [Fact]
         public async Task Can_getAll_categories()
         {
@@ -64,9 +42,11 @@ namespace ShopParserApi.Tests
             Assert.Equal("Two", responseCategories[1].Name);
             Assert.Equal("Three", responseCategories[2].Name);
         }
+
         #endregion
 
         #region CanGetPagedCategories
+
         [Fact]
         public async Task Can_getPaged_categories()
         {
@@ -76,7 +56,7 @@ namespace ShopParserApi.Tests
             var controller = new CategoryController(context);
 
             //Act
-            var result = await controller.GetPagedAsync(1,1);
+            var result = await controller.GetPagedAsync(1, 1);
             var okResult = result as OkObjectResult;
 
             //Assert
@@ -91,9 +71,11 @@ namespace ShopParserApi.Tests
             Assert.Single(responseCategories);
             Assert.Equal("Two", responseCategories[0].Name);
         }
+
         #endregion
 
         #region CanGetAllNestedCategories
+
         [Fact]
         public async Task Can_getAllNested_categories()
         {
@@ -105,7 +87,7 @@ namespace ShopParserApi.Tests
             //Act
             var result = await controller.GetAllNestedAsync();
             var okResult = result as OkObjectResult;
-            
+
             //Assert
             Assert.NotNull(okResult);
             Assert.Equal(StatusCodes.Status200OK, okResult.StatusCode);
@@ -118,6 +100,33 @@ namespace ShopParserApi.Tests
             Assert.Equal("One", responseCategories.Name);
             Assert.Single(responseCategories.SubCategories);
         }
+
+        #endregion
+
+        #region Seeding
+
+        public CategoryControllerTest()
+        {
+            ContextOptions = new DbContextOptionsBuilder<ApplicationDb>()
+                .UseInMemoryDatabase("TestDatabaseCategories")
+                .Options;
+        }
+
+        private DbContextOptions<ApplicationDb> ContextOptions { get; }
+
+        private void Seed()
+        {
+            using var context = new ApplicationDb(ContextOptions);
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
+
+            var category1 = new Category {Name = "One"};
+            var category2 = new Category {Name = "Two", SupCategory = category1};
+            var category3 = new Category {Name = "Three", SupCategory = category2};
+            context.AddRange(category1, category2, category3);
+            context.SaveChanges();
+        }
+
         #endregion
     }
 }

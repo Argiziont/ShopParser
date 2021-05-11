@@ -9,10 +9,8 @@ namespace ShopParserApi.Services.Helpers
 {
     public static class CompanyParsingService
     {
-        public static IEnumerable<ProductData> ParseCompanyProducts(CompanyData company,IDocument companyPage)
+        public static IEnumerable<ProductData> ParseCompanyProducts(CompanyData company, IDocument companyPage)
         {
-
-
             var linksSublistPage = companyPage.QuerySelectorAll("*[data-qaid='product_link']").ToList()
                 .Cast<IHtmlAnchorElement>()
                 .Select(u => u.Href).ToList();
