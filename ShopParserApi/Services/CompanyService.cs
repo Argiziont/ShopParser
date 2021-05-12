@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AngleSharp.Diffing.Extensions;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Schema.Generation;
 using ShopParserApi.Models;
@@ -16,11 +18,14 @@ namespace ShopParserApi.Services
     {
         private readonly IBrowsingContextService _browsingContextService;
         private readonly ApplicationDb _dbContext;
-
-        public CompanyService(ApplicationDb dbContext, IBrowsingContextService browsingContextService)
+        private readonly ILogger<CompanyService> _logger;
+        private IBackgroundTaskQueue<ProductData> TaskQueue { get; }
+        public CompanyService(ApplicationDb dbContext, IBrowsingContextService browsingContextService, IBackgroundTaskQueue<ProductData> taskQueue, ILogger<CompanyService> logger)
         {
             _dbContext = dbContext;
             _browsingContextService = browsingContextService;
+            TaskQueue = taskQueue;
+            _logger = logger;
         }
 
         public async Task<CompanyData> InsertCompanyIntoDb(CompanyData company)
@@ -35,16 +40,23 @@ namespace ShopParserApi.Services
             var page = await _browsingContextService.OpenPageAsync(company.Url.Replace(".html", $";{counter}.html"));
 
             //Get all pages for current company
-            while (page.Url != company.Url)
+            while (page.Url != company.Url || counter==1)
             {
-                page = await _browsingContextService.OpenPageAsync(company.Url.Replace(".html", $";{counter}.html"));
-                if (page == null)
-                    break;
+                var products = CompanyParsingService.ParseCompanyProducts(company, page).ToArray();
+                company.Products.AddRange(products);
+                await TaskQueue.QueueBackgroundWorkItemsRangeAsync(products);
 
-                company.Products.AddRange(CompanyParsingService.ParseCompanyProducts(company, page));
+                _logger.LogInformation("CompanyService new products chunk was added");
 
                 counter++;
                 Thread.Sleep(5000);
+
+                page = await _browsingContextService.OpenPageAsync(company.Url.Replace(".html", $";{counter}.html"));
+
+                if (page != null) continue;
+                company.CompanyState = CompanyState.Failed;
+                await _dbContext.SaveChangesAsync();
+                return company;
             }
 
             company.CompanyState = CompanyState.Success;

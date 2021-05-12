@@ -5,72 +5,64 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using ShopParserApi.Models;
 using ShopParserApi.Services.Interfaces;
 
 namespace ShopParserApi.Services.TimedHostedServices
 {
-    public class BackgroundCompanyControllerWorker : IHostedService, IDisposable
+    public class BackgroundCompanyControllerWorker : BackgroundService
     {
         private readonly ILogger<BackgroundProductControllerWorker> _logger;
         private readonly IServiceProvider _serviceProvider;
-
+        private IBackgroundTaskQueue<CompanyData> TaskQueue { get; }
         public BackgroundCompanyControllerWorker(ILogger<BackgroundProductControllerWorker> logger,
-            IServiceProvider serviceProvider)
+            IServiceProvider serviceProvider, IBackgroundTaskQueue<CompanyData> taskQueue)
         {
             _logger = logger;
             _serviceProvider = serviceProvider;
+            TaskQueue = taskQueue;
         }
 
-        public void Dispose()
-        {
-            _logger.LogInformation("Company Hosted Service stopped.");
-        }
-
-        public Task StartAsync(CancellationToken stoppingToken)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("Company Hosted Service running.");
 
-            var cts = new CancellationTokenSource();
-            var ct = cts.Token;
-
-            Task.Run(() => DoWork(ct), ct);
-
-            return Task.CompletedTask;
-        }
-
-        public Task StopAsync(CancellationToken stoppingToken)
-        {
-            _logger.LogInformation("Company Hosted Service is stopping.");
-
-            return Task.CompletedTask;
-        }
-
-        private async Task DoWork(CancellationToken ct)
-        {
             using var scope = _serviceProvider.CreateScope();
             var context = scope.ServiceProvider.GetService<ApplicationDb>();
             var companyService = scope.ServiceProvider.GetService<ICompanyService>();
-            while (!ct.IsCancellationRequested)
-            {
-                await Task.Delay(TimeSpan.FromSeconds(5), ct);
 
+            await TaskQueue.QueueBackgroundWorkItemsRangeAsync(context?.Companies
+                .Where(c => c.Products.Count == 0));
+
+            await BackgroundProcessing(stoppingToken,companyService);
+        }
+        private async Task BackgroundProcessing(CancellationToken stoppingToken, ICompanyService companyService)
+        {
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                var dequeuedCompany = await TaskQueue.DequeueAsync(stoppingToken);
 
                 try
                 {
-                    if (context == null) throw new NullReferenceException(nameof(context));
-                    if (companyService == null) throw new NullReferenceException(nameof(companyService));
+                    await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
 
-                    var company = context.Companies.FirstOrDefault(p => p.Products.Count == 0);
-                    if (company == null) continue;
 
-                    var result=await companyService.InsertCompanyIntoDb(company);
+                    var result = await companyService.InsertCompanyIntoDb(dequeuedCompany);
                     _logger.LogInformation($"Company with name {result.Name} was updated successfully");
+
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    _logger.LogError(e.Message);
+                    _logger.LogError(ex,
+                        $"Error occurred in BackgroundProductControllerWorker.");
                 }
             }
+        }
+        public override async Task StopAsync(CancellationToken stoppingToken)
+        {
+            _logger.LogInformation("Company Hosted Service stopped.");
+
+            await base.StopAsync(stoppingToken);
         }
     }
 }

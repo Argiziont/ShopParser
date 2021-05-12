@@ -4,10 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ShopParserApi.Models;
 using ShopParserApi.Models.Hubs;
 using ShopParserApi.Services;
 using ShopParserApi.Services.Interfaces;
 using ShopParserApi.Services.TimedHostedServices;
+using ShopParserApi.Services.TimedHostedServices.BackgroundWorkItems;
 
 namespace ShopParserApi
 {
@@ -43,6 +45,19 @@ namespace ShopParserApi
             //Background workers for parsing data
             services.AddHostedService<BackgroundProductControllerWorker>();
             services.AddHostedService<BackgroundCompanyControllerWorker>();
+
+            // services.AddHostedService<QueueBackgroundWorker>();
+            services.AddSingleton<IBackgroundTaskQueue<ProductData>>(ctx => {
+                if (!int.TryParse(Configuration["QueueCapacity"], out var queueCapacity))
+                    queueCapacity = 1000;
+                return new BackgroundProductsQueue(queueCapacity);
+            });
+
+            services.AddSingleton<IBackgroundTaskQueue<CompanyData>>(ctx => {
+                if (!int.TryParse(Configuration["QueueCapacity"], out var queueCapacity))
+                    queueCapacity = 10;
+                return new BackgroundCompaniesQueue(queueCapacity);
+            });
 
             services.AddControllers();
             services.AddOpenApiDocument();

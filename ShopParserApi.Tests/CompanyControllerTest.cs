@@ -12,6 +12,7 @@ using ShopParserApi.Models;
 using ShopParserApi.Models.ResponseModels;
 using ShopParserApi.Services;
 using ShopParserApi.Services.Interfaces;
+using ShopParserApi.Services.TimedHostedServices.BackgroundWorkItems;
 using Xunit;
 
 namespace ShopParserApi.Tests
@@ -28,13 +29,15 @@ namespace ShopParserApi.Tests
             var companyServiceMock = new Mock<ICompanyService>();
             var browsingContextServiceMock = new Mock<IBrowsingContextService>();
             var logger = Mock.Of<ILogger<CompanyController>>();
+            
+
 
             var fistCompany = context.Companies.First();
             companyServiceMock.Setup(service => service.InsertCompanyIntoDb(fistCompany))
                 .ReturnsAsync(MockInsertCompanyIntoDb(fistCompany));
 
             var controller =
-                new CompanyController(context, companyServiceMock.Object, browsingContextServiceMock.Object, logger);
+                new CompanyController(context, companyServiceMock.Object, browsingContextServiceMock.Object, logger, null);
 
             //Act
             var result = await controller.ParseCompanyPageProducts("One");
@@ -66,12 +69,13 @@ namespace ShopParserApi.Tests
             await using var context = new ApplicationDb(ContextOptions);
             var browsingContextServiceMock = new Mock<IBrowsingContextService>();
             var logger = Mock.Of<ILogger<CompanyController>>();
+            var backgroundTaskQueueMock = new BackgroundCompaniesQueue(10);
 
             browsingContextServiceMock
                 .Setup(service => service.OpenPageAsync("https://prom.ua/c3502019-toppoint-tvoj-internet.html"))
                 .ReturnsAsync(await MockOpenPageAsync());
 
-            var controller = new CompanyController(context, null, new BrowsingContextService(), logger);
+            var controller = new CompanyController(context, null, new BrowsingContextService(), logger, backgroundTaskQueueMock);
 
             //Act
             var result = await controller.AddByUrlAsync("https://prom.ua/c3502019-toppoint-tvoj-internet.html");
@@ -98,7 +102,7 @@ namespace ShopParserApi.Tests
             await using var context = new ApplicationDb(ContextOptions);
             var logger = Mock.Of<ILogger<CompanyController>>();
 
-            var controller = new CompanyController(context, null, null, logger);
+            var controller = new CompanyController(context, null, null, logger,null);
 
             //Act
             var result = controller.GetById(1);
@@ -126,7 +130,7 @@ namespace ShopParserApi.Tests
             await using var context = new ApplicationDb(ContextOptions);
             var logger = Mock.Of<ILogger<CompanyController>>();
 
-            var controller = new CompanyController(context, null, null, logger);
+            var controller = new CompanyController(context, null, null, logger,null);
 
             //Act
             var result = controller.GetAll();

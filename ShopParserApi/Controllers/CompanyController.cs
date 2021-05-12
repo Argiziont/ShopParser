@@ -27,14 +27,16 @@ namespace ShopParserApi.Controllers
         private readonly ICompanyService _companyService;
         private readonly ILogger<CompanyController> _logger;
         private readonly ApplicationDb _dbContext;
+        private IBackgroundTaskQueue<CompanyData> TaskQueue { get; }
 
         public CompanyController(ApplicationDb db, ICompanyService companyService,
-            IBrowsingContextService browsingContextService, ILogger<CompanyController> logger)
+            IBrowsingContextService browsingContextService, ILogger<CompanyController> logger, IBackgroundTaskQueue<CompanyData> taskQueue)
         {
             _dbContext = db;
             _companyService = companyService;
             _browsingContextService = browsingContextService;
             _logger = logger;
+            TaskQueue = taskQueue;
         }
 
         [HttpPost]
@@ -101,6 +103,8 @@ namespace ShopParserApi.Controllers
                 };
 
                 await _dbContext.Companies.AddAsync(companyData);
+                await TaskQueue.QueueBackgroundWorkItemAsync(companyData);
+
                 await _dbContext.SaveChangesAsync();
 
                 _logger.LogInformation("AddByUrlAsync method inside CompanyController was called successfully");
