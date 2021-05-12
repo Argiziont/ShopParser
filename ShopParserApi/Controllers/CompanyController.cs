@@ -25,12 +25,12 @@ namespace ShopParserApi.Controllers
     {
         private readonly IBrowsingContextService _browsingContextService;
         private readonly ICompanyService _companyService;
-        private readonly ILogger<CompanyController> _logger;
         private readonly ApplicationDb _dbContext;
-        private IBackgroundTaskQueue<CompanyData> TaskQueue { get; }
+        private readonly ILogger<CompanyController> _logger;
 
         public CompanyController(ApplicationDb db, ICompanyService companyService,
-            IBrowsingContextService browsingContextService, ILogger<CompanyController> logger, IBackgroundTaskQueue<CompanyData> taskQueue)
+            IBrowsingContextService browsingContextService, ILogger<CompanyController> logger,
+            IBackgroundTaskQueue<CompanyData> taskQueue)
         {
             _dbContext = db;
             _companyService = companyService;
@@ -38,6 +38,8 @@ namespace ShopParserApi.Controllers
             _logger = logger;
             TaskQueue = taskQueue;
         }
+
+        private IBackgroundTaskQueue<CompanyData> TaskQueue { get; }
 
         [HttpPost]
         [Route("ParseCompanyPageProducts")]
@@ -54,7 +56,8 @@ namespace ShopParserApi.Controllers
 
                 await _companyService.InsertCompanyIntoDb(company);
 
-                _logger.LogInformation("ParseCompanyPageProducts method inside CompanyController was called successfully");
+                _logger.LogInformation(
+                    "ParseCompanyPageProducts method inside CompanyController was called successfully");
                 return Ok(company.Products);
             }
             catch (Exception e)

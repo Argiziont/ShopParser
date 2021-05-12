@@ -26,9 +26,9 @@ namespace ShopParserApi.Controllers
     public class ProductController : ControllerBase
     {
         private readonly ApplicationDb _dbContext;
+        private readonly ILogger<ProductController> _logger;
         private readonly IProductService _productService;
         private readonly IHubContext<ApiHub, IApiClient> _productsHub;
-        private readonly ILogger<ProductController> _logger;
 
         public ProductController(ApplicationDb db, IHubContext<ApiHub, IApiClient> productsHub,
             IProductService productService, ILogger<ProductController> logger)
@@ -47,7 +47,8 @@ namespace ShopParserApi.Controllers
         {
             var parsedProduct = await _productService.InsertProductPageIntoDb(productUrl);
 
-            _logger.LogInformation("ParseDataInsideProductPageAsync method inside ProductController was called successfully");
+            _logger.LogInformation(
+                "ParseDataInsideProductPageAsync method inside ProductController was called successfully");
             return Ok(parsedProduct);
         }
 
@@ -61,7 +62,8 @@ namespace ShopParserApi.Controllers
             var company = _dbContext.Companies.FirstOrDefault(s => s.Name == companyName);
             if (company == null)
             {
-                _logger.LogWarning("ParseAllProductUrlsInsideCompanyPageAsync method inside ProductController returned BadRequest because \"This company doesn't exist in database\"");
+                _logger.LogWarning(
+                    "ParseAllProductUrlsInsideCompanyPageAsync method inside ProductController returned BadRequest because \"This company doesn't exist in database\"");
                 return BadRequest("This company doesn't exist in database");
             }
 
@@ -81,7 +83,8 @@ namespace ShopParserApi.Controllers
 
             await _dbContext.SaveChangesAsync();
 
-            _logger.LogInformation("ParseAllProductUrlsInsideCompanyPageAsync method inside ProductController was called successfully");
+            _logger.LogInformation(
+                "ParseAllProductUrlsInsideCompanyPageAsync method inside ProductController was called successfully");
             return Ok(productsList);
         }
 
@@ -97,15 +100,18 @@ namespace ShopParserApi.Controllers
 
             if (currentProduct == null)
             {
-                _logger.LogWarning("ParseAllProductUrlsInsideCompanyPageAsync method inside ProductController returned BadRequest because \"This product doesn't exist in database\"");
+                _logger.LogWarning(
+                    "ParseAllProductUrlsInsideCompanyPageAsync method inside ProductController returned BadRequest because \"This product doesn't exist in database\"");
                 return BadRequest("This product doesn't exist in database");
             }
 
             if (currentProduct.ProductState == ProductState.Success)
             {
-                _logger.LogWarning("ParseAllProductUrlsInsideCompanyPageAsync method inside ProductController returned Accepted because \"This product already up to date\"");
+                _logger.LogWarning(
+                    "ParseAllProductUrlsInsideCompanyPageAsync method inside ProductController returned Accepted because \"This product already up to date\"");
                 return Accepted("This product already up to date");
             }
+
             try
             {
                 await _productService.InsertProductPageIntoDb(currentProduct.Url);
@@ -113,13 +119,15 @@ namespace ShopParserApi.Controllers
             catch (TooManyRequestsException)
             {
                 currentProduct.ProductState = ProductState.Failed;
-                _logger.LogWarning("ParseAllProductUrlsInsideCompanyPageAsync method inside ProductController returned BadRequest because \"Product couldn't be updated\"");
+                _logger.LogWarning(
+                    "ParseAllProductUrlsInsideCompanyPageAsync method inside ProductController returned BadRequest because \"Product couldn't be updated\"");
                 return BadRequest("Product couldn't be updated");
             }
 
             await _productsHub.Clients.All.ReceiveMessage(
                 $"Product with name id: {currentProduct.ExternalId} was updated successfully");
-            _logger.LogInformation("ParseSingleProductInsideCompanyPageAsync method inside ProductController was called successfully");
+            _logger.LogInformation(
+                "ParseSingleProductInsideCompanyPageAsync method inside ProductController was called successfully");
             return Ok(currentProduct);
         }
 
@@ -161,7 +169,8 @@ namespace ShopParserApi.Controllers
                 var productList = await _dbContext.Products
                     .Where(p => p.CompanyId == id && p.ProductState == ProductState.Success).ToListAsync();
 
-                _logger.LogInformation("GetProductsByCompanyIdAsync method inside ProductController was called successfully");
+                _logger.LogInformation(
+                    "GetProductsByCompanyIdAsync method inside ProductController was called successfully");
                 return Ok(productList.Select(p => new ResponseProduct
                 {
                     Description = p.Description,
@@ -193,16 +202,18 @@ namespace ShopParserApi.Controllers
                 var currentCategory = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == id);
                 if (currentCategory == null)
                 {
-                    _logger.LogWarning("GetProductsByCategoryIdAsync method inside ProductController returned NotFound");
+                    _logger.LogWarning(
+                        "GetProductsByCategoryIdAsync method inside ProductController returned NotFound");
                     return NotFound();
                 }
-                  
+
 
                 var productList = await _dbContext.Products
                     .Where(p => p.Categories.Contains(currentCategory) && p.ProductState == ProductState.Success)
                     .ToListAsync();
 
-                _logger.LogInformation("GetProductsByCategoryIdAsync method inside ProductController was called successfully");
+                _logger.LogInformation(
+                    "GetProductsByCategoryIdAsync method inside ProductController was called successfully");
                 return Ok(productList.Select(p => new ResponseProduct
                 {
                     Description = p.Description,
@@ -241,12 +252,14 @@ namespace ShopParserApi.Controllers
 
                 if (productSource.Count == 0)
                 {
-                    _logger.LogWarning("GetPagedProductsByCompanyIdAsync method inside ProductController returned NotFound");
+                    _logger.LogWarning(
+                        "GetPagedProductsByCompanyIdAsync method inside ProductController returned NotFound");
                     return NotFound();
                 }
-                   
 
-                _logger.LogInformation("GetPagedProductsByCompanyIdAsync method inside ProductController was called successfully");
+
+                _logger.LogInformation(
+                    "GetPagedProductsByCompanyIdAsync method inside ProductController was called successfully");
                 return Ok(productSource.Select(p => new ResponseProduct
                 {
                     Description = p.Description,
@@ -278,10 +291,11 @@ namespace ShopParserApi.Controllers
                 var currentCategory = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == id);
                 if (currentCategory == null)
                 {
-                    _logger.LogWarning("GetPagedProductsByCategoryIdAsync method inside ProductController returned NotFound");
+                    _logger.LogWarning(
+                        "GetPagedProductsByCategoryIdAsync method inside ProductController returned NotFound");
                     return NotFound();
                 }
-                   
+
 
                 var productSource = await _dbContext.Products
                     .Where(p => p.Categories.Contains(currentCategory) &&
@@ -291,7 +305,8 @@ namespace ShopParserApi.Controllers
                     .OrderBy(p => p.Id) //Order by internal DB id
                     .Skip(page * rowsPerPage).Take(rowsPerPage).ToListAsync(); //Take products by page
 
-                _logger.LogInformation("GetPagedProductsByCategoryIdAsync method inside ProductController was called successfully");
+                _logger.LogInformation(
+                    "GetPagedProductsByCategoryIdAsync method inside ProductController was called successfully");
                 return Ok(productSource.Select(p => new ResponseProduct
                 {
                     Description = p.Description,

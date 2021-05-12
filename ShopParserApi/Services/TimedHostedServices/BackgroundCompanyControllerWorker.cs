@@ -14,7 +14,7 @@ namespace ShopParserApi.Services.TimedHostedServices
     {
         private readonly ILogger<BackgroundProductControllerWorker> _logger;
         private readonly IServiceProvider _serviceProvider;
-        private IBackgroundTaskQueue<CompanyData> TaskQueue { get; }
+
         public BackgroundCompanyControllerWorker(ILogger<BackgroundProductControllerWorker> logger,
             IServiceProvider serviceProvider, IBackgroundTaskQueue<CompanyData> taskQueue)
         {
@@ -22,6 +22,8 @@ namespace ShopParserApi.Services.TimedHostedServices
             _serviceProvider = serviceProvider;
             TaskQueue = taskQueue;
         }
+
+        private IBackgroundTaskQueue<CompanyData> TaskQueue { get; }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -34,8 +36,9 @@ namespace ShopParserApi.Services.TimedHostedServices
             await TaskQueue.QueueBackgroundWorkItemsRangeAsync(context?.Companies
                 .Where(c => c.Products.Count == 0));
 
-            await BackgroundProcessing(stoppingToken,companyService);
+            await BackgroundProcessing(stoppingToken, companyService);
         }
+
         private async Task BackgroundProcessing(CancellationToken stoppingToken, ICompanyService companyService)
         {
             while (!stoppingToken.IsCancellationRequested)
@@ -49,15 +52,15 @@ namespace ShopParserApi.Services.TimedHostedServices
 
                     var result = await companyService.InsertCompanyIntoDb(dequeuedCompany);
                     _logger.LogInformation($"Company with name {result.Name} was updated successfully");
-
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex,
-                        $"Error occurred in BackgroundProductControllerWorker.");
+                        "Error occurred in BackgroundProductControllerWorker.");
                 }
             }
         }
+
         public override async Task StopAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("Company Hosted Service stopped.");

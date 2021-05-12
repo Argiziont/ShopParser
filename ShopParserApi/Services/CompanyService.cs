@@ -19,14 +19,17 @@ namespace ShopParserApi.Services
         private readonly IBrowsingContextService _browsingContextService;
         private readonly ApplicationDb _dbContext;
         private readonly ILogger<CompanyService> _logger;
-        private IBackgroundTaskQueue<ProductData> TaskQueue { get; }
-        public CompanyService(ApplicationDb dbContext, IBrowsingContextService browsingContextService, IBackgroundTaskQueue<ProductData> taskQueue, ILogger<CompanyService> logger)
+
+        public CompanyService(ApplicationDb dbContext, IBrowsingContextService browsingContextService,
+            IBackgroundTaskQueue<ProductData> taskQueue, ILogger<CompanyService> logger)
         {
             _dbContext = dbContext;
             _browsingContextService = browsingContextService;
             TaskQueue = taskQueue;
             _logger = logger;
         }
+
+        private IBackgroundTaskQueue<ProductData> TaskQueue { get; }
 
         public async Task<CompanyData> InsertCompanyIntoDb(CompanyData company)
         {
@@ -40,7 +43,7 @@ namespace ShopParserApi.Services
             var page = await _browsingContextService.OpenPageAsync(company.Url.Replace(".html", $";{counter}.html"));
 
             //Get all pages for current company
-            while (page.Url != company.Url || counter==1)
+            while (page.Url != company.Url || counter == 1)
             {
                 var products = CompanyParsingService.ParseCompanyProducts(company, page).ToArray();
                 company.Products.AddRange(products);

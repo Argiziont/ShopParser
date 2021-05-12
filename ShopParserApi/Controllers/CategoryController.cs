@@ -50,7 +50,6 @@ namespace ShopParserApi.Controllers
             {
                 _logger.LogError(e.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, e);
-                
             }
         }
 

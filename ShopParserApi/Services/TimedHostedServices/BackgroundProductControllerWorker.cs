@@ -20,15 +20,18 @@ namespace ShopParserApi.Services.TimedHostedServices
         private readonly ILogger<BackgroundProductControllerWorker> _logger;
         private readonly IHubContext<ApiHub, IApiClient> _productsHub;
         private readonly IServiceProvider _serviceProvider;
-        private IBackgroundTaskQueue<ProductData> TaskQueue { get; }
+
         public BackgroundProductControllerWorker(ILogger<BackgroundProductControllerWorker> logger,
-            IServiceProvider serviceProvider, IHubContext<ApiHub, IApiClient> productsHub, IBackgroundTaskQueue<ProductData> taskQueue)
+            IServiceProvider serviceProvider, IHubContext<ApiHub, IApiClient> productsHub,
+            IBackgroundTaskQueue<ProductData> taskQueue)
         {
             _logger = logger;
             _serviceProvider = serviceProvider;
             _productsHub = productsHub;
             TaskQueue = taskQueue;
         }
+
+        private IBackgroundTaskQueue<ProductData> TaskQueue { get; }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -42,7 +45,8 @@ namespace ShopParserApi.Services.TimedHostedServices
             await BackgroundProcessing(stoppingToken, productService, context);
         }
 
-        private async Task BackgroundProcessing(CancellationToken stoppingToken, IProductService productService, ApplicationDb context )
+        private async Task BackgroundProcessing(CancellationToken stoppingToken, IProductService productService,
+            ApplicationDb context)
         {
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -88,7 +92,7 @@ namespace ShopParserApi.Services.TimedHostedServices
                 catch (Exception ex)
                 {
                     _logger.LogError(ex,
-                        $"Error occurred in BackgroundProductControllerWorker.");
+                        "Error occurred in BackgroundProductControllerWorker.");
                 }
             }
         }
@@ -99,6 +103,5 @@ namespace ShopParserApi.Services.TimedHostedServices
 
             await base.StopAsync(stoppingToken);
         }
-
     }
 }

@@ -47,13 +47,15 @@ namespace ShopParserApi
             services.AddHostedService<BackgroundCompanyControllerWorker>();
 
             // services.AddHostedService<QueueBackgroundWorker>();
-            services.AddSingleton<IBackgroundTaskQueue<ProductData>>(ctx => {
+            services.AddSingleton<IBackgroundTaskQueue<ProductData>>(ctx =>
+            {
                 if (!int.TryParse(Configuration["QueueCapacity"], out var queueCapacity))
                     queueCapacity = 1000;
                 return new BackgroundProductsQueue(queueCapacity);
             });
 
-            services.AddSingleton<IBackgroundTaskQueue<CompanyData>>(ctx => {
+            services.AddSingleton<IBackgroundTaskQueue<CompanyData>>(ctx =>
+            {
                 if (!int.TryParse(Configuration["QueueCapacity"], out var queueCapacity))
                     queueCapacity = 10;
                 return new BackgroundCompaniesQueue(queueCapacity);
