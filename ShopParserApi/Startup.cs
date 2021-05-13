@@ -42,15 +42,10 @@ namespace ShopParserApi
 
             services.AddScoped<IBrowsingContextService, BrowsingContextService>();
 
-            //Background workers for parsing data
-            services.AddHostedService<BackgroundProductControllerWorker>();
-            services.AddHostedService<BackgroundCompanyControllerWorker>();
-
-            // services.AddHostedService<QueueBackgroundWorker>();
             services.AddSingleton<IBackgroundTaskQueue<ProductData>>(ctx =>
             {
                 if (!int.TryParse(Configuration["QueueCapacity"], out var queueCapacity))
-                    queueCapacity = 1000;
+                    queueCapacity = 100000;
                 return new BackgroundProductsQueue(queueCapacity);
             });
 
@@ -60,6 +55,10 @@ namespace ShopParserApi
                     queueCapacity = 10;
                 return new BackgroundCompaniesQueue(queueCapacity);
             });
+
+            //Background workers for parsing data
+            services.AddHostedService<BackgroundProductControllerWorker>();
+            services.AddHostedService<BackgroundCompanyControllerWorker>();
 
             services.AddControllers();
             services.AddOpenApiDocument();

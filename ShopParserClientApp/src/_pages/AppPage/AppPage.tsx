@@ -1,12 +1,13 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Redirect, Route, Switch } from "react-router-dom";
 import { HomePage } from "../";
 
 export const AppPage: React.FC = () => {
   return (
     <Router>
+      <Redirect exact from="/" to="Home" />
       <Switch>
-        <Route exact path="/" component={() => <HomePage />} />
+        <Route path="/Home" component={() => <HomePage />} />
       </Switch>
     </Router>
   );

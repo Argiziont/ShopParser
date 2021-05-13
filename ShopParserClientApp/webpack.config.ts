@@ -27,8 +27,10 @@ const config: webpack.Configuration = {
     extensions: [".tsx", ".ts", ".js"],
   },
   output: {
+    publicPath: '/',
     path: path.resolve(__dirname, "build"),
-    filename: "bundle.js",
+    filename: "bundle.js"
+    
   },
   devServer: {
     contentBase: path.join(__dirname, "build"),

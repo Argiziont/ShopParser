@@ -6,10 +6,10 @@ namespace ShopParserApi.Services.Interfaces
 {
     public interface IBackgroundTaskQueue<TItem>
     {
-        ValueTask QueueBackgroundWorkItemAsync(TItem product);
-        ValueTask QueueBackgroundWorkItemsRangeAsync(IEnumerable<TItem> products);
+        Task QueueBackgroundWorkItemAsync(TItem product);
+        Task QueueBackgroundWorkItemsRangeAsync(IEnumerable<TItem> products);
 
-        ValueTask<TItem> DequeueAsync(
+        Task<TItem> DequeueAsync(
             CancellationToken cancellationToken);
     }
 }

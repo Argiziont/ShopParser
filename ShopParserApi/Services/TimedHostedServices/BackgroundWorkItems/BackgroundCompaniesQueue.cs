@@ -26,7 +26,7 @@ namespace ShopParserApi.Services.TimedHostedServices.BackgroundWorkItems
             _queue = Channel.CreateBounded<CompanyData>(options);
         }
 
-        public async ValueTask QueueBackgroundWorkItemAsync(
+        public async Task QueueBackgroundWorkItemAsync(
             CompanyData company)
         {
             if (company == null)
@@ -35,7 +35,7 @@ namespace ShopParserApi.Services.TimedHostedServices.BackgroundWorkItems
             await _queue.Writer.WriteAsync(company);
         }
 
-        public async ValueTask QueueBackgroundWorkItemsRangeAsync(IEnumerable<CompanyData> companies)
+        public async Task QueueBackgroundWorkItemsRangeAsync(IEnumerable<CompanyData> companies)
         {
             if (companies == null)
                 throw new ArgumentNullException(nameof(companies));
@@ -43,7 +43,7 @@ namespace ShopParserApi.Services.TimedHostedServices.BackgroundWorkItems
             foreach (var company in companies) await _queue.Writer.WriteAsync(company);
         }
 
-        public async ValueTask<CompanyData> DequeueAsync(
+        public async Task<CompanyData> DequeueAsync(
             CancellationToken cancellationToken)
         {
             var workItem = await _queue.Reader.ReadAsync(cancellationToken);

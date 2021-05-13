@@ -49,7 +49,7 @@ namespace ShopParserApi.Services
                 company.Products.AddRange(products);
                 await TaskQueue.QueueBackgroundWorkItemsRangeAsync(products);
 
-                _logger.LogInformation("CompanyService new products chunk was added");
+                _logger.LogInformation($"CompanyService new products of {company.Name} company, data-chunk was added");
 
                 counter++;
                 Thread.Sleep(5000);

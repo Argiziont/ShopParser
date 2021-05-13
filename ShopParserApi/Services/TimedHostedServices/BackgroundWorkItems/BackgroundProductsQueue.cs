@@ -26,7 +26,7 @@ namespace ShopParserApi.Services.TimedHostedServices.BackgroundWorkItems
             _queue = Channel.CreateBounded<ProductData>(options);
         }
 
-        public async ValueTask QueueBackgroundWorkItemAsync(
+        public async Task QueueBackgroundWorkItemAsync(
             ProductData product)
         {
             if (product == null)
@@ -35,7 +35,7 @@ namespace ShopParserApi.Services.TimedHostedServices.BackgroundWorkItems
             await _queue.Writer.WriteAsync(product);
         }
 
-        public async ValueTask QueueBackgroundWorkItemsRangeAsync(IEnumerable<ProductData> products)
+        public async Task QueueBackgroundWorkItemsRangeAsync(IEnumerable<ProductData> products)
         {
             if (products == null)
                 throw new ArgumentNullException(nameof(products));
@@ -43,7 +43,7 @@ namespace ShopParserApi.Services.TimedHostedServices.BackgroundWorkItems
             foreach (var product in products) await _queue.Writer.WriteAsync(product);
         }
 
-        public async ValueTask<ProductData> DequeueAsync(
+        public async Task<ProductData> DequeueAsync(
             CancellationToken cancellationToken)
         {
             var workItem = await _queue.Reader.ReadAsync(cancellationToken);
