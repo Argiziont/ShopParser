@@ -40,6 +40,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 export const HomePage: React.FC = () => {
   const classes = useStyles();
+  const {path } = useRouteMatch();
   return (
     <React.Fragment>
       <Grid
@@ -51,7 +52,37 @@ export const HomePage: React.FC = () => {
         className={classes.rootBox}
       >
        
-  
+       
+        <Grid
+          item
+          xs={9}
+          spacing={3}
+          container
+          justify="center"
+          direction="row"
+        >
+          <Grid item container spacing={3} direction="column" justify="center">
+            <Grid item>
+              <Switch>
+                <Route path={`${path}/Company`}>
+                  <Typography variant="h6" gutterBottom noWrap>
+                    {"Company"}
+                  </Typography>
+                </Route>
+                <Route path={`${path}/Categories`}>
+                  <Typography variant="h6" gutterBottom noWrap>
+                    {"Categories"}
+                  </Typography>
+                </Route>
+                <Route path={`${path}/Products`}>
+                  <Typography variant="h6" gutterBottom noWrap>
+                    {"Products"}
+                  </Typography>
+                </Route>
+              </Switch>
+            </Grid>
+          </Grid>
+        </Grid>
       </Grid>
 
     </React.Fragment>
