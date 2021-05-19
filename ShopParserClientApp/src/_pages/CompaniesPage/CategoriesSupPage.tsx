@@ -1,8 +1,4 @@
 import {
-  withStyles,
-  Theme,
-  createStyles,
-  InputBase,
   FormControl,
   Grid,
   MenuItem,
@@ -11,58 +7,33 @@ import {
   makeStyles,
   CircularProgress,
 } from "@material-ui/core";
+import { url } from "node:inspector";
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import {
-  IResponseCategory,
-  ResponseCategory,
-  UserActions,
-} from "../../_actions";
+import { useParams, useRouteMatch, Link } from "react-router-dom";
+import { IResponseCategory, UserActions } from "../../_actions";
+import { BootstrapInput } from "../../_components";
+
+const useStyles = makeStyles((theme) => ({
+  divPointer: {
+    cursor: "pointer",
+  },
+  linkItem: {
+    textDecoration: "none",
+  },
+  margin1: {
+    margin: theme.spacing(1),
+    divPointer: {
+      cursor: "pointer",
+    },
+    linkItem: {
+      textDecoration: "none",
+    },
+  },
+}));
 
 export const CategoriesSupPage: React.FC = () => {
-  const BootstrapInput = withStyles((theme: Theme) =>
-    createStyles({
-      root: {
-        "label + &": {
-          marginTop: theme.spacing(3),
-        },
-      },
-      input: {
-        borderRadius: 4,
-        position: "relative",
-        backgroundColor: "#D3D3D3",
-        border: "1px solid #ced4da",
-        fontSize: 16,
-        minWidth: "150px",
-        padding: "10px 26px 10px 12px",
-        transition: theme.transitions.create(["border-color", "box-shadow"]),
-        // Use the system font instead of the default Roboto font.
-        fontFamily: [
-          "-apple-system",
-          "BlinkMacSystemFont",
-          '"Segoe UI"',
-          "Roboto",
-          '"Helvetica Neue"',
-          "Arial",
-          "sans-serif",
-          '"Apple Color Emoji"',
-          '"Segoe UI Emoji"',
-          '"Segoe UI Symbol"',
-        ].join(","),
-        "&:focus": {
-          borderRadius: 4,
-          borderColor: "#80bdff",
-          boxShadow: "0 0 0 0.2rem rgba(0,123,255,.25)",
-        },
-      },
-    })
-  )(InputBase);
-  const useStyles = makeStyles((theme) => ({
-    margin1: {
-      margin: theme.spacing(1),
-    },
-  }));
   const classes = useStyles();
+  const [categorySelectIds, setCategorySelectIds] = useState<number[]>([]);
 
   const { companyId } = useParams<Record<string, string | undefined>>();
   const [nestedCategoryList, setNestedCategoryList] =
@@ -80,7 +51,6 @@ export const CategoriesSupPage: React.FC = () => {
     ).then((categoryList) => {
       if (isMounted && categoryList != undefined) {
         setNestedCategoryList(new Array(categoryList));
-        console.log(categoryList);
         setNestedCategoryListIsLoading(false);
       }
     });
@@ -88,6 +58,46 @@ export const CategoriesSupPage: React.FC = () => {
       isMounted = false;
     }; // use effect cleanup to set flag false, if unmounted
   }, [companyId]);
+
+  const handleCategoryChoose = (
+    categoryId: number | undefined,
+    itemId: number | undefined
+  ) => {
+    if (
+      nestedCategoryList != undefined &&
+      itemId != undefined &&
+      categoryId != undefined
+    ) {
+      const newCategoryList = [...nestedCategoryList];
+
+      UserActions.GetCategoryByParentIdAndCompanyId(
+        categoryId,
+        Number(companyId?.split(":")[1])
+      ).then((categoryList) => {
+        setNestedCategoryListIsLoading(false);
+
+        if (categoryList != undefined) {
+          newCategoryList.splice(itemId + 1, newCategoryList.length - 1);
+
+          newCategoryList[itemId + 1] = categoryList;
+          setNestedCategoryList(newCategoryList);
+        }
+      });
+    }
+  };
+
+  const { url, path } = useRouteMatch();
+
+  const handleSelectValueChange = (
+    event: React.ChangeEvent<{ value: unknown }>,
+    id: number
+  ) => {
+    const newIdsList = [...categorySelectIds];
+    newIdsList.splice(id + 1, newIdsList.length - 1);
+    newIdsList[id] = event.target.value as number;
+    setCategorySelectIds(newIdsList);
+  };
+
   return nestedCategoryListIsLoading ? (
     <Grid item>
       <CircularProgress color="inherit" />
@@ -95,11 +105,15 @@ export const CategoriesSupPage: React.FC = () => {
   ) : (
     <Grid item xs container direction="row">
       <Grid item xs>
-        {nestedCategoryList?.map((categoryList, i) => (
-          <FormControl className={classes.margin1} key={i}>
+        {nestedCategoryList?.map((categoryList, index) => (
+          <FormControl className={classes.margin1} key={index}>
             <Select
               input={<BootstrapInput />}
               defaultValue={categoryList[0].id}
+              value={categorySelectIds[index]}
+              onChange={(event) => {
+                handleSelectValueChange(event, index);
+              }}
               MenuProps={{
                 anchorOrigin: {
                   vertical: "bottom",
@@ -109,9 +123,19 @@ export const CategoriesSupPage: React.FC = () => {
               }}
             >
               {categoryList?.map((category, i) => (
-                <MenuItem key={i} value={category.id}>
+                // <Link
+                //   key={i}
+                //   // to={`${url}/Category=${category.id}`}
+                //   className={`${classes.linkItem} ${classes.divPointer}`}
+                // >
+                <MenuItem
+                  value={category.id}
+                  key={i}
+                  onClick={() => handleCategoryChoose(category.id, index)}
+                >
                   <Typography variant="h6">{category.name}</Typography>
                 </MenuItem>
+                // </Link>
               ))}
             </Select>
           </FormControl>
@@ -120,4 +144,3 @@ export const CategoriesSupPage: React.FC = () => {
     </Grid>
   );
 };
-//<h3>{companyId?.split(":")[1]}</h3>

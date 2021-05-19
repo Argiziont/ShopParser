@@ -19,7 +19,7 @@ async function GetAllCompanys(): Promise<IResponseCompany[]|undefined> {
     return response;
   } 
   catch(error) {
-    console.error(error);
+    //Function returns undefined, don't need to do something
   }
 }
 async function GetAllProductInCompany(id:number): Promise<IResponseCompany[]|undefined> {
@@ -28,7 +28,7 @@ async function GetAllProductInCompany(id:number): Promise<IResponseCompany[]|und
     return response;
   } 
   catch(error) {
-    console.error(error);
+    //Function returns undefined, don't need to do something
   }
 }
 async function GetProductByCompanyIdAndPage(id:number,page:number,rows:number): Promise<IResponseCompany[]|undefined> {
@@ -37,7 +37,7 @@ async function GetProductByCompanyIdAndPage(id:number,page:number,rows:number): 
     return response;
   } 
   catch(error) {
-    console.error(error);
+    //Function returns undefined, don't need to do something
   }
 }
 async function GetProductByCategoryIdAndPage(id:number,page:number,rows:number): Promise<IResponseNestedCategory[]|undefined> {
@@ -46,7 +46,7 @@ async function GetProductByCategoryIdAndPage(id:number,page:number,rows:number):
     return response;
   } 
   catch(error) {
-    console.error(error);
+   //Function returns undefined, don't need to do something
   }
 }
 async function GetProductById(id:number): Promise<IProductJson|undefined> {
@@ -55,7 +55,7 @@ async function GetProductById(id:number): Promise<IProductJson|undefined> {
     return response;
   } 
   catch(error) {
-    console.error(error);
+    //Function returns undefined, don't need to do something
   }
 }
 async function GetSubCategories(): Promise<IResponseNestedCategory|undefined> {
@@ -64,7 +64,7 @@ async function GetSubCategories(): Promise<IResponseNestedCategory|undefined> {
     return response;
   } 
   catch(error) {
-    console.error(error);
+    //Function returns undefined, don't need to do something
   }
 }
 async function GetCategoryByParentIdAndCompanyId(id:number, companyId:number): Promise<IResponseCategory[]|undefined> {
@@ -73,7 +73,7 @@ async function GetCategoryByParentIdAndCompanyId(id:number, companyId:number): P
     return response;
   } 
   catch(error) {
-    console.error(error);
+    //Function returns undefined, don't need to do something
   }
 }
 
@@ -83,6 +83,6 @@ async function AddCompanyByUrl(url: string): Promise<IResponseCompany | undefine
     return response;
   } 
   catch(error) {
-    console.error(error);
+    //Function returns undefined, don't need to do something
   }
 }

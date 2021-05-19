@@ -1,20 +1,7 @@
-import {
-  Grid,
-  GridList,
-  GridListTile,
-  GridListTileBar,
-  IconButton,
-  makeStyles,
-  Typography,
-} from "@material-ui/core";
+import { Grid, makeStyles, Typography } from "@material-ui/core";
 
 import React from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-  Switch,
-  useRouteMatch,
-} from "react-router-dom";
+import { Route, Switch, useRouteMatch } from "react-router-dom";
 import { CompaniesPage } from "../CompaniesPage";
 import { HomePageRouting } from "./HomePageRouting";
 
@@ -44,7 +31,6 @@ const useStyles = makeStyles((theme) => ({
   typographyLink: {
     color: "black",
   },
-  
 }));
 export const HomePage: React.FC = () => {
   const classes = useStyles();
@@ -69,14 +55,13 @@ export const HomePage: React.FC = () => {
           direction="row"
         >
           <Grid item container spacing={3} direction="column" justify="center">
-            <Grid item  container spacing={3}>
+            <Grid item container spacing={3}>
               <Switch>
-                <Route exact path={path}>
-                  
-                </Route>
-                <Route path={`${path}/Company`} component={() =><CompaniesPage/>}>
-                
-                </Route>
+                <Route exact path={path}></Route>
+                <Route
+                  path={`${path}/Company`}
+                  component={() => <CompaniesPage />}
+                ></Route>
                 <Route path={`${path}/Categories`}>
                   <Typography variant="h6" gutterBottom noWrap>
                     {"Categories"}
@@ -95,4 +80,3 @@ export const HomePage: React.FC = () => {
     </React.Fragment>
   );
 };
-

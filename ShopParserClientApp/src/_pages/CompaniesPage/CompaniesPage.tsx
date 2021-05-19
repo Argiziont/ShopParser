@@ -14,6 +14,9 @@ const useStyles = makeStyles(() => ({
   divPointer: {
     cursor: "pointer",
   },
+  linkItem: {
+    textDecoration: "none",
+  },
   gridListRoot: {
     flexGrow: 1,
   },
@@ -33,14 +36,11 @@ const useStyles = makeStyles(() => ({
     borderRadius: 16,
     padding: "15px 15px",
   },
-  linkItem: {
-    textDecoration: "none",
-  },
 }));
 export const CompaniesPage: React.FC = () => {
   const classes = useStyles();
   const { url, path } = useRouteMatch();
-  
+
   const [companyList, setCompanyList] = useState<IResponseCompany[]>();
   const [isCompaniesLodaing, setIsCompanysLodaing] = useState<boolean>(false);
 
