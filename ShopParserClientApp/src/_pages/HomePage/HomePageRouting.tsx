@@ -8,7 +8,7 @@ export const MenuPages = ["Company", "Categories", "Products"];
 export const HomePageRouting: React.FC = () => {
   const useStyles = makeStyles((theme) =>
     createStyles({
-      menuItem: {
+      linkItem: {
         minWidth: "150px",
         minHeight: "30px",
         background: "#D3D3D3",
@@ -38,7 +38,7 @@ export const HomePageRouting: React.FC = () => {
         {MenuPages.map((pageName,i) => <Link
           key={i}
         to={`${url}/${pageName}`}
-        className={`${classes.menuItem} ${classes.divPointer}`}
+        className={`${classes.linkItem} ${classes.divPointer}`}
       >
         <Typography
           variant="h6"
@@ -50,6 +50,7 @@ export const HomePageRouting: React.FC = () => {
         </Typography>
       </Link>)}
       </Grid>
+      
       </Grid>
   );
 };

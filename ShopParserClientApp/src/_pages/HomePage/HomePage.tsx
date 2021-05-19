@@ -1,5 +1,9 @@
 import {
   Grid,
+  GridList,
+  GridListTile,
+  GridListTileBar,
+  IconButton,
   makeStyles,
   Typography,
 } from "@material-ui/core";
@@ -11,6 +15,7 @@ import {
   Switch,
   useRouteMatch,
 } from "react-router-dom";
+import { CompaniesPage } from "../CompaniesPage";
 import { HomePageRouting } from "./HomePageRouting";
 
 const useStyles = makeStyles((theme) => ({
@@ -39,10 +44,11 @@ const useStyles = makeStyles((theme) => ({
   typographyLink: {
     color: "black",
   },
+  
 }));
 export const HomePage: React.FC = () => {
   const classes = useStyles();
-  const {path } = useRouteMatch();
+  const { path } = useRouteMatch();
   return (
     <React.Fragment>
       <Grid
@@ -53,8 +59,7 @@ export const HomePage: React.FC = () => {
         alignItems="flex-start"
         className={classes.rootBox}
       >
-       
-        <HomePageRouting/>
+        <HomePageRouting />
         <Grid
           item
           xs={9}
@@ -64,12 +69,13 @@ export const HomePage: React.FC = () => {
           direction="row"
         >
           <Grid item container spacing={3} direction="column" justify="center">
-            <Grid item>
+            <Grid item  container spacing={3}>
               <Switch>
-                <Route path={`${path}/Company`}>
-                  <Typography variant="h6" gutterBottom noWrap>
-                    {"Company"}
-                  </Typography>
+                <Route exact path={path}>
+                  
+                </Route>
+                <Route path={`${path}/Company`} component={() =><CompaniesPage/>}>
+                
                 </Route>
                 <Route path={`${path}/Categories`}>
                   <Typography variant="h6" gutterBottom noWrap>
@@ -82,13 +88,11 @@ export const HomePage: React.FC = () => {
                   </Typography>
                 </Route>
               </Switch>
-
-             
             </Grid>
           </Grid>
         </Grid>
       </Grid>
-
     </React.Fragment>
   );
 };
+

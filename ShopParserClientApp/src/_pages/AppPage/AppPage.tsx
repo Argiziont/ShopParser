@@ -6,8 +6,7 @@ export const AppPage: React.FC = () => {
   return (
     <HashRouter>
       <Switch>
-       
-        <Route path="/" component={() => <HomePage />}/> 
+        <Route path="/" component={() => <HomePage />} />
       </Switch>
     </HashRouter>
   );

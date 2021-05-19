@@ -109,6 +109,70 @@ namespace ShopParserApi.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("GetNestedByParentIdAsync")]
+        [ProducesResponseType(typeof(IEnumerable<ResponseCategory>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> GetNestedByParentIdAsync(int id)
+        {
+            try
+            {
+                var categoriesList = await _dbContext.Categories.Where(cat => cat.SupCategory.Id == id).ToListAsync();
+                if (!categoriesList.Any())
+                    return NotFound();
+
+               
+
+                _logger.LogInformation("GetNestedByParentIdAsync method inside CategoryController was called successfully");
+
+                return Ok(categoriesList.Select(cat=> new ResponseCategory
+                {
+                    Name = cat.Name,
+                    Href = cat.Url,
+                    Id = cat.Id,
+                    ProductsCount = _dbContext.Products.Count(c => c.Categories.Contains(cat)).ToString()
+                }));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, e);
+            }
+        }
+
+        [HttpGet]
+        [Route("GetNestedByParentIdAndCompanyIdAsync")]
+        [ProducesResponseType(typeof(IEnumerable<ResponseCategory>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> GetNestedByParentIdAndCompanyIdAsync(int id, int companyId)
+        {
+            try
+            {
+                var categoriesList = await _dbContext.Categories.Where(cat => cat.SupCategory.Id == id&& cat.Products.Count(product=>product.Company.Id== companyId) !=0).ToListAsync();
+                if (!categoriesList.Any())
+                    return NotFound();
+                
+                _logger.LogInformation("GetNestedByParentIdAsync method inside CategoryController was called successfully");
+
+                return Ok(categoriesList.Select(cat => new ResponseCategory
+                {
+                    Name = cat.Name,
+                    Href = cat.Url,
+                    Id = cat.Id,
+                    ProductsCount = _dbContext.Products.Count(c => c.Categories.Contains(cat)).ToString()
+                }));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, e);
+            }
+        }
+
         private static ResponseNestedCategory ReverseCategoryListRecursive(Category mainCategory,
             ApplicationDb dbContext)
         {

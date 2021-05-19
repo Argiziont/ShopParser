@@ -1,7 +1,7 @@
 import {
   UserService
 } from "../_services";
-import { IResponseCompany, IProductJson,IResponseNestedCategory } from "./ClientActions";
+import { IResponseCompany, IProductJson,IResponseNestedCategory, IResponseCategory } from "./ClientActions";
 
 export const UserActions = {
   GetAllCompanys,
@@ -10,7 +10,8 @@ export const UserActions = {
   AddCompanyByUrl,
   GetProductByCompanyIdAndPage,
   GetSubCategories,
-  GetProductByCategoryIdAndPage
+  GetProductByCategoryIdAndPage,
+  GetCategoryByParentIdAndCompanyId
 };
 async function GetAllCompanys(): Promise<IResponseCompany[]|undefined> {
   try {
@@ -66,6 +67,16 @@ async function GetSubCategories(): Promise<IResponseNestedCategory|undefined> {
     console.error(error);
   }
 }
+async function GetCategoryByParentIdAndCompanyId(id:number, companyId:number): Promise<IResponseCategory[]|undefined> {
+  try {
+    const response = await  UserService.GetByParentIdAndCompanyId(id,companyId);
+    return response;
+  } 
+  catch(error) {
+    console.error(error);
+  }
+}
+
 async function AddCompanyByUrl(url: string): Promise<IResponseCompany | undefined> {
   try {
     const response = await  UserService.AddCompanyByUrl(url);
