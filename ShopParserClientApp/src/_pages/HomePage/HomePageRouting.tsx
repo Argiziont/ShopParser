@@ -1,6 +1,6 @@
 import { makeStyles, createStyles, Grid, Typography } from "@material-ui/core";
 import React from "react";
-import { Link, useRouteMatch } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 
 export const MenuPages = ["Company", "Categories", "Products"];
@@ -28,16 +28,14 @@ export const HomePageRouting: React.FC = () => {
       },
     })
   );
-  const classes = useStyles();
-  const { url } = useRouteMatch();
-
+  const classes = useStyles()
 
   return (
     <Grid item xs={3} container justify="center" direction="row">
       <Grid item>
-        {MenuPages.map((pageName,i) => <Link
+        {MenuPages.map((pageName,i) => <NavLink
           key={i}
-        to={`${url}/${pageName}`}
+        to={`/${pageName}`}
         className={`${classes.linkItem} ${classes.divPointer}`}
       >
         <Typography
@@ -48,7 +46,7 @@ export const HomePageRouting: React.FC = () => {
         >
           {pageName}
         </Typography>
-      </Link>)}
+      </NavLink>)}
       </Grid>
       
       </Grid>

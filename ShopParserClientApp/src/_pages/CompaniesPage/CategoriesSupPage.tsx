@@ -8,7 +8,7 @@ import {
   CircularProgress,
 } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
-import { useParams, useRouteMatch, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { IResponseCategory, UserActions } from "../../_actions";
 import { BootstrapInput } from "../../_components";
 
@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 interface CategoriesSupPageProps {
-  categorySelectIds: number[];
+  categorySelectIds: number[] | undefined;
   nestedCategoryList: IResponseCategory[][] | undefined;
   setCategorySelectIds: React.Dispatch<React.SetStateAction<number[]>>;
   setNestedCategoryList: React.Dispatch<
@@ -52,34 +52,40 @@ export const CategoriesSupPage: React.FC<CategoriesSupPageProps> = ({
   const [nestedCategoryListIsLoading, setNestedCategoryListIsLoading] =
     useState<boolean>();
 
-  debugger;
   useEffect(() => {
     let isMounted = true;
-    setNestedCategoryListIsLoading(true);
+    if (isMounted) {
+      setNestedCategoryListIsLoading(true);
 
-    UserActions.GetCategoryByParentIdAndCompanyId(
-      1,
-      Number(companyId)
-    ).then((categoryList) => {
-      if (isMounted && categoryList!=undefined) {
-        console.log(categoryList);
-        setNestedCategoryList(new Array(categoryList));
-      }
-      setNestedCategoryListIsLoading(false);
-    });
+      UserActions.GetCategoryByParentIdAndCompanyId(1, Number(companyId)).then(
+        (categoryList) => {
+          if (isMounted) {
+            if (categoryList) {
+              setNestedCategoryList(new Array(categoryList));
+            } else {
+              setNestedCategoryList([]);
+              setCategorySelectIds([]);
+            }
+            //   //console.log(categoryList);
+            setNestedCategoryListIsLoading(false);
+          }
+        }
+      );
+    }
+
     return () => {
       isMounted = false;
     }; // use effect cleanup to set flag false, if unmounted
-  }, [companyId, setNestedCategoryList]);
+  }, [companyId, setCategorySelectIds, setNestedCategoryList]);
 
   const handleCategoryChoose = (
     categoryId: number | undefined,
     itemId: number | undefined
   ) => {
     if (
-      nestedCategoryList != undefined &&
-      itemId != undefined &&
-      categoryId != undefined
+      nestedCategoryList !== undefined &&
+      itemId !== undefined &&
+      categoryId !== undefined
     ) {
       const newCategoryList = [...nestedCategoryList];
 
@@ -89,7 +95,7 @@ export const CategoriesSupPage: React.FC<CategoriesSupPageProps> = ({
       ).then((categoryList) => {
         setNestedCategoryListIsLoading(false);
 
-        if (categoryList != undefined) {
+        if (categoryList !== undefined) {
           newCategoryList.splice(itemId + 1, newCategoryList.length - 1);
 
           newCategoryList[itemId + 1] = categoryList;
@@ -99,16 +105,18 @@ export const CategoriesSupPage: React.FC<CategoriesSupPageProps> = ({
     }
   };
 
-  const { url } = useRouteMatch();
+  // const { url } = useRouteMatch();
 
   const handleSelectValueChange = (
     event: React.ChangeEvent<{ value: unknown }>,
     id: number
   ) => {
-    const newIdsList = [...categorySelectIds];
-    newIdsList.splice(id + 1, newIdsList.length - 1);
-    newIdsList[id] = event.target.value as number;
-    setCategorySelectIds(newIdsList);
+    if (categorySelectIds) {
+      const newIdsList = [...categorySelectIds];
+      newIdsList.splice(id + 1, newIdsList.length - 1);
+      newIdsList[id] = event.target.value as number;
+      setCategorySelectIds(newIdsList);
+    }
   };
 
   return nestedCategoryListIsLoading ? (
@@ -118,49 +126,37 @@ export const CategoriesSupPage: React.FC<CategoriesSupPageProps> = ({
   ) : (
     <Grid item xs container direction="row">
       <Grid item xs>
-        {nestedCategoryList?.map((categoryList, index) => (
-          <FormControl className={classes.margin1} key={index}>
-            <Select
-              input={<BootstrapInput />}
-              defaultValue={categoryList[0].id}
-              value={categorySelectIds[index]}
-              onChange={(event) => {
-                handleSelectValueChange(event, index);
-              }}
-              MenuProps={{
-                anchorOrigin: {
-                  vertical: "bottom",
-                  horizontal: "left",
-                },
-                getContentAnchorEl: null,
-              }}
-            >
-              {categoryList?.map((category, i) => (
-                // <Link
-                //   key={i}
-                //   // to={`${url}/Category=${category.id}`}
-                //   className={`${classes.linkItem} ${classes.divPointer}`}
-                // >
-                <MenuItem
-                  value={category.id}
-                  key={i}
-                  onClick={() => handleCategoryChoose(category.id, index)}
-                >
-                  <Typography variant="h6">{category.name}</Typography>
-                </MenuItem>
-                // </Link>
-              ))}
-            </Select>
-            <Link
-              to={`${url}/:${"Category"}`}
-              className={`${classes.linkItem} ${classes.divPointer}`}
-            >
-              <Typography variant="h6" gutterBottom>
-                {"Link"}
-              </Typography>
-            </Link>
-          </FormControl>
-        ))}
+        {!categorySelectIds ? (
+          <></>
+        ) : (
+          nestedCategoryList?.map((categoryList, index) => (
+            <FormControl className={classes.margin1} key={index}>
+              <Select
+                input={<BootstrapInput />}
+                value={categorySelectIds[index] ? categorySelectIds[index] : ""}
+                onChange={(event) => {
+                  handleSelectValueChange(event, index);
+                }}
+                MenuProps={{
+                  anchorOrigin: {
+                    vertical: "bottom",
+                    horizontal: "left",
+                  },
+                  getContentAnchorEl: null,
+                }}
+              >
+                {categoryList?.map((category, i) => (
+                  <MenuItem
+                    value={category.id}
+                    onClick={() => handleCategoryChoose(category.id, index)}
+                  >
+                    <Typography variant="h6">{category.name}</Typography>
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          ))
+        )}
       </Grid>
     </Grid>
   );

@@ -35,6 +35,7 @@ const useStyles = makeStyles((theme) => ({
 export const HomePage: React.FC = () => {
   const classes = useStyles();
   const { path } = useRouteMatch();
+
   return (
     <React.Fragment>
       <Grid
@@ -59,15 +60,15 @@ export const HomePage: React.FC = () => {
               <Switch>
                 <Route exact path={path}></Route>
                 <Route
-                  path={`${path}/Company`}
-                  component={() => <CompaniesPage />}
+                  path={`${path}Company`}
+                  render={() => <CompaniesPage />}
                 ></Route>
-                <Route path={`${path}/Categories`}>
+                <Route path={`${path}Categories`}>
                   <Typography variant="h6" gutterBottom noWrap>
                     {"Categories"}
                   </Typography>
                 </Route>
-                <Route path={`${path}/Products`}>
+                <Route path={`${path}Products`}>
                   <Typography variant="h6" gutterBottom noWrap>
                     {"Products"}
                   </Typography>

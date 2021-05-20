@@ -153,7 +153,7 @@ export const ParseDataSegment: React.FC = () => {
       UserActions.GetSubCategories().then((categoryList) => {
         if (isMounted) {
           setCompanyList(companyList);
-          if (categoryList != undefined) {
+          if (categoryList !== undefined) {
             const nestedArray: IResponseNestedCategory[] = new Array(1);
             nestedArray[0] = categoryList;
             setCategoriesList(nestedArray);
@@ -174,6 +174,7 @@ export const ParseDataSegment: React.FC = () => {
       setMessageInfo({ ...snackPack[0] });
       setSnackPack((prev) => prev.slice(1));
       setOpenSnack(true);
+    // eslint-disable-next-line no-restricted-globals
     } else if (snackPack.length && messageInfo && open) {
       // Close an active snack when a new one is added
       setOpenSnack(false);
@@ -219,7 +220,7 @@ export const ParseDataSegment: React.FC = () => {
     rowsCount: number | undefined
   ): Promise<boolean | undefined> => {
     try {
-      if (id != undefined && page != undefined && rowsCount != undefined) {
+      if (id !== undefined && page !== undefined && rowsCount !== undefined) {
         setCurrentProductListId(id);
         setCheckedProduct(undefined);
         setIsProductsLodaing(true);
@@ -230,7 +231,7 @@ export const ParseDataSegment: React.FC = () => {
         );
         setIsProductsLodaing(false);
 
-        if (response != undefined) {
+        if (response !== undefined) {
           setProductList(response);
           if (response.length === 0) {
             return false;
@@ -248,7 +249,7 @@ export const ParseDataSegment: React.FC = () => {
     rowsCount: number | undefined
   ): Promise<boolean | undefined> => {
     try {
-      if (id != undefined && page != undefined && rowsCount != undefined) {
+      if (id !== undefined && page !== undefined && rowsCount !== undefined) {
         setCurrentProductListId(id);
         setCheckedProduct(undefined);
         setIsProductsLodaing(true);
@@ -259,7 +260,7 @@ export const ParseDataSegment: React.FC = () => {
         );
         setIsProductsLodaing(false);
 
-        if (response != undefined) {
+        if (response !== undefined) {
           setProductList(response);
           if (response.length === 0) {
             return false;
@@ -272,10 +273,10 @@ export const ParseDataSegment: React.FC = () => {
     }
   };
   const handleProductClick = async (id: number | undefined) => {
-    if (id != undefined) {
+    if (id !== undefined) {
       const response = await UserActions.GetProductById(id);
 
-      if (response != undefined) {
+      if (response !== undefined) {
         setCheckedProduct(response);
         scrollToTop();
       }
@@ -285,7 +286,7 @@ export const ParseDataSegment: React.FC = () => {
     id: number | undefined,
     pagesCount: number | undefined
   ) => {
-    if (id != undefined && pagesCount != undefined) {
+    if (id !== undefined && pagesCount !== undefined) {
       const products = handlesetNumberOfProductsInTotal(pagesCount);
 
       setProductPage(0);
@@ -296,7 +297,7 @@ export const ParseDataSegment: React.FC = () => {
   const handlesetNumberOfProductsInTotal = (
     pages: number | undefined
   ): number => {
-    if (pages != undefined) {
+    if (pages !== undefined) {
       setNumberOfProductsInTotal(pages);
       if (pages <= pagesArray[0]) {
         setRowsPerProductPageList([]);
@@ -327,13 +328,13 @@ export const ParseDataSegment: React.FC = () => {
     id: number | undefined,
     productCount: number | undefined
   ) => {
-    if (id != undefined && productCount != undefined) {
+    if (id !== undefined && productCount !== undefined) {
       const products = handlesetNumberOfProductsInTotal(productCount);
 
       setProductPage(0);
       handleGetProductRequestByCompanys(id, productPage, products);
       handlesetNumberOfProductsInTotal(
-        productCount != undefined ? productCount : 0
+        productCount !== undefined ? productCount : 0
       );
     }
   };
@@ -341,7 +342,7 @@ export const ParseDataSegment: React.FC = () => {
     setIsCompanysLodaing(true);
     UserActions.GetAllCompanys().then((companyList) => {
       UserActions.GetSubCategories().then((categoryList) => {
-        if (categoryList != undefined && companyList != undefined) {
+        if (categoryList !== undefined && companyList !== undefined) {
           const nestedArray: IResponseNestedCategory[] = new Array(1);
           nestedArray[0] = categoryList;
           setCategoriesList(nestedArray);
@@ -358,10 +359,10 @@ export const ParseDataSegment: React.FC = () => {
   };
   const handleCompanyUrlUploadClick = async () => {
     try {
-      if (companyUrl != undefined) {
+      if (companyUrl !== undefined) {
         const response = await UserActions.AddCompanyByUrl(companyUrl);
 
-        if (response != undefined) {
+        if (response !== undefined) {
           handleProductsUpdate();
         }
       }
@@ -454,7 +455,7 @@ export const ParseDataSegment: React.FC = () => {
   //Company list component
   const companiesBlocks = (
     <>
-      {companyList != undefined ? companyList?.length > 0 ? <List
+      {companyList !== undefined ? companyList?.length > 0 ? <List
         component="nav"
         aria-labelledby="nested-list-subheader"
         className={classes.companyListRoot}
@@ -519,7 +520,7 @@ export const ParseDataSegment: React.FC = () => {
 
   //Product list component pagintaion
   const productBlockPagination =
-    isProductsLodaing || productList == undefined || productList.length == 0 ? (
+    isProductsLodaing || productList === undefined || productList.length === 0 ? (
       <div></div>
     ) : (
       <Grid item>
@@ -558,7 +559,7 @@ export const ParseDataSegment: React.FC = () => {
 
   //Product which was chosen
   const productBlocks =
-    checkedProduct == undefined ? (
+    checkedProduct === undefined ? (
       <div></div>
     ) : (
       <Grid item>
@@ -581,7 +582,7 @@ export const ParseDataSegment: React.FC = () => {
           <Typography variant="body1" gutterBottom>
             {checkedProduct.description}
           </Typography>
-          {checkedProduct.imageUrls?.length == 0 ? (
+          {checkedProduct.imageUrls?.length === 0 ? (
             <div></div>
           ) : (
             <Typography variant="h6" gutterBottom>
@@ -680,7 +681,7 @@ export const ParseDataSegment: React.FC = () => {
                 </Grid>
               </div>
             </Grid>
-            {selectedSortByValue == "Companies" ? (
+            {selectedSortByValue === "Companies" ? (
               <>
                 <Grid item>
                   <div className={classes.companyItem}>
@@ -722,7 +723,7 @@ export const ParseDataSegment: React.FC = () => {
               </>
             ) : (
               <>
-                {categoriesList == undefined ? (
+                {categoriesList === undefined ? (
                   <></>
                 ) : (
                   <Grid item>

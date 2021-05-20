@@ -57,7 +57,7 @@ export const NestedCategoryList: React.FC<NestedCategoryListProps> = (
     index: number
   ) => {
     event.stopPropagation();
-    if (index == openedCategoryId) {
+    if (index === openedCategoryId) {
       setOpenedCategoryId(-1);
     } else {
       setOpenedCategoryId(index);
@@ -80,7 +80,7 @@ export const NestedCategoryList: React.FC<NestedCategoryListProps> = (
       {props.list.map((element, i) => {
         return (
           <div key={i}>
-            {element.subCategories == undefined ? (
+            {element.subCategories === undefined ? (
               <></>
             ) : element.subCategories.length === 0 ? (
               <ListItem
@@ -125,14 +125,14 @@ export const NestedCategoryList: React.FC<NestedCategoryListProps> = (
                   edge="end"
                   onClick={(event) => handleContainedExpandClick(event, i)}
                 >
-                  {openedCategoryId == i ? <ExpandLess /> : <ExpandMore />}
+                  {openedCategoryId === i ? <ExpandLess /> : <ExpandMore />}
                 </IconButton>
               </ListItem>
             )}
-            {element.subCategories == undefined ? (
+            {element.subCategories === undefined ? (
               <></>
             ) : (
-              <Collapse in={openedCategoryId == i} timeout="auto" unmountOnExit>
+              <Collapse in={openedCategoryId === i} timeout="auto" unmountOnExit>
                 <NestedCategoryList
                   setCurrentCompanyId={props.setCurrentCompanyId}
                   list={element.subCategories}
