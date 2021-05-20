@@ -69,8 +69,6 @@ export const CategoriesSupPage: React.FC<CategoriesSupPageProps> = ({
       });
     }
       
-
-   
     return () => {
       isMounted = false;
     }; // use effect cleanup to set flag false, if unmounted

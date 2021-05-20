@@ -59,7 +59,6 @@ export const CompaniesPage: React.FC = () => {
   useEffect(() => {
     let isMounted = true;
     setIsCompanysLodaing(true);
-
     UserActions.GetAllCompanys().then((companyList) => {
       if (isMounted) {
         setCompanyList(companyList);
@@ -113,7 +112,7 @@ export const CompaniesPage: React.FC = () => {
         </Grid>
         <Grid container spacing={3}>
           <Switch>
-            <Route exact path={path}></Route>
+          
               <Route path={`${path}/:companyId`}>
                 <CategoriesSupPage
                 categorySelectIds={categorySelectIds}

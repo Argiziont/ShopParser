@@ -36,10 +36,6 @@ export const HomePage: React.FC = () => {
   const classes = useStyles();
   const { path } = useRouteMatch();
 
-
-
-
-  
   return (
     <React.Fragment>
       <Grid
@@ -63,10 +59,10 @@ export const HomePage: React.FC = () => {
             <Grid item container spacing={3}>
               <Switch>
                 <Route exact path={path}></Route>
-                <Route
-                  path={`${path}Company`}
-                  component={() => <CompaniesPage />}
-                ></Route>
+                <Route path={`${path}Company`}>
+                  {" "}
+                  <CompaniesPage />
+                </Route>
                 <Route path={`${path}Categories`}>
                   <Typography variant="h6" gutterBottom noWrap>
                     {"Categories"}
