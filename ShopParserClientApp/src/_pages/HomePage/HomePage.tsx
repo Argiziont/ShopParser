@@ -62,7 +62,7 @@ export const HomePage: React.FC = () => {
                 <Route
                   path={`${path}Company`}
                   render={() => <CompaniesPage />}
-                ></Route>
+                />
                 <Route path={`${path}Categories`}>
                   <Typography variant="h6" gutterBottom noWrap>
                     {"Categories"}

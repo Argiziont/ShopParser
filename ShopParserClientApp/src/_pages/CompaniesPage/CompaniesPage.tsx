@@ -7,7 +7,11 @@ import {
 
 import React, { useEffect, useState } from "react";
 import { Link, Route, Switch, useRouteMatch } from "react-router-dom";
-import { IResponseCategory, IResponseCompany, UserActions } from "../../_actions";
+import {
+  IResponseCategory,
+  IResponseCompany,
+  UserActions,
+} from "../../_actions";
 import { CategoriesSupPage } from "./CategoriesSupPage";
 
 const useStyles = makeStyles(() => ({
@@ -37,6 +41,7 @@ const useStyles = makeStyles(() => ({
     padding: "15px 15px",
   },
 }));
+
 export const CompaniesPage: React.FC = () => {
   const classes = useStyles();
   const { url, path } = useRouteMatch();
@@ -44,17 +49,9 @@ export const CompaniesPage: React.FC = () => {
   const [companyList, setCompanyList] = useState<IResponseCompany[]>();
   const [isCompaniesLodaing, setIsCompanysLodaing] = useState<boolean>(false);
 
-
-
   const [categorySelectIds, setCategorySelectIds] = useState<number[]>([]);
   const [nestedCategoryList, setNestedCategoryList] =
     useState<IResponseCategory[][]>();
-  
-
-
-
-
-
 
   useEffect(() => {
     let isMounted = true;
@@ -112,15 +109,17 @@ export const CompaniesPage: React.FC = () => {
         </Grid>
         <Grid container spacing={3}>
           <Switch>
-          
-              <Route path={`${path}/:companyId`}>
+            <Route
+              path={`${path}/:companyId`}
+              render={() => (
                 <CategoriesSupPage
-                categorySelectIds={categorySelectIds}
-                nestedCategoryList={nestedCategoryList}
-                setCategorySelectIds={setCategorySelectIds}
-                setNestedCategoryList={setNestedCategoryList}
-              />
-                </Route>
+                  categorySelectIds={categorySelectIds}
+                  nestedCategoryList={nestedCategoryList}
+                  setCategorySelectIds={setCategorySelectIds}
+                  setNestedCategoryList={setNestedCategoryList}
+                />
+              )}
+            />
           </Switch>
         </Grid>
       </div>

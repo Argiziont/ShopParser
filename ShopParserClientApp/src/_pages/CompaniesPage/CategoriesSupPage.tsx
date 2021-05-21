@@ -8,7 +8,7 @@ import {
   CircularProgress,
 } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory, useRouteMatch } from "react-router-dom";
 import { IResponseCategory, UserActions } from "../../_actions";
 import { BootstrapInput } from "../../_components";
 
@@ -47,7 +47,9 @@ export const CategoriesSupPage: React.FC<CategoriesSupPageProps> = ({
 }) => {
   const classes = useStyles();
 
+  const history = useHistory();
   const { companyId } = useParams<Record<string, string | undefined>>();
+  const { url } = useRouteMatch();
 
   const [nestedCategoryListIsLoading, setNestedCategoryListIsLoading] =
     useState<boolean>();
@@ -61,12 +63,13 @@ export const CategoriesSupPage: React.FC<CategoriesSupPageProps> = ({
         (categoryList) => {
           if (isMounted) {
             if (categoryList) {
-              setNestedCategoryList(new Array(categoryList));
-            } else {
-              setNestedCategoryList([]);
-              setCategorySelectIds([]);
+              if (categoryList.length > 0)
+                setNestedCategoryList(new Array(categoryList));
+              else {
+                setNestedCategoryList([]);
+                setCategorySelectIds([]);
+              }
             }
-            //   //console.log(categoryList);
             setNestedCategoryListIsLoading(false);
           }
         }
@@ -96,16 +99,17 @@ export const CategoriesSupPage: React.FC<CategoriesSupPageProps> = ({
         setNestedCategoryListIsLoading(false);
 
         if (categoryList !== undefined) {
-          newCategoryList.splice(itemId + 1, newCategoryList.length - 1);
+          if (categoryList.length > 0) {
+            newCategoryList.splice(itemId + 1, newCategoryList.length - 1);
 
-          newCategoryList[itemId + 1] = categoryList;
-          setNestedCategoryList(newCategoryList);
+            newCategoryList[itemId + 1] = categoryList;
+            setNestedCategoryList(newCategoryList);
+          }
+          history.push(`${url}/Category=${categoryId}`);
         }
       });
     }
   };
-
-  // const { url } = useRouteMatch();
 
   const handleSelectValueChange = (
     event: React.ChangeEvent<{ value: unknown }>,
@@ -147,6 +151,7 @@ export const CategoriesSupPage: React.FC<CategoriesSupPageProps> = ({
               >
                 {categoryList?.map((category, i) => (
                   <MenuItem
+                    key={i}
                     value={category.id}
                     onClick={() => handleCategoryChoose(category.id, index)}
                   >
