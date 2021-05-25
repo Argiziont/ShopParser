@@ -13,6 +13,7 @@ import {
   UserActions,
 } from "../../_actions";
 import { CategoriesSupPage } from "./CategoriesSupPage";
+import { ProductSubPage } from "./ProductSubPage";
 
 const useStyles = makeStyles(() => ({
   divPointer: {
@@ -107,20 +108,24 @@ export const CompaniesPage: React.FC = () => {
             </Grid>
           ))}
         </Grid>
-        <Grid container spacing={3}>
+        <Grid container direction="column" spacing={3}>
           <Switch>
-            <Route
-              path={`${path}/:companyId`}
-              render={() => (
-                <CategoriesSupPage
-                  categorySelectIds={categorySelectIds}
-                  nestedCategoryList={nestedCategoryList}
-                  setCategorySelectIds={setCategorySelectIds}
-                  setNestedCategoryList={setNestedCategoryList}
-                />
-              )}
-            />
-          </Switch>
+          
+            <Route path={`${path}/:companyId`}>
+              <CategoriesSupPage
+                categorySelectIds={categorySelectIds}
+                nestedCategoryList={nestedCategoryList}
+                setCategorySelectIds={setCategorySelectIds}
+                setNestedCategoryList={setNestedCategoryList}
+              />
+            </Route>
+
+            </Switch>
+            <Switch>
+            <Route path={`${path}/:companyId/:categoryId`}>
+              <ProductSubPage />
+            </Route>
+            </Switch>
         </Grid>
       </div>
     </React.Fragment>
