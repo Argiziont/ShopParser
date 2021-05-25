@@ -46,6 +46,7 @@
   },
   "devDependencies": {
     "@microsoft/signalr": "^5.0.6",
+    "@types/node": "9.6.7",
     "@types/react-router-dom": "^5.1.7"
   }
 }

@@ -120,6 +120,7 @@ export const CategoriesSupPage: React.FC<CategoriesSupPageProps> = ({
       newIdsList.splice(id + 1, newIdsList.length - 1);
       newIdsList[id] = event.target.value as number;
       setCategorySelectIds(newIdsList);
+
     }
   };
 

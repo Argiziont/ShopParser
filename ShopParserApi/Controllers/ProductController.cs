@@ -234,7 +234,7 @@ namespace ShopParserApi.Controllers
 
         [HttpGet]
         [Route("GetPagedProductsByCompanyId")]
-        [ProducesResponseType(typeof(IEnumerable<ProductData>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<ResponseProduct>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesDefaultResponseType]
@@ -280,7 +280,7 @@ namespace ShopParserApi.Controllers
 
         [HttpGet]
         [Route("GetPagedProductsByCategoryId")]
-        [ProducesResponseType(typeof(IEnumerable<ProductData>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<ResponseProduct>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesDefaultResponseType]
@@ -327,7 +327,7 @@ namespace ShopParserApi.Controllers
 
         [HttpGet]
         [Route("GetPagedProductsByCategoryIdAndCompanyId")]
-        [ProducesResponseType(typeof(IEnumerable<ProductData>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<ResponseProduct>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesDefaultResponseType]
@@ -348,7 +348,8 @@ namespace ShopParserApi.Controllers
                     .Where(p => p.Categories.Contains(currentCategory) &&
                                 p.ProductState ==
                                 ProductState
-                                    .Success) //Take products which owned by current company and was parsed successfully
+                                    .Success&&
+                                p.CompanyId== companyId) //Take products which owned by current company and was parsed successfully
                     .OrderBy(p => p.Id) //Order by internal DB categoryId
                     .Skip(page * rowsPerPage).Take(rowsPerPage).ToListAsync(); //Take products by page
 
