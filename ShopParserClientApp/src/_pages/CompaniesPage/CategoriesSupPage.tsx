@@ -105,7 +105,7 @@ export const CategoriesSupPage: React.FC<CategoriesSupPageProps> = ({
             newCategoryList[itemId + 1] = categoryList;
             setNestedCategoryList(newCategoryList);
           }
-          history.push(`${url}/Category=${categoryId}`);
+          history.push(`${url}/${categoryId}`);
         }
       });
     }

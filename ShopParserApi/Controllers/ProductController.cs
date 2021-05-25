@@ -125,7 +125,7 @@ namespace ShopParserApi.Controllers
             }
 
             await _productsHub.Clients.All.ReceiveMessage(
-                $"Product with name id: {currentProduct.ExternalId} was updated successfully");
+                $"Product with name categoryId: {currentProduct.ExternalId} was updated successfully");
             _logger.LogInformation(
                 "ParseSingleProductInsideCompanyPageAsync method inside ProductController was called successfully");
             return Ok(currentProduct);
@@ -247,7 +247,7 @@ namespace ShopParserApi.Controllers
                                 p.ProductState ==
                                 ProductState
                                     .Success) //Take products which owned by current company and was parsed successfully
-                    .OrderBy(p => p.Id) //Order by internal DB id
+                    .OrderBy(p => p.Id) //Order by internal DB categoryId
                     .Skip(page * rowsPerPage).Take(rowsPerPage).ToListAsync(); //Take products by page
 
                 if (productSource.Count == 0)
@@ -302,7 +302,54 @@ namespace ShopParserApi.Controllers
                                 p.ProductState ==
                                 ProductState
                                     .Success) //Take products which owned by current company and was parsed successfully
-                    .OrderBy(p => p.Id) //Order by internal DB id
+                    .OrderBy(p => p.Id) //Order by internal DB categoryId
+                    .Skip(page * rowsPerPage).Take(rowsPerPage).ToListAsync(); //Take products by page
+
+                _logger.LogInformation(
+                    "GetPagedProductsByCategoryIdAsync method inside ProductController was called successfully");
+                return Ok(productSource.Select(p => new ResponseProduct
+                {
+                    Description = p.Description,
+                    ExternalId = p.ExternalId,
+                    Id = p.Id,
+                    Url = p.Url,
+                    SyncDate = p.SyncDate,
+                    Price = p.Price,
+                    Title = p.Title
+                }));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, e);
+            }
+        }
+
+        [HttpGet]
+        [Route("GetPagedProductsByCategoryIdAndCompanyId")]
+        [ProducesResponseType(typeof(IEnumerable<ProductData>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> GetPagedProductsByCategoryIdAndCompanyIdAsync(int categoryId,int companyId, int page, int rowsPerPage)
+        {
+            try
+            {
+                var currentCategory = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == categoryId);
+                if (currentCategory == null)
+                {
+                    _logger.LogWarning(
+                        "GetPagedProductsByCategoryIdAsync method inside ProductController returned NotFound");
+                    return NotFound();
+                }
+
+
+                var productSource = await _dbContext.Products
+                    .Where(p => p.Categories.Contains(currentCategory) &&
+                                p.ProductState ==
+                                ProductState
+                                    .Success) //Take products which owned by current company and was parsed successfully
+                    .OrderBy(p => p.Id) //Order by internal DB categoryId
                     .Skip(page * rowsPerPage).Take(rowsPerPage).ToListAsync(); //Take products by page
 
                 _logger.LogInformation(
