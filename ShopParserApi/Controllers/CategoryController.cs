@@ -95,7 +95,7 @@ namespace ShopParserApi.Controllers
             {
                 var currentCategory = await _dbContext.Categories.FirstOrDefaultAsync(cat => cat.SupCategory == null);
                 if (currentCategory == null)
-                    return Ok(new List<ResponseNestedCategory>());
+                    return NotFound();
 
                 var reversedCategory = ReverseCategoryListRecursive(currentCategory, _dbContext);
                 _logger.LogInformation("GetAllNestedAsync method inside CategoryController was called successfully");
@@ -121,9 +121,9 @@ namespace ShopParserApi.Controllers
             {
                 var categoriesList = await _dbContext.Categories.Where(cat => cat.SupCategory.Id == id).ToListAsync();
                 if (!categoriesList.Any())
-                    return Ok(new List<ResponseCategory>());
+                    return NotFound();
 
-
+               
 
                 _logger.LogInformation("GetNestedByParentIdAsync method inside CategoryController was called successfully");
 
@@ -154,7 +154,7 @@ namespace ShopParserApi.Controllers
             {
                 var categoriesList = await _dbContext.Categories.Where(cat => cat.SupCategory.Id == id&& cat.Products.Count(product=>product.Company.Id== companyId) !=0).ToListAsync();
                 if (!categoriesList.Any())
-                    return Ok(new List<ResponseCategory>());
+                    return NotFound();
                 
                 _logger.LogInformation("GetNestedByParentIdAsync method inside CategoryController was called successfully");
 
