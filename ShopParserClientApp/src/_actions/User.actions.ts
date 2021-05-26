@@ -14,7 +14,10 @@ export const UserActions = {
   GetCategoryByParentIdAndCompanyId,
   GetCategoryByParentId,
   GetProductByCategoryIdAndCompanyIdAndPage,
-  GetProductsCountByCategoryIdAndCompanyId
+  GetProductsCountByCategoryIdAndCompanyId,
+  GetProductsCountByCategoryId,
+  GetProductByPage,
+  GetProductsCount
 };
 async function GetAllCompanys(): Promise<IResponseCompany[]|undefined> {
   try {
@@ -72,6 +75,15 @@ async function GetProductById(id:number): Promise<IProductJson|undefined> {
     //Function returns undefined, don't need to do something
   }
 }
+async function GetProductByPage(page: number, rows: number): Promise<IResponseNestedCategory[]|undefined> {
+  try {
+    const response = await  UserService.GetProductByPage(page,rows);
+    return response;
+  } 
+  catch(error) {
+    //Function returns undefined, don't need to do something
+  }
+}
 async function GetSubCategories(): Promise<IResponseNestedCategory|undefined> {
   try {
     const response = await  UserService.GetSubCategories();
@@ -108,6 +120,25 @@ async function GetProductsCountByCategoryIdAndCompanyId(id:number, companyId:num
     //Function returns undefined, don't need to do something
   }
 }
+async function GetProductsCountByCategoryId(id:number): Promise<number|undefined> {
+  try {
+    const response = await  UserService.GetProductsCountByCategoryId(id);
+    return response;
+  } 
+  catch(error) {
+    //Function returns undefined, don't need to do something
+  }
+}
+async function GetProductsCount(): Promise<number|undefined> {
+  try {
+    const response = await  UserService.GetProductsCount();
+    return response;
+  } 
+  catch(error) {
+    //Function returns undefined, don't need to do something
+  }
+}
+
 
 async function AddCompanyByUrl(url: string): Promise<IResponseCompany | undefined> {
   try {

@@ -200,6 +200,31 @@ namespace ShopParserApi.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, e);
             }
         }
+        [HttpGet]
+        [Route("GetProductCountByCategoryId")]
+        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> GetProductCountByCategoryIdAsync(int id)
+        {
+            try
+            {
+                var currentCategory = await _dbContext.Categories.Include(c => c.Products).FirstOrDefaultAsync(c => c.Id == id);
+
+
+                var productSource = currentCategory.Products.Where(p => p.ProductState == ProductState.Success);
+
+                _logger.LogInformation("GetNestedByParentIdAsync method inside CategoryController was called successfully");
+
+                return Ok(productSource.Count());
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, e);
+            }
+        }
         private static ResponseNestedCategory ReverseCategoryListRecursive(Category mainCategory,
             ApplicationDb dbContext)
         {

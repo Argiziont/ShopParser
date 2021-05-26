@@ -1,11 +1,11 @@
 import { Grid, makeStyles, Typography } from "@material-ui/core";
 import { Pagination, PaginationItem } from "@material-ui/lab";
 import React, { useEffect, useState } from "react";
-import { Link, useLocation, useParams, useRouteMatch } from "react-router-dom";
+import { Link, useLocation, useRouteMatch } from "react-router-dom";
 import { IProductJson, IResponseProduct, UserActions } from "../../_actions";
 import { ProductDetailsDialog } from "../../_components";
 
-export const ProductSubPage: React.FC = () => {
+export const ProductsPage: React.FC = () => {
   const useStyles = makeStyles((theme) => ({
     outlinedItem: {
       maxWidth: "320px",
@@ -22,7 +22,7 @@ export const ProductSubPage: React.FC = () => {
 
   const classes = useStyles();
 
-  const itemNumber = 16; //Number of products per page
+  const itemNumber = 20; //Number of products per page
 
   //Products states
   const [productsList, setProductsList] = useState<IResponseProduct[]>();
@@ -30,10 +30,6 @@ export const ProductSubPage: React.FC = () => {
     useState<number>();
   const [productsListIsLoading, setProductsListIsLoading] = useState<boolean>();
   const [productDetailed, setProductDetailed] = useState<IProductJson | undefined>()
-
-  //url params 
-  const { categoryId } =
-    useParams<Record<string, string | undefined>>();
 
   //Url paging
   const search = useLocation().search;
@@ -49,11 +45,9 @@ export const ProductSubPage: React.FC = () => {
     let isMounted = true;
     setProductsListIsLoading(true);
 
-    UserActions.GetProductsCountByCategoryId(
-      Number(categoryId),
+    UserActions.GetProductsCount(
     ).then((count) => {
-      UserActions.GetProductByCategoryIdAndPage(
-        Number(categoryId),
+      UserActions.GetProductByPage(
         0,
         itemNumber
       ).then((products) => {
@@ -72,15 +66,14 @@ export const ProductSubPage: React.FC = () => {
     return () => {
       isMounted = false;
     }; // use effect cleanup to set flag false, if unmounted
-  }, [categoryId]);
+  },[]);
 
   const hanglePageChange = (
     event: React.ChangeEvent<unknown>,
     value: number
   ) => {
     setProductsListIsLoading(true);
-    UserActions.GetProductByCategoryIdAndPage(
-      Number(categoryId),
+    UserActions.GetProductByPage(
       value - 1,
       itemNumber
     ).then((products) => {
@@ -140,7 +133,7 @@ export const ProductSubPage: React.FC = () => {
       alignItems="center"
       direction="column"
     >
-      {numberOfProductsInTotal?(numberOfProductsInTotal > itemNumber && productBlockPagination):<></>}
+      {productBlockPagination}
       <Grid item container spacing={3} justify="flex-start" direction="row">
         {!productsListIsLoading &&
           productsList &&

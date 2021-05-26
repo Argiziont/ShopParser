@@ -8,9 +8,10 @@ import {
   CircularProgress,
 } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
-import { useHistory, useRouteMatch } from "react-router-dom";
+import { Route, Switch, useHistory, useRouteMatch } from "react-router-dom";
 import { IResponseCategory, UserActions } from "../../_actions";
 import { BootstrapInput } from "../../_components";
+import { ProductSubPage } from "./ProductSubPage";
 
 const useStyles = makeStyles((theme) => ({
   divPointer: {
@@ -48,7 +49,7 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({
   const classes = useStyles();
 
   const history = useHistory();
-  const { url } = useRouteMatch();
+  const { url, path } = useRouteMatch();
 
   const [nestedCategoryListIsLoading, setNestedCategoryListIsLoading] =
     useState<boolean>();
@@ -58,28 +59,23 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({
     if (isMounted) {
       setNestedCategoryListIsLoading(true);
 
-      UserActions.GetCategoryByParentId(1).then(
-        (categoryList) => {
-          if (isMounted) {
-            if (categoryList) {
-              if (categoryList.length > 0) {
-                setNestedCategoryList(new Array(categoryList));
+      UserActions.GetCategoryByParentId(1).then((categoryList) => {
+        if (isMounted) {
+          if (categoryList) {
+            if (categoryList.length > 0) {
+              setNestedCategoryList(new Array(categoryList));
 
-                const newIdsList: number[] = [];
-                if(categoryList[0].id)
-                  newIdsList[0] = categoryList[0].id;
-                setCategorySelectIds(newIdsList);
-              }
-              
-              else {
-                setNestedCategoryList([]);
-                setCategorySelectIds([]);
-              }
+              const newIdsList: number[] = [];
+              if (categoryList[0].id) newIdsList[0] = categoryList[0].id;
+              setCategorySelectIds(newIdsList);
+            } else {
+              setNestedCategoryList([]);
+              setCategorySelectIds([]);
             }
-            setNestedCategoryListIsLoading(false);
           }
+          setNestedCategoryListIsLoading(false);
         }
-      );
+      });
     }
 
     return () => {
@@ -98,9 +94,7 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({
     ) {
       const newCategoryList = [...nestedCategoryList];
 
-      UserActions.GetCategoryByParentId(
-        categoryId
-      ).then((categoryList) => {
+      UserActions.GetCategoryByParentId(categoryId).then((categoryList) => {
         setNestedCategoryListIsLoading(false);
 
         if (categoryList !== undefined) {
@@ -112,14 +106,12 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({
 
             if (categorySelectIds) {
               const newIdsList = [...categorySelectIds];
-              
-              if(categoryList[0].id)
-                newIdsList[itemId + 1] = categoryList[0].id;
-              
-              setCategorySelectIds(newIdsList);
-        
-            }
 
+              if (categoryList[0].id)
+                newIdsList[itemId + 1] = categoryList[0].id;
+
+              setCategorySelectIds(newIdsList);
+            }
           }
           history.push(`${url}/${categoryId}`);
         }
@@ -136,7 +128,6 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({
       newIdsList.splice(id + 1, newIdsList.length - 1);
       newIdsList[id] = event.target.value as number;
       setCategorySelectIds(newIdsList);
-
     }
   };
 
@@ -145,41 +136,53 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({
       <CircularProgress color="inherit" />
     </Grid>
   ) : (
-    <Grid item xs container direction="row">
-      <Grid item xs>
-        {!categorySelectIds ? (
-          <></>
-        ) : (
-          nestedCategoryList?.map((categoryList, index) => (
-            <FormControl className={classes.margin1} key={index}>
-              <Select
-                input={<BootstrapInput />}
-                value={categorySelectIds[index] ? categorySelectIds[index] : ""}
-                onChange={(event) => {
-                  handleSelectValueChange(event, index);
-                }}
-                MenuProps={{
-                  anchorOrigin: {
-                    vertical: "bottom",
-                    horizontal: "left",
-                  },
-                  getContentAnchorEl: null,
-                }}
-              >
-                {categoryList?.map((category, i) => (
-                  <MenuItem
-                    key={i}
-                    value={category.id}
-                    onClick={() => handleCategoryChoose(category.id, index)}
-                  >
-                    <Typography variant="h6">{category.name}</Typography>
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          ))
-        )}
-      </Grid>
-    </Grid>
+    <>
+      <Grid item xs container direction="column">
+        <Grid item xs>
+          {!categorySelectIds ? (
+            <></>
+          ) : (
+            nestedCategoryList?.map((categoryList, index) => (
+              <FormControl className={classes.margin1} key={index}>
+                <Select
+                  input={<BootstrapInput />}
+                  value={
+                    categorySelectIds[index] ? categorySelectIds[index] : ""
+                  }
+                  onChange={(event) => {
+                    handleSelectValueChange(event, index);
+                  }}
+                  MenuProps={{
+                    anchorOrigin: {
+                      vertical: "bottom",
+                      horizontal: "left",
+                    },
+                    getContentAnchorEl: null,
+                  }}
+                >
+                  {categoryList?.map((category, i) => (
+                    <MenuItem
+                      key={i}
+                      value={category.id}
+                      onClick={() => handleCategoryChoose(category.id, index)}
+                    >
+                      <Typography variant="h6">{category.name}</Typography>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            ))
+          )}
+        </Grid>
+        <Grid item>
+        <Switch>
+            <Route path={`${path}/:categoryId`}>
+              <ProductSubPage />
+            </Route>
+            </Switch>
+        </Grid>
+        </Grid>
+        
+    </>
   );
 };

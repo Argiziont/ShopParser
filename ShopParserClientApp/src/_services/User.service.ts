@@ -23,7 +23,10 @@ export const UserService = {
   GetByParentIdAndCompanyId,
   GetByParentId,
   GetProductByCategoryIdAndCompanyIdAndPage,
-  GetProductsCountByCategoryIdAndCompanyId
+  GetProductsCountByCategoryIdAndCompanyId,
+  GetProductsCountByCategoryId,
+  GetProductByPage,
+  GetProductsCount
 };
 
 async function GetAllCompanys(): Promise<ResponseCompany[]> {
@@ -138,9 +141,39 @@ async function GetProductByCategoryIdAndCompanyIdAndPage(categoryId: number, com
     return Promise.reject(handledException);
   });
 }
+async function GetProductByPage(page: number, rows: number): Promise<ResponseNestedCategory[]> {
+
+  return ProductApi().getPagedProducts(page, rows).then((productResponse) => {
+    return productResponse;
+    //Ok
+  }, async (error) => {
+    const handledException = await handleExeption(error);
+    return Promise.reject(handledException);
+  });
+}
 async function GetProductsCountByCategoryIdAndCompanyId(categoryId: number, companyId: number): Promise<number> {
 
   return CategoryApi().getProductCountByCategoryIdAndCompanyId(categoryId,companyId).then((count) => {
+    return count;
+    //Ok
+  }, async (error) => {
+    const handledException = await handleExeption(error);
+    return Promise.reject(handledException);
+  });
+}
+async function GetProductsCountByCategoryId(categoryId: number, ): Promise<number> {
+
+  return CategoryApi().getProductCountByCategoryId(categoryId).then((count) => {
+    return count;
+    //Ok
+  }, async (error) => {
+    const handledException = await handleExeption(error);
+    return Promise.reject(handledException);
+  });
+}
+async function GetProductsCount(): Promise<number> {
+
+  return ProductApi().getTotalProductCount().then((count) => {
     return count;
     //Ok
   }, async (error) => {

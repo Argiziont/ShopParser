@@ -279,6 +279,51 @@ namespace ShopParserApi.Controllers
         }
 
         [HttpGet]
+        [Route("GetPagedProducts")]
+        [ProducesResponseType(typeof(IEnumerable<ResponseProduct>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> GetPagedProductsAsync(int page, int rowsPerPage)
+        {
+            try
+            {
+                var productSource = await _dbContext.Products
+                    .Where(p => p.ProductState ==
+                                ProductState
+                                    .Success) //Take products which owned by current company and was parsed successfully
+                    .OrderBy(p => p.Id) //Order by internal DB categoryId
+                    .Skip(page * rowsPerPage).Take(rowsPerPage).ToListAsync(); //Take products by page
+
+                if (productSource.Count == 0)
+                {
+                    _logger.LogWarning(
+                        "GetPagedProductsAsync method inside ProductController returned NotFound");
+                    return NotFound();
+                }
+
+
+                _logger.LogInformation(
+                    "GetPagedProductsAsync method inside ProductController was called successfully");
+                return Ok(productSource.Select(p => new ResponseProduct
+                {
+                    Description = p.Description,
+                    ExternalId = p.ExternalId,
+                    Id = p.Id,
+                    Url = p.Url,
+                    SyncDate = p.SyncDate,
+                    Price = p.Price,
+                    Title = p.Title
+                }));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, e);
+            }
+        }
+
+        [HttpGet]
         [Route("GetPagedProductsByCategoryId")]
         [ProducesResponseType(typeof(IEnumerable<ResponseProduct>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
@@ -288,7 +333,7 @@ namespace ShopParserApi.Controllers
         {
             try
             {
-                var currentCategory = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == id);
+                var currentCategory = await _dbContext.Categories.Include(c => c.Products).FirstOrDefaultAsync(c => c.Id == id);
                 if (currentCategory == null)
                 {
                     _logger.LogWarning(
@@ -337,7 +382,7 @@ namespace ShopParserApi.Controllers
                 if (currentCategory == null)
                 {
                     _logger.LogWarning(
-                        "GetPagedProductsByCategoryIdAsync method inside ProductController returned NotFound");
+                        "GetPagedProductsByCategoryIdAndCompanyId method inside ProductController returned NotFound");
                     return NotFound();
                 }
 
@@ -349,7 +394,7 @@ namespace ShopParserApi.Controllers
 
 
                 _logger.LogInformation(
-                    "GetPagedProductsByCategoryIdAsync method inside ProductController was called successfully");
+                    "GetPagedProductsByCategoryIdAndCompanyId method inside ProductController was called successfully");
                 return Ok(productSource.Select(p => new ResponseProduct
                 {
                     Description = p.Description,
@@ -360,6 +405,26 @@ namespace ShopParserApi.Controllers
                     Price = p.Price,
                     Title = p.Title
                 }));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, e);
+            }
+        }
+        [HttpGet]
+        [Route("GetTotalProductCount")]
+        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> GetTotalProductCount()
+        {
+            try
+            {
+                var productsCount = await _dbContext.Products.Where(p => p.ProductState == ProductState.Success).CountAsync();
+
+                _logger.LogInformation(
+                    "GetTotalProductCount method inside ProductController was called successfully");
+                return Ok(productsCount);
             }
             catch (Exception e)
             {

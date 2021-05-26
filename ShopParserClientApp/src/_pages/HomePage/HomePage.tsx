@@ -1,8 +1,11 @@
-import { Grid, makeStyles, Typography } from "@material-ui/core";
+import { Grid, makeStyles } from "@material-ui/core";
 
-import React from "react";
+import React, { useState } from "react";
 import { Route, Switch, useRouteMatch } from "react-router-dom";
+import { IResponseCategory } from "../../_actions";
+import { CategoriesPage } from "../CategoriesPage";
 import { CompaniesPage } from "../CompaniesPage";
+import { ProductsPage } from "../ProductsPage";
 import { HomePageRouting } from "./HomePageRouting";
 
 const useStyles = makeStyles((theme) => ({
@@ -36,6 +39,10 @@ export const HomePage: React.FC = () => {
   const classes = useStyles();
   const { path } = useRouteMatch();
 
+  const [categorySelectIds, setCategorySelectIds] = useState<number[]>([]);
+  const [nestedCategoryList, setNestedCategoryList] =
+    useState<IResponseCategory[][]>();
+
   return (
     <React.Fragment>
       <Grid
@@ -59,20 +66,19 @@ export const HomePage: React.FC = () => {
             <Grid item container spacing={3}>
               <Switch>
                 <Route exact path={path}></Route>
-                <Route
-                  path={`${path}Company`}
-                  render={() => <CompaniesPage />}
-                />
+                <Route path={`${path}Company`} component={CompaniesPage} />
                 <Route path={`${path}Categories`}>
-                  <Typography variant="h6" gutterBottom noWrap>
-                    {"Categories"}
-                  </Typography>
+                  <CategoriesPage
+                    categorySelectIds={categorySelectIds}
+                    nestedCategoryList={nestedCategoryList}
+                    setCategorySelectIds={setCategorySelectIds}
+                    setNestedCategoryList={setNestedCategoryList}
+                  />
                 </Route>
-                <Route path={`${path}Products`}>
-                  <Typography variant="h6" gutterBottom noWrap>
-                    {"Products"}
-                  </Typography>
-                </Route>
+                <Route
+                  path={`${path}Products`}
+                  component={ProductsPage}
+                ></Route>
               </Switch>
             </Grid>
           </Grid>
