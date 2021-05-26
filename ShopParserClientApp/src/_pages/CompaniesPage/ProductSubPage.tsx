@@ -2,7 +2,8 @@ import { Grid, makeStyles, Typography } from "@material-ui/core";
 import { Pagination, PaginationItem } from "@material-ui/lab";
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useParams, useRouteMatch } from "react-router-dom";
-import { IResponseProduct, UserActions } from "../../_actions";
+import { IProductJson, IResponseProduct, UserActions } from "../../_actions";
+import { ProductDetailsDialog } from "../../_components";
 
 export const ProductSubPage: React.FC = () => {
   const useStyles = makeStyles((theme) => ({
@@ -21,18 +22,28 @@ export const ProductSubPage: React.FC = () => {
 
   const classes = useStyles();
 
+  const itemNumber = 12; //Number of products per page
+
+  //Products states
   const [productsList, setProductsList] = useState<IResponseProduct[]>();
   const [numberOfProductsInTotal, setNumberOfProductsInTotal] =
     useState<number>();
   const [productsListIsLoading, setProductsListIsLoading] = useState<boolean>();
+  const [productDetailed, setProductDetailed] = useState<IProductJson | undefined>()
 
+  //url params 
   const { companyId, categoryId } =
     useParams<Record<string, string | undefined>>();
 
+  //Url paging
   const search = useLocation().search;
   const query = new URLSearchParams(search);
   const productPage = parseInt(query.get("page") || "1", 10);
   const { url } = useRouteMatch();
+
+  //Product dialog state
+  const [dialogOpenState, setDialogOpenState] = React.useState(false);
+
 
   useEffect(() => {
     let isMounted = true;
@@ -46,7 +57,7 @@ export const ProductSubPage: React.FC = () => {
         Number(categoryId),
         Number(companyId),
         0,
-        5
+        itemNumber
       ).then((products) => {
         if (isMounted) {
           if (products !== undefined) {
@@ -74,7 +85,7 @@ export const ProductSubPage: React.FC = () => {
       Number(categoryId),
       Number(companyId),
       value - 1,
-      5
+      itemNumber
     ).then((products) => {
       if (products !== undefined) {
         setProductsList(products);
@@ -86,13 +97,30 @@ export const ProductSubPage: React.FC = () => {
     });
   };
 
+  const handleDialogSwitchAndGet = (productId: number | undefined) => {
+    if (productId !== undefined) {
+      if (!dialogOpenState) {
+        UserActions.GetProductById(productId).then((product) => {
+          setProductDetailed(product);
+        });
+      } else {
+        setProductDetailed(undefined);
+      }
+    }
+    handleDialogSwitch();
+  };
+  const handleDialogSwitch = () => {
+    setDialogOpenState(!dialogOpenState);
+  }
+
+
   //Product list component pagintaion
   const productBlockPagination = (
     <Grid item>
       <Pagination
         page={productPage}
         count={
-          numberOfProductsInTotal ? Math.ceil(numberOfProductsInTotal / 5) : 0
+          numberOfProductsInTotal ? Math.ceil(numberOfProductsInTotal / itemNumber) : 0
         }
         onChange={hanglePageChange}
         renderItem={(item) => (
@@ -115,7 +143,7 @@ export const ProductSubPage: React.FC = () => {
       alignItems="center"
       direction="column"
     >
-      {numberOfProductsInTotal?(numberOfProductsInTotal > 5 && productBlockPagination):<></>}
+      {numberOfProductsInTotal?(numberOfProductsInTotal > itemNumber && productBlockPagination):<></>}
       <Grid item container spacing={3} justify="flex-start" direction="row">
         {!productsListIsLoading &&
           productsList &&
@@ -124,8 +152,9 @@ export const ProductSubPage: React.FC = () => {
               <Grid item key={product.id}>
                 <div
                   className={`${classes.outlinedItem} ${classes.divPointer}`}
+                  onClick={()=>handleDialogSwitchAndGet(product.id)}
                 >
-                  <Typography variant="h6" gutterBottom noWrap>
+                  <Typography variant="h6" gutterBottom >
                     {product.title}
                   </Typography>
                   <Typography variant="body1" gutterBottom>
@@ -136,8 +165,7 @@ export const ProductSubPage: React.FC = () => {
             </Grid>
           ))}
       </Grid>
+      {productDetailed && <ProductDetailsDialog handleSwitch={handleDialogSwitch} openState={dialogOpenState} productInfo={productDetailed}></ProductDetailsDialog>}
     </Grid>
   );
 };
-
-//|| productsList.length === 0

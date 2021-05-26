@@ -21,6 +21,7 @@ export const UserService = {
   GetAllCategoriesByPage,
   GetSubCategories,
   GetByParentIdAndCompanyId,
+  GetByParentId,
   GetProductByCategoryIdAndCompanyIdAndPage,
   GetProductsCountByCategoryIdAndCompanyId
 };
@@ -48,6 +49,16 @@ async function GetAllCategories(): Promise<ResponseCategory[]> {
 async function GetByParentIdAndCompanyId(id: number, companyId: number): Promise<ResponseCategory[]> {
 
   return CategoryApi().getNestedByParentIdAndCompanyId(id, companyId).then((categoryResponse) => {
+    return categoryResponse;
+    //Ok
+  }, async (error) => {
+    const handledException = await handleExeption(error);
+    return Promise.reject(handledException);
+  });
+}
+async function GetByParentId(id: number): Promise<ResponseCategory[]> {
+
+  return CategoryApi().getNestedByParentId(id).then((categoryResponse) => {
     return categoryResponse;
     //Ok
   }, async (error) => {

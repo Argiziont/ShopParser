@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ShopParserApi.Models;
+using ShopParserApi.Models.Helpers;
 using ShopParserApi.Models.ResponseModels;
 using ShopParserApi.Services;
 
@@ -183,12 +184,15 @@ namespace ShopParserApi.Controllers
         {
             try
             {
-                var categoriesList = await _dbContext.Categories.Where(cat => cat.SupCategory.Id == id && cat.Products.Count(product => product.Company.Id == companyId) != 0).ToListAsync();
- 
+                var currentCategory = await _dbContext.Categories.Include(c => c.Products).FirstOrDefaultAsync(c => c.Id == id);
+
+
+                var productSource = currentCategory.Products.Where(p => p.ProductState == ProductState.Success &&
+                                                                        p.CompanyId == companyId);
 
                 _logger.LogInformation("GetNestedByParentIdAsync method inside CategoryController was called successfully");
 
-                return Ok(categoriesList.Count());
+                return Ok(productSource.Count());
             }
             catch (Exception e)
             {

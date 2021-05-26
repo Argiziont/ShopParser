@@ -8,7 +8,7 @@ import {
   CircularProgress,
 } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
-import { useParams, useHistory, useRouteMatch } from "react-router-dom";
+import { useHistory, useRouteMatch } from "react-router-dom";
 import { IResponseCategory, UserActions } from "../../_actions";
 import { BootstrapInput } from "../../_components";
 
@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-interface CategoriesSupPageProps {
+interface CategoriesPageProps {
   categorySelectIds: number[] | undefined;
   nestedCategoryList: IResponseCategory[][] | undefined;
   setCategorySelectIds: React.Dispatch<React.SetStateAction<number[]>>;
@@ -39,7 +39,7 @@ interface CategoriesSupPageProps {
   >;
 }
 
-export const CategoriesSupPage: React.FC<CategoriesSupPageProps> = ({
+export const CategoriesPage: React.FC<CategoriesPageProps> = ({
   categorySelectIds,
   nestedCategoryList,
   setCategorySelectIds,
@@ -48,7 +48,6 @@ export const CategoriesSupPage: React.FC<CategoriesSupPageProps> = ({
   const classes = useStyles();
 
   const history = useHistory();
-  const { companyId } = useParams<Record<string, string | undefined>>();
   const { url } = useRouteMatch();
 
   const [nestedCategoryListIsLoading, setNestedCategoryListIsLoading] =
@@ -59,7 +58,7 @@ export const CategoriesSupPage: React.FC<CategoriesSupPageProps> = ({
     if (isMounted) {
       setNestedCategoryListIsLoading(true);
 
-      UserActions.GetCategoryByParentIdAndCompanyId(1, Number(companyId)).then(
+      UserActions.GetCategoryByParentId(1).then(
         (categoryList) => {
           if (isMounted) {
             if (categoryList) {
@@ -86,7 +85,7 @@ export const CategoriesSupPage: React.FC<CategoriesSupPageProps> = ({
     return () => {
       isMounted = false;
     }; // use effect cleanup to set flag false, if unmounted
-  }, [companyId, setCategorySelectIds, setNestedCategoryList]);
+  }, [setCategorySelectIds, setNestedCategoryList]);
 
   const handleCategoryChoose = (
     categoryId: number | undefined,
@@ -99,9 +98,8 @@ export const CategoriesSupPage: React.FC<CategoriesSupPageProps> = ({
     ) {
       const newCategoryList = [...nestedCategoryList];
 
-      UserActions.GetCategoryByParentIdAndCompanyId(
-        categoryId,
-        Number(companyId)
+      UserActions.GetCategoryByParentId(
+        categoryId
       ).then((categoryList) => {
         setNestedCategoryListIsLoading(false);
 

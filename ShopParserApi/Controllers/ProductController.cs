@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +14,10 @@ using ShopParserApi.Services;
 using ShopParserApi.Services.Exceptions;
 using ShopParserApi.Services.Extensions;
 using ShopParserApi.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ShopParserApi.Controllers
 {
@@ -297,13 +297,10 @@ namespace ShopParserApi.Controllers
                 }
 
 
-                var productSource = await _dbContext.Products
-                    .Where(p => p.Categories.Contains(currentCategory) &&
-                                p.ProductState ==
-                                ProductState
-                                    .Success) //Take products which owned by current company and was parsed successfully
+                var productSource = currentCategory.Products.
+                    Where(p => p.ProductState == ProductState.Success)  //Take products which owned by current company and was parsed successfully
                     .OrderBy(p => p.Id) //Order by internal DB categoryId
-                    .Skip(page * rowsPerPage).Take(rowsPerPage).ToListAsync(); //Take products by page
+                    .Skip(page * rowsPerPage).Take(rowsPerPage); //Take products by page
 
                 _logger.LogInformation(
                     "GetPagedProductsByCategoryIdAsync method inside ProductController was called successfully");
@@ -331,11 +328,12 @@ namespace ShopParserApi.Controllers
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesDefaultResponseType]
-        public async Task<IActionResult> GetPagedProductsByCategoryIdAndCompanyIdAsync(int categoryId,int companyId, int page, int rowsPerPage)
+        public async Task<IActionResult> GetPagedProductsByCategoryIdAndCompanyIdAsync(int categoryId, int companyId, int page, int rowsPerPage)
         {
             try
             {
-                var currentCategory = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == categoryId);
+                var currentCategory = await _dbContext.Categories.Include(c => c.Products).FirstOrDefaultAsync(c => c.Id == categoryId);
+
                 if (currentCategory == null)
                 {
                     _logger.LogWarning(
@@ -343,15 +341,12 @@ namespace ShopParserApi.Controllers
                     return NotFound();
                 }
 
-
-                var productSource = await _dbContext.Products
-                    .Where(p => p.Categories.Contains(currentCategory) &&
-                                p.ProductState ==
-                                ProductState
-                                    .Success&&
-                                p.CompanyId== companyId) //Take products which owned by current company and was parsed successfully
+                var productSource = currentCategory.Products.
+                    Where(p => p.ProductState ==ProductState.Success &&
+                                                                              p.CompanyId == companyId)  //Take products which owned by current company and was parsed successfully
                     .OrderBy(p => p.Id) //Order by internal DB categoryId
-                    .Skip(page * rowsPerPage).Take(rowsPerPage).ToListAsync(); //Take products by page
+                    .Skip(page * rowsPerPage).Take(rowsPerPage); //Take products by page
+
 
                 _logger.LogInformation(
                     "GetPagedProductsByCategoryIdAsync method inside ProductController was called successfully");

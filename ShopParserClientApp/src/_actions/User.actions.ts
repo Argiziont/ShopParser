@@ -12,6 +12,7 @@ export const UserActions = {
   GetSubCategories,
   GetProductByCategoryIdAndPage,
   GetCategoryByParentIdAndCompanyId,
+  GetCategoryByParentId,
   GetProductByCategoryIdAndCompanyIdAndPage,
   GetProductsCountByCategoryIdAndCompanyId
 };
@@ -83,6 +84,15 @@ async function GetSubCategories(): Promise<IResponseNestedCategory|undefined> {
 async function GetCategoryByParentIdAndCompanyId(id:number, companyId:number): Promise<IResponseCategory[]|undefined> {
   try {
     const response = await  UserService.GetByParentIdAndCompanyId(id,companyId);
+    return response;
+  } 
+  catch(error) {
+    //Function returns undefined, don't need to do something
+  }
+}
+async function GetCategoryByParentId(id:number): Promise<IResponseCategory[]|undefined> {
+  try {
+    const response = await  UserService.GetByParentId(id);
     return response;
   } 
   catch(error) {
