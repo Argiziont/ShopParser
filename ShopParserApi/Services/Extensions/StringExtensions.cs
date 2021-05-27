@@ -16,7 +16,7 @@ namespace ShopParserApi.Services.Extensions
             return result.Remove(result.Length - 1);
         }
 
-        public static string CategoryToString(this IEnumerable<Category> categories)
+        public static string CategoryToString(this IEnumerable<CategoryData> categories)
         {
             var categoryString = categories.Aggregate("", (current, category) => current + category.Name + " > ");
             return categoryString.Remove(categoryString.Length - 3);

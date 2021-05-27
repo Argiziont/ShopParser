@@ -36,7 +36,7 @@ namespace ShopParserApi.Migrations
                     b.ToTable("CategoryProductData");
                 });
 
-            modelBuilder.Entity("companyParserApi.Models.Category", b =>
+            modelBuilder.Entity("companyParserApi.Models.CategoryData", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -193,7 +193,7 @@ namespace ShopParserApi.Migrations
 
             modelBuilder.Entity("CategoryProductData", b =>
                 {
-                    b.HasOne("companyParserApi.Models.Category", null)
+                    b.HasOne("companyParserApi.Models.CategoryData", null)
                         .WithMany()
                         .HasForeignKey("CategoriesId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -206,13 +206,13 @@ namespace ShopParserApi.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("companyParserApi.Models.Category", b =>
+            modelBuilder.Entity("companyParserApi.Models.CategoryData", b =>
                 {
-                    b.HasOne("companyParserApi.Models.Category", "SupCategory")
+                    b.HasOne("companyParserApi.Models.CategoryData", "SupCategoryData")
                         .WithMany()
                         .HasForeignKey("SupCategoryId");
 
-                    b.Navigation("SupCategory");
+                    b.Navigation("SupCategoryData");
                 });
 
             modelBuilder.Entity("companyParserApi.Models.Helpers.ProductAttribute", b =>

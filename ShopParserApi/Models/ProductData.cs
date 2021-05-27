@@ -31,7 +31,7 @@ namespace ShopParserApi.Models
         //Data base connections
         public CompanyData Company { get; set; }
         public PresenceData Presence { get; set; }
-        public ICollection<Category> Categories { get; set; } = new List<Category>();
+        public ICollection<CategoryData> Categories { get; set; } = new List<CategoryData>();
         public ICollection<ProductPaymentOption> ProductPaymentOptions { get; set; } = new List<ProductPaymentOption>();
 
         public ICollection<ProductDeliveryOption> ProductDeliveryOptions { get; set; } =

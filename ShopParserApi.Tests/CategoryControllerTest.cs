@@ -128,9 +128,9 @@ namespace ShopParserApi.Tests
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
 
-            var category1 = new Category {Name = "One"};
-            var category2 = new Category {Name = "Two", SupCategory = category1};
-            var category3 = new Category {Name = "Three", SupCategory = category2};
+            var category1 = new CategoryData {Name = "One"};
+            var category2 = new CategoryData {Name = "Two", SupCategoryData = category1};
+            var category3 = new CategoryData {Name = "Three", SupCategoryData = category2};
             context.AddRange(category1, category2, category3);
             context.SaveChanges();
         }

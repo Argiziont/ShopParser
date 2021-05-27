@@ -97,7 +97,7 @@ namespace ShopParserApi.Services.Helpers
             }
 
 
-            productFromProm.JsonCategorySchema = JsonSchema.FromType<Category>().ToJson();
+            productFromProm.JsonCategorySchema = JsonSchema.FromType<CategoryData>().ToJson();
             productFromProm.SyncDate = DateTime.Now;
 
             var productSchema = JsonSchema.FromType<ProductJson>().ToJson();

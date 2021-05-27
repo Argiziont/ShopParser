@@ -117,13 +117,13 @@ namespace ShopParserApi.Tests
             var product3 = new ProductData
                 {Title = "Three", JsonData = JsonConvert.SerializeObject(productJson3), Url = "Url3", ExternalId = "3"};
 
-            var category1 = new Category {Name = "One"};
-            var category2 = new Category {Name = "Two", SupCategory = category1};
-            var category3 = new Category {Name = "Three", SupCategory = category2};
+            var category1 = new CategoryData {Name = "One"};
+            var category2 = new CategoryData {Name = "Two", SupCategoryData = category1};
+            var category3 = new CategoryData {Name = "Three", SupCategoryData = category2};
 
-            product1.Categories = new List<Category> {category1, category2, category3};
-            product2.Categories = new List<Category> {category1, category2};
-            product3.Categories = new List<Category> {category1};
+            product1.Categories = new List<CategoryData> {category1, category2, category3};
+            product2.Categories = new List<CategoryData> {category1, category2};
+            product3.Categories = new List<CategoryData> {category1};
 
             company1.Products = new List<ProductData> {product1, product2, product3};
 

@@ -8,6 +8,8 @@ using ShopParserApi.Models;
 using ShopParserApi.Models.Hubs;
 using ShopParserApi.Services;
 using ShopParserApi.Services.Interfaces;
+using ShopParserApi.Services.Repositories;
+using ShopParserApi.Services.Repositories.Interfaces;
 using ShopParserApi.Services.TimedHostedServices;
 using ShopParserApi.Services.TimedHostedServices.BackgroundWorkItems;
 
@@ -32,6 +34,8 @@ namespace ShopParserApi
             var connectionString = Configuration.GetConnectionString("UserDb");
             services.AddDbContext<ApplicationDb>(options =>
                 options.UseSqlServer(connectionString));
+            services.AddTransient<ICategoryRepository, CategoryRepository>(provider =>
+                new CategoryRepository(connectionString));
 
             //SignalR connection
             services.AddSignalR();

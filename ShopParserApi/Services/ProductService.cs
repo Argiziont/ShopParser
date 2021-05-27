@@ -40,23 +40,23 @@ namespace ShopParserApi.Services
             var parsedProduct = ProductParsingService.ParseSinglePage(product, productPage);
 
             var categories = CategoryParsingService.ParseCategories(product, productPage);
-            var enumerableCategories = categories as Category[] ?? categories.ToArray();
+            var enumerableCategories = categories as CategoryData[] ?? categories.ToArray();
 
             parsedProduct.Categories = enumerableCategories.ToList();
 
             foreach (var category in enumerableCategories.Where(category =>
                 _dbContext.Categories.FirstOrDefault(cat => cat.Name == category.Name) == null))
             {
-                if (category.SupCategory?.SupCategory != null)
-                    category.SupCategory.SupCategory = null;
+                if (category.SupCategoryData?.SupCategoryData != null)
+                    category.SupCategoryData.SupCategoryData = null;
 
-                await _dbContext.Categories.AddAsync(new Category
+                await _dbContext.Categories.AddAsync(new CategoryData
                 {
                     Url = category.Url,
                     Name = category.Name,
-                    SupCategory = category.SupCategory == null
+                    SupCategoryData = category.SupCategoryData == null
                         ? null
-                        : _dbContext.Categories.FirstOrDefault(c => c.Name == category.SupCategory.Name)
+                        : _dbContext.Categories.FirstOrDefault(c => c.Name == category.SupCategoryData.Name)
                 });
 
                 await _dbContext.SaveChangesAsync();

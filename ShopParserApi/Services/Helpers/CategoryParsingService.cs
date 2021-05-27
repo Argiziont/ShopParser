@@ -11,7 +11,7 @@ namespace ShopParserApi.Services.Helpers
 {
     public static class CategoryParsingService
     {
-        public static IEnumerable<Category> ParseCategories(ProductData product, IDocument productPage)
+        public static IEnumerable<CategoryData> ParseCategories(ProductData product, IDocument productPage)
         {
             var externalId = product.Url
                 .Split("/").Last().Split('-').First().Replace("p", "");
@@ -21,16 +21,16 @@ namespace ShopParserApi.Services.Helpers
 
             var productBreadCrumbsObjectsList =
                 productJson[$"$Product:{externalId}.breadCrumbs"]?["items"]?.Select(a => a["id"].ToString());
-            var categoryList = new List<Category>();
-            if (productBreadCrumbsObjectsList == null) return new List<Category>();
-            Category higherLevelCategory = null;
+            var categoryList = new List<CategoryData>();
+            if (productBreadCrumbsObjectsList == null) return new List<CategoryData>();
+            CategoryData higherLevelCategoryData = null;
             foreach (var productBreadCrumbsObject in productBreadCrumbsObjectsList)
             {
                 var categoryObject = productJson[productBreadCrumbsObject]?.ToString();
                 if (categoryObject == null) continue;
-                var category = JsonConvert.DeserializeObject<Category>(categoryObject);
-                category.SupCategory = higherLevelCategory;
-                higherLevelCategory = category;
+                var category = JsonConvert.DeserializeObject<CategoryData>(categoryObject);
+                category.SupCategoryData = higherLevelCategoryData;
+                higherLevelCategoryData = category;
                 categoryList.Add(category);
             }
 
