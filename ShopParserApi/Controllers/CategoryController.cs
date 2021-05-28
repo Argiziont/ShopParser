@@ -21,12 +21,14 @@ namespace ShopParserApi.Controllers
         private readonly ApplicationDb _dbContext;
         private readonly ILogger<CategoryController> _logger;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IProductRepository _productRepository;
 
-        public CategoryController(ApplicationDb dbContext, ILogger<CategoryController> logger, ICategoryRepository categoryRepository)
+        public CategoryController(ApplicationDb dbContext, ILogger<CategoryController> logger, ICategoryRepository categoryRepository , IProductRepository productRepository)
         {
             _dbContext = dbContext;
             _logger = logger;
             _categoryRepository = categoryRepository;
+            _productRepository = productRepository;
         }
 
         [HttpGet]
@@ -34,21 +36,28 @@ namespace ShopParserApi.Controllers
         [ProducesResponseType(typeof(IEnumerable<ResponseCategory>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
         [ProducesDefaultResponseType]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAllAsync()
         {
             try
             {
-                var categoryList = await _categoryRepository.GetAll();
+                var categoriesList = await _categoryRepository.GetAll();
 
                 _logger.LogInformation("GetAll method inside CategoryController was called successfully");
 
-                return Ok(categoryList.Select(c => new ResponseCategory
+                var response = categoriesList.Select(c => new ResponseCategory
                 {
                     Id = c.Id,
                     Href = c.Url,
-                    Name = c.Name,
-                    ProductsCount = 0.ToString()
-                }));
+                    Name = c.Name
+                }).ToList();
+
+                foreach (var responseCategory in response)
+                {
+                    var productsCount = await _productRepository.GetCountByCategoryId(responseCategory.Id);
+                    responseCategory.ProductsCount = productsCount.ToString();
+                }
+
+                return Ok(response);
             }
             catch (Exception e)
             {
@@ -66,20 +75,24 @@ namespace ShopParserApi.Controllers
         {
             try
             {
-                //var categorySource = await _dbContext.Categories
-                //    .OrderBy(p => p.Id)
-                //    .Skip(page * rowsPerPage).Take(rowsPerPage).ToListAsync();
-                var categorySource= await _categoryRepository.GetPaged(page, rowsPerPage);
+                var categoriesList = await _categoryRepository.GetPaged(page, rowsPerPage);
 
                 _logger.LogInformation("GetPagedAsync method inside CategoryController was called successfully");
 
-                return Ok(categorySource.Select(c => new ResponseCategory
+                var response = categoriesList.Select(c => new ResponseCategory
                 {
                     Id = c.Id,
                     Href = c.Url,
-                    Name = c.Name,
-                    ProductsCount = 0.ToString()
-                }));
+                    Name = c.Name
+                }).ToList();
+
+                foreach (var responseCategory in response)
+                {
+                    var productsCount = await _productRepository.GetCountByCategoryId(responseCategory.Id);
+                    responseCategory.ProductsCount = productsCount.ToString();
+                }
+
+                return Ok(response);
             }
             catch (Exception e)
             {
@@ -98,11 +111,13 @@ namespace ShopParserApi.Controllers
         {
             try
             {
-                var currentCategory = await _dbContext.Categories.FirstOrDefaultAsync(cat => cat.SupCategoryData == null);
-                if (currentCategory == null)
+                var currentCategory = await _categoryRepository.GetAll();
+                var topLevelCategory=  currentCategory.FirstOrDefault(cat => cat.SupCategoryData == null);
+
+                if (topLevelCategory == null)
                     return NotFound();
 
-                var reversedCategory = ReverseCategoryListRecursive(currentCategory, _dbContext);
+                var reversedCategory = ReverseCategoryListRecursive(topLevelCategory, _dbContext);
                 _logger.LogInformation("GetAllNestedAsync method inside CategoryController was called successfully");
 
                 return Ok(reversedCategory);
@@ -124,21 +139,30 @@ namespace ShopParserApi.Controllers
         {
             try
             {
-                var categoriesList = await _dbContext.Categories.Where(cat => cat.SupCategoryData.Id == id).ToListAsync();
-                if (!categoriesList.Any())
+                var categoriesList = await _categoryRepository.GetNestedByParentId(id);
+
+                var categoryDataArray = categoriesList as CategoryData[] ?? categoriesList.ToArray(); //Avoiding multiple itterations
+                if (!categoryDataArray.Any())
                     return Ok(new List<ResponseCategory>());
 
 
 
                 _logger.LogInformation("GetNestedByParentIdAsync method inside CategoryController was called successfully");
 
-                return Ok(categoriesList.Select(cat=> new ResponseCategory
+                var response = categoryDataArray.Select(c => new ResponseCategory
                 {
-                    Name = cat.Name,
-                    Href = cat.Url,
-                    Id = cat.Id,
-                    ProductsCount = _dbContext.Products.Count(c => c.Categories.Contains(cat)).ToString()
-                }));
+                    Id = c.Id,
+                    Href = c.Url,
+                    Name = c.Name
+                }).ToList();
+
+                foreach (var responseCategory in response)
+                {
+                    var productsCount = await _productRepository.GetCountByCategoryId(responseCategory.Id);
+                    responseCategory.ProductsCount = productsCount.ToString();
+                }
+
+                return Ok(response);
             }
             catch (Exception e)
             {
@@ -163,13 +187,20 @@ namespace ShopParserApi.Controllers
                 
                 _logger.LogInformation("GetNestedByParentIdAsync method inside CategoryController was called successfully");
 
-                return Ok(categoriesList.Select(cat => new ResponseCategory
+                var response = categoriesList.Select(c => new ResponseCategory
                 {
-                    Name = cat.Name,
-                    Href = cat.Url,
-                    Id = cat.Id,
-                    ProductsCount = _dbContext.Products.Count(c => c.Categories.Contains(cat)).ToString()
-                }));
+                    Id = c.Id,
+                    Href = c.Url,
+                    Name = c.Name
+                }).ToList();
+
+                foreach (var responseCategory in response)
+                {
+                    var productsCount = await _productRepository.GetCountByCategoryId(responseCategory.Id);
+                    responseCategory.ProductsCount = productsCount.ToString();
+                }
+
+                return Ok(response);
             }
             catch (Exception e)
             {

@@ -26,7 +26,7 @@ namespace ShopParserApi.Tests
             var logger = Mock.Of<ILogger<CategoryController>>();
             Seed();
 
-            var controller = new CategoryController(context, logger);
+            var controller = new CategoryController(context, logger, null, null);
 
             //Act
             var result = await controller.GetAllAsync();
@@ -59,7 +59,7 @@ namespace ShopParserApi.Tests
             var logger = Mock.Of<ILogger<CategoryController>>();
             Seed();
 
-            var controller = new CategoryController(context,logger);
+            var controller = new CategoryController(context,logger, null, null);
 
             //Act
             var result = await controller.GetPagedAsync(1, 1);
@@ -90,7 +90,7 @@ namespace ShopParserApi.Tests
             var logger = Mock.Of<ILogger<CategoryController>>();
             Seed();
 
-            var controller = new CategoryController(context, logger);
+            var controller = new CategoryController(context, logger, null, null);
 
             //Act
             var result = await controller.GetAllNestedAsync();

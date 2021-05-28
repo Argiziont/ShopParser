@@ -1,9 +1,7 @@
-﻿using System;
-using ShopParserApi.Models;
+﻿using ShopParserApi.Models;
 using ShopParserApi.Services.Repositories.Interfaces;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Data.SqlClient;
@@ -30,13 +28,19 @@ namespace ShopParserApi.Services.Repositories
         {
             await using var connection = new SqlConnection(_connectionString);
 
-            await connection.OpenAsync();
-
             var values = new{page, rowsPerPage };
 
             return await connection.QueryAsync<CategoryData>("sp_GetPagedCategories", param: values, commandType: CommandType.StoredProcedure);
             
         }
 
+        public async Task<IEnumerable<CategoryData>> GetNestedByParentId(int categoryId)
+        {
+            await using var connection = new SqlConnection(_connectionString);
+
+            var values = new { categoryId };
+
+            return await connection.QueryAsync<CategoryData>("sp_GetNestedCategoryByParentId", param: values, commandType: CommandType.StoredProcedure);
+        }
     }
 }

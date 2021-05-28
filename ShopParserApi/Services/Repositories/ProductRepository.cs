@@ -38,7 +38,7 @@ namespace ShopParserApi.Services.Repositories
 
             var values = new { categoryId };
 
-            return await connection.ExecuteAsync("sp_CountProductsWithCategory", values, commandType: CommandType.StoredProcedure);
+            return await connection.ExecuteScalarAsync<int>("sp_CountProductsWithCategory", values, commandType: CommandType.StoredProcedure);
         }
     }
 }

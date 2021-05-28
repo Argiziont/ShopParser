@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShopParserApi", "ShopParserApi\ShopParserApi.csproj", "{CB88CF92-7340-4EBF-ADAA-28C931955929}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShopParserApi.Tests", "ShopParserApi.Tests\ShopParserApi.Tests.csproj", "{7A12B7BC-65C4-4CE6-87B4-CE93F8FBF1F8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShopParserApi.Tests", "ShopParserApi.Tests\ShopParserApi.Tests.csproj", "{7A12B7BC-65C4-4CE6-87B4-CE93F8FBF1F8}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "ShopParserDb", "ShopParserDb\ShopParserDb.sqlproj", "{65F3E664-594B-459C-9D92-EFA0F87A1978}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,12 @@ Global
 		{7A12B7BC-65C4-4CE6-87B4-CE93F8FBF1F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A12B7BC-65C4-4CE6-87B4-CE93F8FBF1F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7A12B7BC-65C4-4CE6-87B4-CE93F8FBF1F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65F3E664-594B-459C-9D92-EFA0F87A1978}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65F3E664-594B-459C-9D92-EFA0F87A1978}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65F3E664-594B-459C-9D92-EFA0F87A1978}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{65F3E664-594B-459C-9D92-EFA0F87A1978}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65F3E664-594B-459C-9D92-EFA0F87A1978}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65F3E664-594B-459C-9D92-EFA0F87A1978}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

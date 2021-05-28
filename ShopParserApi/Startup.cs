@@ -34,8 +34,11 @@ namespace ShopParserApi
             var connectionString = Configuration.GetConnectionString("UserDb");
             services.AddDbContext<ApplicationDb>(options =>
                 options.UseSqlServer(connectionString));
+
             services.AddTransient<ICategoryRepository, CategoryRepository>(provider =>
                 new CategoryRepository(connectionString));
+            services.AddTransient<IProductRepository, ProductRepository>(provider =>
+                new ProductRepository(connectionString));
 
             //SignalR connection
             services.AddSignalR();
