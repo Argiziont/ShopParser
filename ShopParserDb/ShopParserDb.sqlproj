@@ -64,10 +64,6 @@
     <Folder Include="Objects\dbo\StoredProcedures" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Objects\ShopParserDb.publish.xml" />
-    <None Include="Objects\ShopParserDb.publish2.xml" />
-  </ItemGroup>
-  <ItemGroup>
     <Build Include="Objects\dbo\Tables\Categories.sql" />
     <Build Include="Objects\dbo\StoredProcedures\sp_CountProductsWithCategory.sql" />
     <Build Include="Objects\dbo\Tables\CategoryDataProductData.sql" />
@@ -78,5 +74,14 @@
     <Build Include="Objects\dbo\Tables\ProductPaymentOptions.sql" />
     <Build Include="Objects\dbo\Tables\Products.sql" />
     <Build Include="Objects\dbo\Tables\Sources.sql" />
+    <Build Include="Objects\dbo\StoredProcedures\sp_GetAllCategories.sql" />
+    <Build Include="Objects\dbo\StoredProcedures\sp_GetAllProducts.sql" />
+    <Build Include="Objects\dbo\StoredProcedures\sp_GetNestedCategoryByParentId.sql" />
+    <Build Include="Objects\dbo\StoredProcedures\sp_GetNestedCategoryByParentIdAndCompanyId.sql" />
+    <Build Include="Objects\dbo\StoredProcedures\sp_GetPagedCategories.sql" />
+    <Build Include="Objects\dbo\StoredProcedures\sp_GetProductsByCategoryId.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ShopParserDb.publish1.xml" />
   </ItemGroup>
 </Project>
