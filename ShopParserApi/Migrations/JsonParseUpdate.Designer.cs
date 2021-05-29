@@ -21,7 +21,7 @@ namespace ShopParserApi.Migrations
                 .HasAnnotation("ProductVersion", "5.0.4")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("CategoryProductData", b =>
+            modelBuilder.Entity("CategoryDataProductData", b =>
                 {
                     b.Property<int>("CategoriesId")
                         .HasColumnType("int");
@@ -33,7 +33,7 @@ namespace ShopParserApi.Migrations
 
                     b.HasIndex("ProductsId");
 
-                    b.ToTable("CategoryProductData");
+                    b.ToTable("CategoryDataProductData");
                 });
 
             modelBuilder.Entity("companyParserApi.Models.CategoryData", b =>
@@ -191,7 +191,7 @@ namespace ShopParserApi.Migrations
                     b.ToTable("Sources");
                 });
 
-            modelBuilder.Entity("CategoryProductData", b =>
+            modelBuilder.Entity("CategoryDataProductData", b =>
                 {
                     b.HasOne("companyParserApi.Models.CategoryData", null)
                         .WithMany()

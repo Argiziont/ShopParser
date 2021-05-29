@@ -94,7 +94,7 @@ namespace ShopParserApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                "CategoryProductData",
+                "CategoryDataProductData",
                 table => new
                 {
                     CategoriesId = table.Column<int>("int", nullable: false),
@@ -102,15 +102,15 @@ namespace ShopParserApi.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CategoryProductData", x => new {x.CategoriesId, x.ProductsId});
+                    table.PrimaryKey("PK_CategoryDataProductData", x => new {x.CategoriesId, x.ProductsId});
                     table.ForeignKey(
-                        "FK_CategoryProductData_Categories_CategoriesId",
+                        "FK_CategoryDataProductData_Categories_CategoriesId",
                         x => x.CategoriesId,
                         "Categories",
                         "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        "FK_CategoryProductData_Products_ProductsId",
+                        "FK_CategoryDataProductData_Products_ProductsId",
                         x => x.ProductsId,
                         "Products",
                         "Id",
@@ -144,8 +144,8 @@ namespace ShopParserApi.Migrations
                 "SupCategoryId");
 
             migrationBuilder.CreateIndex(
-                "IX_CategoryProductData_ProductsId",
-                "CategoryProductData",
+                "IX_CategoryDataProductData_ProductsId",
+                "CategoryDataProductData",
                 "ProductsId");
 
             migrationBuilder.CreateIndex(
@@ -167,7 +167,7 @@ namespace ShopParserApi.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                "CategoryProductData");
+                "CategoryDataProductData");
 
             migrationBuilder.DropTable(
                 "ProductAttributes");
