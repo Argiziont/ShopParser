@@ -37,7 +37,7 @@ namespace ShopParserApi.Tests
                 .ReturnsAsync(MockInsertCompanyIntoDb(fistCompany));
 
             var controller =
-                new CompanyController(context, companyServiceMock.Object, browsingContextServiceMock.Object, logger, null);
+                new CompanyController(context, companyServiceMock.Object, browsingContextServiceMock.Object, logger, null, null);
 
             //Act
             var result = await controller.ParseCompanyPageProducts("One");
@@ -75,7 +75,7 @@ namespace ShopParserApi.Tests
                 .Setup(service => service.OpenPageAsync("https://prom.ua/c3502019-toppoint-tvoj-internet.html"))
                 .ReturnsAsync(await MockOpenPageAsync());
 
-            var controller = new CompanyController(context, null, new BrowsingContextService(), logger, backgroundTaskQueueMock);
+            var controller = new CompanyController(context, null, new BrowsingContextService(), logger, backgroundTaskQueueMock, null);
 
             //Act
             var result = await controller.AddByUrlAsync("https://prom.ua/c3502019-toppoint-tvoj-internet.html");
@@ -102,10 +102,10 @@ namespace ShopParserApi.Tests
             await using var context = new ApplicationDb(ContextOptions);
             var logger = Mock.Of<ILogger<CompanyController>>();
 
-            var controller = new CompanyController(context, null, null, logger,null);
+            var controller = new CompanyController(context, null, null, logger,null, null);
 
             //Act
-            var result = controller.GetById(1);
+            var result = await controller.GetByIdAsync(1);
             var okResult = result as OkObjectResult;
 
             //Assert
@@ -130,10 +130,10 @@ namespace ShopParserApi.Tests
             await using var context = new ApplicationDb(ContextOptions);
             var logger = Mock.Of<ILogger<CompanyController>>();
 
-            var controller = new CompanyController(context, null, null, logger,null);
+            var controller = new CompanyController(context, null, null, logger,null, null);
 
             //Act
-            var result = controller.GetAll();
+            var result = await controller.GetAllAsync();
             var okResult = result as OkObjectResult;
 
             //Assert

@@ -8,5 +8,6 @@ namespace ShopParserApi.Services.Repositories.Interfaces
     {
         public Task<IEnumerable<CompanyData>> GetAll();
         public Task<CompanyData> GetByName(string name);
+        public Task<CompanyData> GetById(int id);
     }
 }

@@ -54,7 +54,7 @@ namespace ShopParserApi.Controllers
         {
             try
             {
-                var company = _dbContext.Companies.FirstOrDefault(s => s.Name == companyName);
+                var company = await _companyRepository.GetByName(companyName);
                 if (company == null) return BadRequest("Database doesn't contains this company");
 
                 await _companyService.InsertCompanyIntoDb(company);
@@ -135,11 +135,47 @@ namespace ShopParserApi.Controllers
         [ProducesResponseType(typeof(ResponseCompany), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
         [ProducesDefaultResponseType]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetByIdAsync(int id)
         {
             try
             {
-                var company = _dbContext.Companies.FirstOrDefault(s => s.Id == id);
+                var company = await  _companyRepository.GetById(id);
+
+                if (company != null)
+                {
+                    _logger.LogInformation("GetById method inside CompanyController was called successfully");
+                    return Ok(new ResponseCompany
+                    {
+                        ExternalId = company.ExternalId,
+                        Id = company.Id,
+                        Url = company.Url,
+                        SyncDate = company.SyncDate,
+                        Name = company.Name,
+                        ProductCount = _dbContext.Products.Count(p =>
+                            p.CompanyId == company.Id && p.ProductState == ProductState.Success)
+                    });
+                }
+
+                _logger.LogWarning("GetById method inside CompanyController returned NotFound");
+                return NotFound();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, e);
+            }
+        }
+
+        [HttpGet]
+        [Route("GetByName")]
+        [ProducesResponseType(typeof(ResponseCompany), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> GetByNameAsync(string name)
+        {
+            try
+            {
+                var company = await _companyRepository.GetByName(name);
 
                 if (company != null)
                 {

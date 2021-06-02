@@ -2,5 +2,5 @@
 	@companyName nvarchar(MAX)NULL
 AS
 BEGIN
-	SELECT * FROM Categories ctg WHERE	ctg.Name = @companyName
+	SELECT * FROM Companies cmp WHERE cmp.Name = @companyName
 END

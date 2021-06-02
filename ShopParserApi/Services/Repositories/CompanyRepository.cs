@@ -1,4 +1,5 @@
-﻿using ShopParserApi.Models;
+﻿using System;
+using ShopParserApi.Models;
 using ShopParserApi.Services.Repositories.Interfaces;
 using System.Collections.Generic;
 using System.Data;
@@ -29,9 +30,22 @@ namespace ShopParserApi.Services.Repositories
         {
             await using var connection = new SqlConnection(_connectionString);
 
-            var values = new { name };
+            var values = new { @companyName = name };
 
-            return await connection.ExecuteScalarAsync<CompanyData>("sp_GetCompanyByName", param: values, commandType: CommandType.StoredProcedure);
+            return await connection.QuerySingleOrDefaultAsync<CompanyData>("sp_GetCompanyByName", param: values, commandType: CommandType.StoredProcedure);
+        }
+
+        public async Task<CompanyData> GetById(int id)
+        {
+
+                await using var connection = new SqlConnection(_connectionString);
+
+                var values = new { @companyId = id };
+
+                return await connection.QuerySingleOrDefaultAsync<CompanyData>("sp_GetCompanyById", param: values, commandType: CommandType.StoredProcedure);
+
+
         }
     }
 }
+//sp_GetCompanyById

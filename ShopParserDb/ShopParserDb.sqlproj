@@ -84,6 +84,7 @@
     <Build Include="Objects\dbo\StoredProcedures\sp_GetCompanyByName.sql" />
     <Build Include="Objects\dbo\StoredProcedures\sp_GetAllCompanies.sql" />
     <Build Include="Objects\dbo\StoredProcedures\sp_GetCompanyById.sql" />
+    <Build Include="Objects\dbo\StoredProcedures\sp_CountProductsWithCompany.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ShopParserDb.publish1.xml" />
