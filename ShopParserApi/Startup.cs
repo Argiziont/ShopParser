@@ -39,6 +39,8 @@ namespace ShopParserApi
                 new CategoryRepository(connectionString));
             services.AddTransient<IProductRepository, ProductRepository>(provider =>
                 new ProductRepository(connectionString));
+            services.AddTransient<ICompanyRepository, CompanyRepository>(provider =>
+                new CompanyRepository(connectionString));
 
             //SignalR connection
             services.AddSignalR();
@@ -64,8 +66,8 @@ namespace ShopParserApi
             });
 
             //Background workers for parsing data
-            services.AddHostedService<BackgroundProductControllerWorker>();
-            services.AddHostedService<BackgroundCompanyControllerWorker>();
+            //services.AddHostedService<BackgroundProductControllerWorker>();
+            //services.AddHostedService<BackgroundCompanyControllerWorker>();
 
             services.AddControllers();
             services.AddOpenApiDocument();

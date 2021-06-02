@@ -16,6 +16,7 @@ using ShopParserApi.Models.ResponseModels;
 using ShopParserApi.Services;
 using ShopParserApi.Services.Extensions;
 using ShopParserApi.Services.Interfaces;
+using ShopParserApi.Services.Repositories.Interfaces;
 
 namespace ShopParserApi.Controllers
 {
@@ -27,15 +28,17 @@ namespace ShopParserApi.Controllers
         private readonly ICompanyService _companyService;
         private readonly ApplicationDb _dbContext;
         private readonly ILogger<CompanyController> _logger;
+        private readonly ICompanyRepository _companyRepository;
 
         public CompanyController(ApplicationDb db, ICompanyService companyService,
             IBrowsingContextService browsingContextService, ILogger<CompanyController> logger,
-            IBackgroundTaskQueue<CompanyData> taskQueue)
+            IBackgroundTaskQueue<CompanyData> taskQueue, ICompanyRepository companyRepository)
         {
             _dbContext = db;
             _companyService = companyService;
             _browsingContextService = browsingContextService;
             _logger = logger;
+            _companyRepository = companyRepository;
             TaskQueue = taskQueue;
         }
 
@@ -168,15 +171,17 @@ namespace ShopParserApi.Controllers
         [ProducesResponseType(typeof(IEnumerable<ResponseCompany>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
         [ProducesDefaultResponseType]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAllAsync()
         {
             try
             {
-                var company = _dbContext.Companies.ToList();
-                if (company.Count > 0)
+                var company = await _companyRepository.GetAll();
+
+                var companyDataArray = company as CompanyData[] ?? company.ToArray();
+                if (companyDataArray.Any())
                 {
                     _logger.LogInformation("GetAll method inside CompanyController was called successfully");
-                    return Ok(company.Select(s => new ResponseCompany
+                    return Ok(companyDataArray.Select(s => new ResponseCompany
                     {
                         ExternalId = s.ExternalId,
                         Id = s.Id,

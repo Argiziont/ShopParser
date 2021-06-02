@@ -4,10 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ShopParserApi.Models;
-using ShopParserApi.Models.Helpers;
 using ShopParserApi.Models.ResponseModels;
 using ShopParserApi.Services;
 using ShopParserApi.Services.Repositories.Interfaces;
@@ -18,14 +16,12 @@ namespace ShopParserApi.Controllers
     [ApiController]
     public class CategoryController : ControllerBase
     {
-        private readonly ApplicationDb _dbContext;
         private readonly ILogger<CategoryController> _logger;
         private readonly ICategoryRepository _categoryRepository;
         private readonly IProductRepository _productRepository;
 
         public CategoryController(ApplicationDb dbContext, ILogger<CategoryController> logger, ICategoryRepository categoryRepository , IProductRepository productRepository)
         {
-            _dbContext = dbContext;
             _logger = logger;
             _categoryRepository = categoryRepository;
             _productRepository = productRepository;
@@ -117,7 +113,7 @@ namespace ShopParserApi.Controllers
                 if (topLevelCategory == null)
                     return NotFound();
 
-                var reversedCategory = ReverseCategoryListRecursive(topLevelCategory, _dbContext);
+                var reversedCategory = ReverseCategoryListRecursive(topLevelCategory);
                 _logger.LogInformation("GetAllNestedAsync method inside CategoryController was called successfully");
 
                 return Ok(reversedCategory);
@@ -181,13 +177,15 @@ namespace ShopParserApi.Controllers
         {
             try
             {
-                var categoriesList = await _dbContext.Categories.Where(cat => cat.SupCategoryData.Id == id&& cat.Products.Count(product=>product.Company.Id== companyId) !=0).ToListAsync();
-                if (!categoriesList.Any())
+                var categoriesList = await _categoryRepository.GetNestedByParentIdAndCompanyId(id, companyId);
+                var categoryDataArray = categoriesList as CategoryData[] ?? categoriesList.ToArray();
+
+                if (!categoryDataArray.Any())
                     return Ok(new List<ResponseCategory>());
                 
                 _logger.LogInformation("GetNestedByParentIdAsync method inside CategoryController was called successfully");
 
-                var response = categoriesList.Select(c => new ResponseCategory
+                var response = categoryDataArray.Select(c => new ResponseCategory
                 {
                     Id = c.Id,
                     Href = c.Url,
@@ -219,15 +217,12 @@ namespace ShopParserApi.Controllers
         {
             try
             {
-                var currentCategory = await _dbContext.Categories.Include(c => c.Products).FirstOrDefaultAsync(c => c.Id == id);
 
-
-                var productSource = currentCategory.Products.Where(p => p.ProductState == ProductState.Success &&
-                                                                        p.CompanyId == companyId);
+                var productCount = await _productRepository.GetCountByCategoryIdAndCompanyId(id, companyId);
 
                 _logger.LogInformation("GetNestedByParentIdAsync method inside CategoryController was called successfully");
 
-                return Ok(productSource.Count());
+                return Ok(productCount);
             }
             catch (Exception e)
             {
@@ -247,14 +242,12 @@ namespace ShopParserApi.Controllers
             {
                 try
                 {
-                    var currentCategory = await _dbContext.Categories.Include(c => c.Products).FirstOrDefaultAsync(c => c.Id == id);
+                    var productCount = await _productRepository.GetCountByCategoryId(id);
 
-
-                    var productSource = currentCategory.Products.Where(p => p.ProductState == ProductState.Success);
 
                     _logger.LogInformation("GetNestedByParentIdAsync method inside CategoryController was called successfully");
 
-                    return Ok(productSource.Count());
+                    return Ok(productCount);
                 }
                 catch (Exception e)
                 {
@@ -269,21 +262,19 @@ namespace ShopParserApi.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, e);
             }
         }
-        private static ResponseNestedCategory ReverseCategoryListRecursive(CategoryData mainCategoryData,
-            ApplicationDb dbContext)
+        private async Task<ResponseNestedCategory> ReverseCategoryListRecursive(CategoryData mainCategoryData)
         {
-            var tmp = dbContext.Products.Count(cat => cat.Categories.Contains(mainCategoryData)).ToString();
-            var tmp2 = dbContext.Categories.Where(cat => cat.SupCategoryData == mainCategoryData)
-                .Select(cat => ReverseCategoryListRecursive(cat, dbContext)).ToList();
+            var subCategory = await _categoryRepository.GetNestedByParentId(mainCategoryData.Id);
+            var productCount = await _productRepository.GetCountByCategoryId(mainCategoryData.Id);
 
+            var subCategoryList = subCategory.Select(cat => ReverseCategoryListRecursive(cat).Result).ToList();
             return new ResponseNestedCategory
             {
                 Id = mainCategoryData.Id,
                 Name = mainCategoryData.Name,
                 Href = mainCategoryData.Url,
-                ProductsCount = dbContext.Products.Count(cat => cat.Categories.Contains(mainCategoryData)).ToString(),
-                SubCategories = dbContext.Categories.Where(cat => cat.SupCategoryData == mainCategoryData)
-                    .Select(cat => ReverseCategoryListRecursive(cat, dbContext)).ToList()
+                ProductsCount = productCount.ToString(),
+                SubCategories = subCategoryList
             };
         }
     }

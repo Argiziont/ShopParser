@@ -1,5 +1,6 @@
-﻿CREATE PROCEDURE [dbo].[sp_CountProductsWithCategory]
-	 @categoryId int
+﻿CREATE PROCEDURE [dbo].[sp_CountProductsWithCategoryAndCompany]
+	 @categoryId int,
+	 @companyId int
 AS
 
 BEGIN
@@ -12,7 +13,7 @@ BEGIN
 		Products prd
 	JOIN CategoryDataProductData cdpd ON prd.Id = cdpd.ProductsId
 	JOIN Categories ctg ON cdpd.CategoriesId = ctg.Id
-	WHERE ctg.Id=@categoryId AND prd.ProductState=1
+	WHERE ctg.Id=@categoryId AND prd.CompanyId=@companyId AND prd.ProductState=1
 	
 
 END

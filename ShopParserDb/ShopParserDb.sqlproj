@@ -80,6 +80,10 @@
     <Build Include="Objects\dbo\StoredProcedures\sp_GetNestedCategoryByParentIdAndCompanyId.sql" />
     <Build Include="Objects\dbo\StoredProcedures\sp_GetPagedCategories.sql" />
     <Build Include="Objects\dbo\StoredProcedures\sp_GetProductsByCategoryId.sql" />
+    <Build Include="Objects\dbo\StoredProcedures\sp_CountProductsWithCategoryAndCompany.sql" />
+    <Build Include="Objects\dbo\StoredProcedures\sp_GetCompanyByName.sql" />
+    <Build Include="Objects\dbo\StoredProcedures\sp_GetAllCompanies.sql" />
+    <Build Include="Objects\dbo\StoredProcedures\sp_GetCompanyById.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ShopParserDb.publish1.xml" />

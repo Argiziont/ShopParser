@@ -1,5 +1,4 @@
 ﻿CREATE PROCEDURE [dbo].[sp_GetNestedCategoryByParentId]
-	-- Add the parameters for the stored procedure here
 	@categoryId int
 AS
 BEGIN

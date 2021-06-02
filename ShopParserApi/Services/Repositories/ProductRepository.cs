@@ -40,6 +40,14 @@ namespace ShopParserApi.Services.Repositories
 
             return await connection.ExecuteScalarAsync<int>("sp_CountProductsWithCategory", values, commandType: CommandType.StoredProcedure);
         }
+
+        public async Task<int> GetCountByCategoryIdAndCompanyId(int categoryId, int companyId)
+        {
+            await using var connection = new SqlConnection(_connectionString);
+
+            var values = new { categoryId, companyId };
+
+            return await connection.ExecuteScalarAsync<int>("sp_CountProductsWithCategoryAndCompany", values, commandType: CommandType.StoredProcedure);
+        }
     }
 }
-//sp_CountProductsWithCategory
