@@ -62,10 +62,12 @@
     <Folder Include="Objects\dbo\Functions" />
     <Folder Include="Objects\dbo\Views" />
     <Folder Include="Objects\dbo\StoredProcedures" />
+    <Folder Include="Objects\dbo\StoredProcedures\Category Procedures" />
+    <Folder Include="Objects\dbo\StoredProcedures\Company Procedures" />
+    <Folder Include="Objects\dbo\StoredProcedures\Product Procedures" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Objects\dbo\Tables\Categories.sql" />
-    <Build Include="Objects\dbo\StoredProcedures\sp_CountProductsWithCategory.sql" />
     <Build Include="Objects\dbo\Tables\CategoryDataProductData.sql" />
     <Build Include="Objects\dbo\Tables\Companies.sql" />
     <Build Include="Objects\dbo\Tables\Presence.sql" />
@@ -74,18 +76,23 @@
     <Build Include="Objects\dbo\Tables\ProductPaymentOptions.sql" />
     <Build Include="Objects\dbo\Tables\Products.sql" />
     <Build Include="Objects\dbo\Tables\Sources.sql" />
-    <Build Include="Objects\dbo\StoredProcedures\sp_GetAllCategories.sql" />
-    <Build Include="Objects\dbo\StoredProcedures\sp_GetAllProducts.sql" />
-    <Build Include="Objects\dbo\StoredProcedures\sp_GetNestedCategoryByParentId.sql" />
-    <Build Include="Objects\dbo\StoredProcedures\sp_GetNestedCategoryByParentIdAndCompanyId.sql" />
-    <Build Include="Objects\dbo\StoredProcedures\sp_GetPagedCategories.sql" />
-    <Build Include="Objects\dbo\StoredProcedures\sp_GetProductsByCategoryId.sql" />
-    <Build Include="Objects\dbo\StoredProcedures\sp_CountProductsWithCategoryAndCompany.sql" />
-    <Build Include="Objects\dbo\StoredProcedures\sp_GetCompanyByName.sql" />
-    <Build Include="Objects\dbo\StoredProcedures\sp_GetAllCompanies.sql" />
-    <Build Include="Objects\dbo\StoredProcedures\sp_GetCompanyById.sql" />
-    <Build Include="Objects\dbo\StoredProcedures\sp_CountProductsWithCompany.sql" />
-    <Build Include="Objects\dbo\StoredProcedures\sp_AddCompany.sql" />
+    <Build Include="Objects\dbo\StoredProcedures\Company Procedures\sp_AddCompany.sql" />
+    <Build Include="Objects\dbo\StoredProcedures\Product Procedures\sp_CountProductsWithCategory.sql" />
+    <Build Include="Objects\dbo\StoredProcedures\Product Procedures\sp_CountProductsWithCategoryAndCompany.sql" />
+    <Build Include="Objects\dbo\StoredProcedures\Product Procedures\sp_CountProductsWithCompany.sql" />
+    <Build Include="Objects\dbo\StoredProcedures\Category Procedures\sp_GetAllCategories.sql" />
+    <Build Include="Objects\dbo\StoredProcedures\Company Procedures\sp_GetAllCompanies.sql" />
+    <Build Include="Objects\dbo\StoredProcedures\Product Procedures\sp_GetAllProductsByCompanyId.sql" />
+    <Build Include="Objects\dbo\StoredProcedures\Product Procedures\sp_GetAllProducts.sql" />
+    <Build Include="Objects\dbo\StoredProcedures\Company Procedures\sp_GetCompanyById.sql" />
+    <Build Include="Objects\dbo\StoredProcedures\Company Procedures\sp_GetCompanyByName.sql" />
+    <Build Include="Objects\dbo\StoredProcedures\Category Procedures\sp_GetNestedCategoryByParentId.sql" />
+    <Build Include="Objects\dbo\StoredProcedures\Category Procedures\sp_GetNestedCategoryByParentIdAndCompanyId.sql" />
+    <Build Include="Objects\dbo\StoredProcedures\Category Procedures\sp_GetPagedCategories.sql" />
+    <Build Include="Objects\dbo\StoredProcedures\Product Procedures\sp_GetProductsByCategoryId.sql" />
+    <Build Include="Objects\dbo\StoredProcedures\Product Procedures\sp_UpdateProduct.sql" />
+    <Build Include="Objects\dbo\StoredProcedures\Product Procedures\sp_UpdateProductState.sql" />
+    <Build Include="Objects\dbo\StoredProcedures\Product Procedures\sp_GetProductById.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ShopParserDb.publish1.xml" />

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
 using Dapper;
@@ -32,6 +33,15 @@ namespace ShopParserApi.Services.Repositories
             return await connection.QueryAsync<ProductData>("sp_GetProductsByCategoryId", values, commandType: CommandType.StoredProcedure);
         }
 
+        public async Task<IEnumerable<ProductData>> GetAllByCompanyId(int companyId)
+        {
+            await using var connection = new SqlConnection(_connectionString);
+
+            var values = new { companyId };
+
+            return await connection.QueryAsync<ProductData>("sp_GetAllProductsByCompanyId", values, commandType: CommandType.StoredProcedure);
+        }
+
         public async Task<int> GetCountByCategoryId(int categoryId)
         {
             await using var connection = new SqlConnection(_connectionString);
@@ -57,6 +67,44 @@ namespace ShopParserApi.Services.Repositories
             var values = new { categoryId, companyId };
 
             return await connection.ExecuteScalarAsync<int>("sp_CountProductsWithCategoryAndCompany", values, commandType: CommandType.StoredProcedure);
+        }
+
+        public async Task Update(int productId, int? companyId, string externalId, string title, string url, DateTime syncDate, DateTime expirationDate,
+            int productState, string description, string price, string keyWords, string jsonData, string jsonDataSchema)
+        {
+            await using var connection = new SqlConnection(_connectionString);
+
+            var values = new
+            {
+                @productId=productId,
+                @companyId=companyId,
+                @externalId=externalId,
+                @title=title,
+                @url=url,
+                @syncDate=syncDate,
+                @expirationDate=expirationDate,
+                @productState=productState,
+                @description=description,
+                @price=price,
+                @keyWords=keyWords,
+                @jsonData=jsonData,
+                @jsonDataSchema=jsonDataSchema
+            };
+
+            await connection.ExecuteAsync("sp_UpdateProduct", param: values, commandType: CommandType.StoredProcedure);
+        }
+
+        public async Task Update(int productId, ProductData product) => await Update(productId, product.CompanyId, product.ExternalId,
+            product.Title, product.Url, product.SyncDate, product.ExpirationDate, (int) product.ProductState,
+            product.Description, product.Price, product.KeyWords, product.JsonData, product.JsonDataSchema);
+
+        public async Task UpdateProductState(int productId, int productState)
+        {
+            await using var connection = new SqlConnection(_connectionString);
+
+            var values = new { productId, productState };
+
+            await connection.ExecuteAsync("sp_UpdateProductState", values, commandType: CommandType.StoredProcedure);
         }
     }
 }

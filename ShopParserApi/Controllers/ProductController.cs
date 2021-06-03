@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ShopParserApi.Services.Repositories.Interfaces;
 
 namespace ShopParserApi.Controllers
 {
@@ -27,16 +28,20 @@ namespace ShopParserApi.Controllers
     {
         private readonly ApplicationDb _dbContext;
         private readonly ILogger<ProductController> _logger;
+        private readonly IProductRepository _productRepository;
+        private readonly ICompanyRepository _companyRepository;
         private readonly IProductService _productService;
         private readonly IHubContext<ApiHub, IApiClient> _productsHub;
 
         public ProductController(ApplicationDb db, IHubContext<ApiHub, IApiClient> productsHub,
-            IProductService productService, ILogger<ProductController> logger)
+            IProductService productService, ILogger<ProductController> logger, IProductRepository productRepository, ICompanyRepository companyRepository)
         {
             _dbContext = db;
             _productsHub = productsHub;
             _productService = productService;
             _logger = logger;
+            _productRepository = productRepository;
+            _companyRepository = companyRepository;
         }
 
         [HttpGet]
@@ -59,7 +64,7 @@ namespace ShopParserApi.Controllers
         [ProducesDefaultResponseType]
         public async Task<IActionResult> ParseAllProductUrlsInsideCompanyPageAsync(string companyName)
         {
-            var company = _dbContext.Companies.FirstOrDefault(s => s.Name == companyName);
+            var company = await _companyRepository.GetByName(companyName);
             if (company == null)
             {
                 _logger.LogWarning(
@@ -67,21 +72,24 @@ namespace ShopParserApi.Controllers
                 return BadRequest("This company doesn't exist in database");
             }
 
-            var productsList = _dbContext.Products.Where(p => p.Company.Id == company.Id).ToArray();
-            for (var i = 0; i < productsList.Length; i++)
+            var productsList = await _productRepository.GetAllByCompanyId(company.Id);
+            var productDataArray = productsList as ProductData[] ?? productsList.ToArray();
+
+            for (var i = 0; i < productDataArray.Length; i++)
             {
-                var parsedProduct = await _productService.InsertProductPageIntoDb(productsList[i].Url);
+                var parsedProduct = await _productService.InsertProductPageIntoDb(productDataArray[i].Url);
 
                 if (parsedProduct != null)
                 {
-                    parsedProduct.Id = productsList[i].Id;
-                    productsList[i] = parsedProduct;
+                    parsedProduct.Id = productDataArray[i].Id;
+                    productDataArray[i] = parsedProduct;
+                    await _productRepository.Update(productDataArray[i].Id, parsedProduct);
                 }
 
-                productsList[i].ProductState = ProductState.Success;
+                
+                productDataArray[i].ProductState = ProductState.Success;
+                await _productRepository.UpdateProductState(productDataArray[i].Id, (int)ProductState.Success);
             }
-
-            await _dbContext.SaveChangesAsync();
 
             _logger.LogInformation(
                 "ParseAllProductUrlsInsideCompanyPageAsync method inside ProductController was called successfully");
