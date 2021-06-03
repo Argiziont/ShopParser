@@ -46,6 +46,15 @@ namespace ShopParserApi.Services.Repositories
                 commandType: CommandType.StoredProcedure);
         }
 
+        public async Task<ProductData> GetById(int id)
+        {
+            await using var connection = new SqlConnection(_connectionString);
+
+            var values = new { @productId=id };
+
+            return await connection.QuerySingleAsync<ProductData>("sp_GetProductById", param:values, commandType: CommandType.StoredProcedure);
+        }
+
         public async Task<int> GetCountByCategoryId(int categoryId)
         {
             await using var connection = new SqlConnection(_connectionString);

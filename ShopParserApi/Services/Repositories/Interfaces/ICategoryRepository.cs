@@ -12,6 +12,8 @@ namespace ShopParserApi.Services.Repositories.Interfaces
 
         public Task<IEnumerable<CategoryData>> GetNestedByParentId(int categoryId);
 
+        public Task<IEnumerable<CategoryData>> GetByProductId(int productId);
+
         public Task<IEnumerable<CategoryData>> GetNestedByParentIdAndCompanyId(int categoryId, int companyId);
     }
 }

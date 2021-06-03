@@ -45,6 +45,16 @@ namespace ShopParserApi.Services.Repositories
                 commandType: CommandType.StoredProcedure);
         }
 
+        public async Task<IEnumerable<CategoryData>> GetByProductId(int productId)
+        {
+            await using var connection = new SqlConnection(_connectionString);
+
+            var values = new { @productId= productId };
+
+            return await connection.QueryAsync<CategoryData>("sp_GetCategoriesByProductId", values,
+                commandType: CommandType.StoredProcedure);
+        }
+
         public async Task<IEnumerable<CategoryData>> GetNestedByParentIdAndCompanyId(int categoryId, int companyId)
         {
             await using var connection = new SqlConnection(_connectionString);

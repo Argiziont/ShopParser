@@ -27,6 +27,7 @@ namespace ShopParserApi.Controllers
     public class ProductController : ControllerBase
     {
         private readonly ICompanyRepository _companyRepository;
+        private readonly ICategoryRepository _categoryRepository;
         private readonly ApplicationDb _dbContext;
         private readonly ILogger<ProductController> _logger;
         private readonly IProductRepository _productRepository;
@@ -35,7 +36,7 @@ namespace ShopParserApi.Controllers
 
         public ProductController(ApplicationDb db, IHubContext<ApiHub, IApiClient> productsHub,
             IProductService productService, ILogger<ProductController> logger, IProductRepository productRepository,
-            ICompanyRepository companyRepository)
+            ICompanyRepository companyRepository, ICategoryRepository categoryRepository)
         {
             _dbContext = db;
             _productsHub = productsHub;
@@ -43,6 +44,7 @@ namespace ShopParserApi.Controllers
             _logger = logger;
             _productRepository = productRepository;
             _companyRepository = companyRepository;
+            _categoryRepository = categoryRepository;
         }
 
         [HttpGet]
@@ -105,7 +107,7 @@ namespace ShopParserApi.Controllers
         [ProducesDefaultResponseType]
         public async Task<IActionResult> ParseSingleProductInsideCompanyPageAsync(string productId)
         {
-            var currentProduct = _dbContext.Products.FirstOrDefault(s => s.Id == Convert.ToInt32(productId));
+            var currentProduct =await _productRepository.GetById(Convert.ToInt32(productId));
 
             if (currentProduct == null)
             {
@@ -145,16 +147,16 @@ namespace ShopParserApi.Controllers
         [ProducesResponseType(typeof(ProductJson), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
         [ProducesDefaultResponseType]
-        public IActionResult GetFullProductsById(int id)
+        public async Task<IActionResult> GetFullProductsByIdAsync(int id)
         {
             try
             {
-                var product = _dbContext.Products.Include(db => db.Categories).FirstOrDefault(p => p.Id == id);
-
+                var product = await _productRepository.GetById(id);
+                var categoriesFromProducts = await _categoryRepository.GetByProductId(id);
                 var jsonData = product?.JsonData;
                 var deserializeJson =
                     JsonConvert.DeserializeObject<ProductJson>(jsonData ?? throw new InvalidOperationException());
-                deserializeJson.StringCategory = product.Categories.CategoryToString();
+                deserializeJson.StringCategory = categoriesFromProducts.CategoryToString();
 
                 _logger.LogInformation("GetFullProductsById method inside ProductController was called successfully");
                 return Ok(deserializeJson);

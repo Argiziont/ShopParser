@@ -11,6 +11,9 @@ namespace ShopParserApi.Services.Repositories.Interfaces
 
         public Task<IEnumerable<ProductData>> GetByCategoryId(int categoryId);
         public Task<IEnumerable<ProductData>> GetAllByCompanyId(int companyId);
+
+        public Task<ProductData> GetById(int id);
+
         public Task<int> GetCountByCategoryId(int categoryId);
         public Task<int> GetCountByCompanyId(int companyId);
         public Task<int> GetCountByCategoryIdAndCompanyId(int categoryId, int companyId);
