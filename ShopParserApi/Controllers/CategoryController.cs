@@ -16,11 +16,12 @@ namespace ShopParserApi.Controllers
     [ApiController]
     public class CategoryController : ControllerBase
     {
-        private readonly ILogger<CategoryController> _logger;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly ILogger<CategoryController> _logger;
         private readonly IProductRepository _productRepository;
 
-        public CategoryController(ApplicationDb dbContext, ILogger<CategoryController> logger, ICategoryRepository categoryRepository , IProductRepository productRepository)
+        public CategoryController(ApplicationDb dbContext, ILogger<CategoryController> logger,
+            ICategoryRepository categoryRepository, IProductRepository productRepository)
         {
             _logger = logger;
             _categoryRepository = categoryRepository;
@@ -108,7 +109,7 @@ namespace ShopParserApi.Controllers
             try
             {
                 var currentCategory = await _categoryRepository.GetAll();
-                var topLevelCategory=  currentCategory.FirstOrDefault(cat => cat.SupCategoryData == null);
+                var topLevelCategory = currentCategory.FirstOrDefault(cat => cat.SupCategoryData == null);
 
                 if (topLevelCategory == null)
                     return NotFound();
@@ -137,13 +138,14 @@ namespace ShopParserApi.Controllers
             {
                 var categoriesList = await _categoryRepository.GetNestedByParentId(id);
 
-                var categoryDataArray = categoriesList as CategoryData[] ?? categoriesList.ToArray(); //Avoiding multiple itterations
+                var categoryDataArray =
+                    categoriesList as CategoryData[] ?? categoriesList.ToArray(); //Avoiding multiple itterations
                 if (!categoryDataArray.Any())
                     return Ok(new List<ResponseCategory>());
 
 
-
-                _logger.LogInformation("GetNestedByParentIdAsync method inside CategoryController was called successfully");
+                _logger.LogInformation(
+                    "GetNestedByParentIdAsync method inside CategoryController was called successfully");
 
                 var response = categoryDataArray.Select(c => new ResponseCategory
                 {
@@ -182,8 +184,9 @@ namespace ShopParserApi.Controllers
 
                 if (!categoryDataArray.Any())
                     return Ok(new List<ResponseCategory>());
-                
-                _logger.LogInformation("GetNestedByParentIdAsync method inside CategoryController was called successfully");
+
+                _logger.LogInformation(
+                    "GetNestedByParentIdAsync method inside CategoryController was called successfully");
 
                 var response = categoryDataArray.Select(c => new ResponseCategory
                 {
@@ -217,10 +220,10 @@ namespace ShopParserApi.Controllers
         {
             try
             {
-
                 var productCount = await _productRepository.GetCountByCategoryIdAndCompanyId(id, companyId);
 
-                _logger.LogInformation("GetNestedByParentIdAsync method inside CategoryController was called successfully");
+                _logger.LogInformation(
+                    "GetNestedByParentIdAsync method inside CategoryController was called successfully");
 
                 return Ok(productCount);
             }
@@ -230,6 +233,7 @@ namespace ShopParserApi.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, e);
             }
         }
+
         [HttpGet]
         [Route("GetProductCountByCategoryId")]
         [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
@@ -245,7 +249,8 @@ namespace ShopParserApi.Controllers
                     var productCount = await _productRepository.GetCountByCategoryId(id);
 
 
-                    _logger.LogInformation("GetNestedByParentIdAsync method inside CategoryController was called successfully");
+                    _logger.LogInformation(
+                        "GetNestedByParentIdAsync method inside CategoryController was called successfully");
 
                     return Ok(productCount);
                 }
@@ -254,7 +259,6 @@ namespace ShopParserApi.Controllers
                     Console.WriteLine(e);
                     throw;
                 }
-             
             }
             catch (Exception e)
             {
@@ -262,6 +266,7 @@ namespace ShopParserApi.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, e);
             }
         }
+
         private async Task<ResponseNestedCategory> ReverseCategoryListRecursive(CategoryData mainCategoryData)
         {
             var subCategory = await _categoryRepository.GetNestedByParentId(mainCategoryData.Id);

@@ -29,7 +29,6 @@ namespace ShopParserApi.Tests
             var companyServiceMock = new Mock<ICompanyService>();
             var browsingContextServiceMock = new Mock<IBrowsingContextService>();
             var logger = Mock.Of<ILogger<CompanyController>>();
-            
 
 
             var fistCompany = context.Companies.First();
@@ -37,7 +36,8 @@ namespace ShopParserApi.Tests
                 .ReturnsAsync(MockInsertCompanyIntoDb(fistCompany));
 
             var controller =
-                new CompanyController(context, companyServiceMock.Object, browsingContextServiceMock.Object, logger, null, null);
+                new CompanyController(context, companyServiceMock.Object, browsingContextServiceMock.Object, logger,
+                    null, null);
 
             //Act
             var result = await controller.ParseCompanyPageProducts("One");
@@ -75,7 +75,8 @@ namespace ShopParserApi.Tests
                 .Setup(service => service.OpenPageAsync("https://prom.ua/c3502019-toppoint-tvoj-internet.html"))
                 .ReturnsAsync(await MockOpenPageAsync());
 
-            var controller = new CompanyController(context, null, new BrowsingContextService(), logger, backgroundTaskQueueMock, null);
+            var controller = new CompanyController(context, null, new BrowsingContextService(), logger,
+                backgroundTaskQueueMock, null);
 
             //Act
             var result = await controller.AddByUrlAsync("https://prom.ua/c3502019-toppoint-tvoj-internet.html");
@@ -102,7 +103,7 @@ namespace ShopParserApi.Tests
             await using var context = new ApplicationDb(ContextOptions);
             var logger = Mock.Of<ILogger<CompanyController>>();
 
-            var controller = new CompanyController(context, null, null, logger,null, null);
+            var controller = new CompanyController(context, null, null, logger, null, null);
 
             //Act
             var result = await controller.GetByIdAsync(1);
@@ -130,7 +131,7 @@ namespace ShopParserApi.Tests
             await using var context = new ApplicationDb(ContextOptions);
             var logger = Mock.Of<ILogger<CompanyController>>();
 
-            var controller = new CompanyController(context, null, null, logger,null, null);
+            var controller = new CompanyController(context, null, null, logger, null, null);
 
             //Act
             var result = await controller.GetAllAsync();

@@ -24,14 +24,15 @@ namespace ShopParserApi.Controllers
     public class CompanyController : ControllerBase
     {
         private readonly IBrowsingContextService _browsingContextService;
+        private readonly ICompanyRepository _companyRepository;
         private readonly ICompanyService _companyService;
         private readonly ILogger<CompanyController> _logger;
-        private readonly ICompanyRepository _companyRepository;
         private readonly IProductRepository _productRepository;
 
         public CompanyController(ICompanyService companyService,
             IBrowsingContextService browsingContextService, ILogger<CompanyController> logger,
-            IBackgroundTaskQueue<CompanyData> taskQueue, ICompanyRepository companyRepository, IProductRepository productRepository)
+            IBackgroundTaskQueue<CompanyData> taskQueue, ICompanyRepository companyRepository,
+            IProductRepository productRepository)
         {
             _companyService = companyService;
             _browsingContextService = browsingContextService;
@@ -110,7 +111,7 @@ namespace ShopParserApi.Controllers
                 await _companyRepository.Add(companyData);
                 await TaskQueue.QueueBackgroundWorkItemAsync(companyData);
 
-               _logger.LogInformation("AddByUrlAsync method inside CompanyController was called successfully");
+                _logger.LogInformation("AddByUrlAsync method inside CompanyController was called successfully");
                 return Ok(new ResponseCompany
                 {
                     ExternalId = companyData.ExternalId,
@@ -136,7 +137,7 @@ namespace ShopParserApi.Controllers
         {
             try
             {
-                var company = await  _companyRepository.GetById(id);
+                var company = await _companyRepository.GetById(id);
 
                 if (company != null)
                 {

@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -14,10 +18,6 @@ using ShopParserApi.Services;
 using ShopParserApi.Services.Exceptions;
 using ShopParserApi.Services.Extensions;
 using ShopParserApi.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using ShopParserApi.Services.Repositories.Interfaces;
 
 namespace ShopParserApi.Controllers
@@ -26,15 +26,16 @@ namespace ShopParserApi.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
+        private readonly ICompanyRepository _companyRepository;
         private readonly ApplicationDb _dbContext;
         private readonly ILogger<ProductController> _logger;
         private readonly IProductRepository _productRepository;
-        private readonly ICompanyRepository _companyRepository;
         private readonly IProductService _productService;
         private readonly IHubContext<ApiHub, IApiClient> _productsHub;
 
         public ProductController(ApplicationDb db, IHubContext<ApiHub, IApiClient> productsHub,
-            IProductService productService, ILogger<ProductController> logger, IProductRepository productRepository, ICompanyRepository companyRepository)
+            IProductService productService, ILogger<ProductController> logger, IProductRepository productRepository,
+            ICompanyRepository companyRepository)
         {
             _dbContext = db;
             _productsHub = productsHub;
@@ -86,9 +87,9 @@ namespace ShopParserApi.Controllers
                     await _productRepository.Update(productDataArray[i].Id, parsedProduct);
                 }
 
-                
+
                 productDataArray[i].ProductState = ProductState.Success;
-                await _productRepository.UpdateProductState(productDataArray[i].Id, (int)ProductState.Success);
+                await _productRepository.UpdateProductState(productDataArray[i].Id, (int) ProductState.Success);
             }
 
             _logger.LogInformation(
@@ -341,7 +342,8 @@ namespace ShopParserApi.Controllers
         {
             try
             {
-                var currentCategory = await _dbContext.Categories.Include(c => c.Products).FirstOrDefaultAsync(c => c.Id == id);
+                var currentCategory = await _dbContext.Categories.Include(c => c.Products)
+                    .FirstOrDefaultAsync(c => c.Id == id);
                 if (currentCategory == null)
                 {
                     _logger.LogWarning(
@@ -350,8 +352,10 @@ namespace ShopParserApi.Controllers
                 }
 
 
-                var productSource = currentCategory.Products.
-                    Where(p => p.ProductState == ProductState.Success)  //Take products which owned by current company and was parsed successfully
+                var productSource = currentCategory.Products
+                    .Where(p => p.ProductState ==
+                                ProductState
+                                    .Success) //Take products which owned by current company and was parsed successfully
                     .OrderBy(p => p.Id) //Order by internal DB categoryId
                     .Skip(page * rowsPerPage).Take(rowsPerPage); //Take products by page
 
@@ -381,11 +385,13 @@ namespace ShopParserApi.Controllers
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesDefaultResponseType]
-        public async Task<IActionResult> GetPagedProductsByCategoryIdAndCompanyIdAsync(int categoryId, int companyId, int page, int rowsPerPage)
+        public async Task<IActionResult> GetPagedProductsByCategoryIdAndCompanyIdAsync(int categoryId, int companyId,
+            int page, int rowsPerPage)
         {
             try
             {
-                var currentCategory = await _dbContext.Categories.Include(c => c.Products).FirstOrDefaultAsync(c => c.Id == categoryId);
+                var currentCategory = await _dbContext.Categories.Include(c => c.Products)
+                    .FirstOrDefaultAsync(c => c.Id == categoryId);
 
                 if (currentCategory == null)
                 {
@@ -394,9 +400,9 @@ namespace ShopParserApi.Controllers
                     return NotFound();
                 }
 
-                var productSource = currentCategory.Products.
-                    Where(p => p.ProductState ==ProductState.Success &&
-                                                                              p.CompanyId == companyId)  //Take products which owned by current company and was parsed successfully
+                var productSource = currentCategory.Products.Where(p => p.ProductState == ProductState.Success &&
+                                                                        p.CompanyId ==
+                                                                        companyId) //Take products which owned by current company and was parsed successfully
                     .OrderBy(p => p.Id) //Order by internal DB categoryId
                     .Skip(page * rowsPerPage).Take(rowsPerPage); //Take products by page
 
@@ -420,6 +426,7 @@ namespace ShopParserApi.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, e);
             }
         }
+
         [HttpGet]
         [Route("GetTotalProductCount")]
         [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
@@ -428,7 +435,8 @@ namespace ShopParserApi.Controllers
         {
             try
             {
-                var productsCount = await _dbContext.Products.Where(p => p.ProductState == ProductState.Success).CountAsync();
+                var productsCount = await _dbContext.Products.Where(p => p.ProductState == ProductState.Success)
+                    .CountAsync();
 
                 _logger.LogInformation(
                     "GetTotalProductCount method inside ProductController was called successfully");

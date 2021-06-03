@@ -10,7 +10,6 @@ using ShopParserApi.Services;
 using ShopParserApi.Services.Interfaces;
 using ShopParserApi.Services.Repositories;
 using ShopParserApi.Services.Repositories.Interfaces;
-using ShopParserApi.Services.TimedHostedServices;
 using ShopParserApi.Services.TimedHostedServices.BackgroundWorkItems;
 
 namespace ShopParserApi

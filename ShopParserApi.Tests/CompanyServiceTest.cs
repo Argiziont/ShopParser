@@ -4,7 +4,6 @@ using AngleSharp.Dom;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
-using ShopParserApi.Controllers;
 using ShopParserApi.Models;
 using ShopParserApi.Services;
 using ShopParserApi.Services.Interfaces;
@@ -22,7 +21,7 @@ namespace ShopParserApi.Tests
         {
             //Arrange
             await using var context = new ApplicationDb(ContextOptions);
-            
+
             Seed();
 
             var browsingContextServiceMock = new Mock<IBrowsingContextService>();
@@ -32,7 +31,8 @@ namespace ShopParserApi.Tests
             browsingContextServiceMock.Setup(service => service.OpenPageAsync("CompanyPageTest;1.html"))
                 .ReturnsAsync(await MockOpenPageAsync());
 
-            var controller = new CompanyService(context, browsingContextServiceMock.Object, backgroundTaskQueueMock, logger);
+            var controller = new CompanyService(context, browsingContextServiceMock.Object, backgroundTaskQueueMock,
+                logger);
             var targetProduct = context.Companies.FirstOrDefault();
             //Act
             var result = await controller.InsertCompanyIntoDb(targetProduct);
