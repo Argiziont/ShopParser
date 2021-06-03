@@ -218,7 +218,7 @@ namespace ShopParserApi.Controllers
                 }
 
 
-                var productList = await _productRepository.GetByCategoryId(currentCategory.Id)
+                var productList = await _productRepository.GetByCategoryId(currentCategory.Id);
 
                 _logger.LogInformation(
                     "GetProductsByCategoryIdAsync method inside ProductController was called successfully");
