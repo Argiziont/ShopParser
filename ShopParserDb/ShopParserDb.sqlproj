@@ -94,6 +94,8 @@
     <Build Include="Objects\dbo\StoredProcedures\Product Procedures\sp_UpdateProductState.sql" />
     <Build Include="Objects\dbo\StoredProcedures\Product Procedures\sp_GetProductById.sql" />
     <Build Include="Objects\dbo\StoredProcedures\Category Procedures\sp_GetCategoriesByProductId.sql" />
+    <Build Include="Objects\dbo\StoredProcedures\Product Procedures\sp_GetSuccessfulProductsByCompanyId.sql" />
+    <Build Include="Objects\dbo\StoredProcedures\Category Procedures\sp_GetCategoryById.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ShopParserDb.publish1.xml" />

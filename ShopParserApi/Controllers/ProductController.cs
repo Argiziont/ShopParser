@@ -177,8 +177,7 @@ namespace ShopParserApi.Controllers
         {
             try
             {
-                var productList = await _dbContext.Products
-                    .Where(p => p.CompanyId == id && p.ProductState == ProductState.Success).ToListAsync();
+                var productList = await _productRepository.GetSuccessfulByCompanyId(id);
 
                 _logger.LogInformation(
                     "GetProductsByCompanyIdAsync method inside ProductController was called successfully");
@@ -210,7 +209,7 @@ namespace ShopParserApi.Controllers
         {
             try
             {
-                var currentCategory = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == id);
+                var currentCategory = await _categoryRepository.GetById(id);
                 if (currentCategory == null)
                 {
                     _logger.LogWarning(
@@ -219,9 +218,7 @@ namespace ShopParserApi.Controllers
                 }
 
 
-                var productList = await _dbContext.Products
-                    .Where(p => p.Categories.Contains(currentCategory) && p.ProductState == ProductState.Success)
-                    .ToListAsync();
+                var productList = await _productRepository.GetByCategoryId(currentCategory.Id)
 
                 _logger.LogInformation(
                     "GetProductsByCategoryIdAsync method inside ProductController was called successfully");

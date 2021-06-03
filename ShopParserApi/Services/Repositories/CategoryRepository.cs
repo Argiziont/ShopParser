@@ -64,5 +64,15 @@ namespace ShopParserApi.Services.Repositories
             return await connection.QueryAsync<CategoryData>("sp_GetNestedCategoryByParentIdAndCompanyId", values,
                 commandType: CommandType.StoredProcedure);
         }
+
+        public async Task<CategoryData> GetById(int categoryId)
+        {
+            await using var connection = new SqlConnection(_connectionString);
+
+            var values = new { @categoryId = categoryId };
+
+            return await connection.QuerySingleAsync<CategoryData>("sp_GetCategoryById", values,
+                commandType: CommandType.StoredProcedure);
+        }
     }
 }

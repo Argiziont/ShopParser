@@ -46,6 +46,16 @@ namespace ShopParserApi.Services.Repositories
                 commandType: CommandType.StoredProcedure);
         }
 
+        public async Task<IEnumerable<ProductData>> GetSuccessfulByCompanyId(int companyId)
+        {
+            await using var connection = new SqlConnection(_connectionString);
+
+            var values = new { companyId };
+
+            return await connection.QueryAsync<ProductData>("sp_GetSuccessfulProductsByCompanyId", values,
+                commandType: CommandType.StoredProcedure);
+        }
+
         public async Task<ProductData> GetById(int id)
         {
             await using var connection = new SqlConnection(_connectionString);
