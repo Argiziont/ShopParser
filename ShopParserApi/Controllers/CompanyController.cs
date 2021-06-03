@@ -13,7 +13,6 @@ using ShopParserApi.Models;
 using ShopParserApi.Models.Helpers;
 using ShopParserApi.Models.Json_DTO;
 using ShopParserApi.Models.ResponseModels;
-using ShopParserApi.Services;
 using ShopParserApi.Services.Extensions;
 using ShopParserApi.Services.Interfaces;
 using ShopParserApi.Services.Repositories.Interfaces;
@@ -26,19 +25,19 @@ namespace ShopParserApi.Controllers
     {
         private readonly IBrowsingContextService _browsingContextService;
         private readonly ICompanyService _companyService;
-        private readonly ApplicationDb _dbContext;
         private readonly ILogger<CompanyController> _logger;
         private readonly ICompanyRepository _companyRepository;
+        private readonly IProductRepository _productRepository;
 
-        public CompanyController(ApplicationDb db, ICompanyService companyService,
+        public CompanyController(ICompanyService companyService,
             IBrowsingContextService browsingContextService, ILogger<CompanyController> logger,
-            IBackgroundTaskQueue<CompanyData> taskQueue, ICompanyRepository companyRepository)
+            IBackgroundTaskQueue<CompanyData> taskQueue, ICompanyRepository companyRepository, IProductRepository productRepository)
         {
-            _dbContext = db;
             _companyService = companyService;
             _browsingContextService = browsingContextService;
             _logger = logger;
             _companyRepository = companyRepository;
+            _productRepository = productRepository;
             TaskQueue = taskQueue;
         }
 
@@ -108,12 +107,10 @@ namespace ShopParserApi.Controllers
                     JsonDataSchema = companyScheme
                 };
 
-                await _dbContext.Companies.AddAsync(companyData);
+                await _companyRepository.Add(companyData);
                 await TaskQueue.QueueBackgroundWorkItemAsync(companyData);
 
-                await _dbContext.SaveChangesAsync();
-
-                _logger.LogInformation("AddByUrlAsync method inside CompanyController was called successfully");
+               _logger.LogInformation("AddByUrlAsync method inside CompanyController was called successfully");
                 return Ok(new ResponseCompany
                 {
                     ExternalId = companyData.ExternalId,
@@ -144,6 +141,8 @@ namespace ShopParserApi.Controllers
                 if (company != null)
                 {
                     _logger.LogInformation("GetById method inside CompanyController was called successfully");
+
+                    var productCount = await _productRepository.GetCountByCompanyId(company.Id);
                     return Ok(new ResponseCompany
                     {
                         ExternalId = company.ExternalId,
@@ -151,8 +150,7 @@ namespace ShopParserApi.Controllers
                         Url = company.Url,
                         SyncDate = company.SyncDate,
                         Name = company.Name,
-                        ProductCount = _dbContext.Products.Count(p =>
-                            p.CompanyId == company.Id && p.ProductState == ProductState.Success)
+                        ProductCount = productCount
                     });
                 }
 
@@ -180,6 +178,8 @@ namespace ShopParserApi.Controllers
                 if (company != null)
                 {
                     _logger.LogInformation("GetById method inside CompanyController was called successfully");
+
+                    var productCount = await _productRepository.GetCountByCompanyId(company.Id);
                     return Ok(new ResponseCompany
                     {
                         ExternalId = company.ExternalId,
@@ -187,8 +187,7 @@ namespace ShopParserApi.Controllers
                         Url = company.Url,
                         SyncDate = company.SyncDate,
                         Name = company.Name,
-                        ProductCount = _dbContext.Products.Count(p =>
-                            p.CompanyId == company.Id && p.ProductState == ProductState.Success)
+                        ProductCount = productCount
                     });
                 }
 
@@ -217,16 +216,26 @@ namespace ShopParserApi.Controllers
                 if (companyDataArray.Any())
                 {
                     _logger.LogInformation("GetAll method inside CompanyController was called successfully");
-                    return Ok(companyDataArray.Select(s => new ResponseCompany
+
+                    var responseCompanyArray = new List<ResponseCompany>();
+
+                    foreach (var companyData in companyDataArray)
                     {
-                        ExternalId = s.ExternalId,
-                        Id = s.Id,
-                        Url = s.Url,
-                        SyncDate = s.SyncDate,
-                        Name = s.Name,
-                        ProductCount = _dbContext.Products.Count(p =>
-                            p.CompanyId == s.Id && p.ProductState == ProductState.Success)
-                    }));
+                        var productCount = await _productRepository.GetCountByCompanyId(companyData.Id);
+
+                        responseCompanyArray.Add(new ResponseCompany
+                        {
+                            ExternalId = companyData.ExternalId,
+                            Id = companyData.Id,
+                            Url = companyData.Url,
+                            SyncDate = companyData.SyncDate,
+                            Name = companyData.Name,
+                            ProductCount = productCount
+                        });
+                    }
+
+
+                    return Ok(responseCompanyArray);
                 }
 
                 _logger.LogWarning("GetAll method inside CompanyController returned NotFound");
