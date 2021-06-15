@@ -114,7 +114,7 @@ namespace ShopParserApi.Controllers
                 if (topLevelCategory == null)
                     return NotFound();
 
-                var reversedCategory = ReverseCategoryListRecursive(topLevelCategory);
+                var reversedCategory = await ReverseCategoryListRecursive(topLevelCategory);
                 _logger.LogInformation("GetAllNestedAsync method inside CategoryController was called successfully");
 
                 return Ok(reversedCategory);

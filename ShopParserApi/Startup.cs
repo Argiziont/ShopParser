@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +8,9 @@ using Microsoft.Extensions.Hosting;
 using ShopParserApi.Models;
 using ShopParserApi.Models.Hubs;
 using ShopParserApi.Services;
+using ShopParserApi.Services.GeneratedClientFile;
 using ShopParserApi.Services.Interfaces;
+using ShopParserApi.Services.MapperService;
 using ShopParserApi.Services.Repositories;
 using ShopParserApi.Services.Repositories.Interfaces;
 using ShopParserApi.Services.TimedHostedServices.BackgroundWorkItems;
@@ -34,12 +37,21 @@ namespace ShopParserApi
             services.AddDbContext<ApplicationDb>(options =>
                 options.UseSqlServer(connectionString));
 
-            services.AddTransient<ICategoryRepository, CategoryRepository>(provider =>
-                new CategoryRepository(connectionString));
+            //AutoMapper
+
+            var mapperConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new CategoryMappingProfile());
+            });
+            services.AddSingleton(mapperConfig.CreateMapper());
+
+            //Dapper repository wrappers
+            services.AddTransient<ICategoryRepository, CategoryRepository>();
             services.AddTransient<IProductRepository, ProductRepository>(provider =>
                 new ProductRepository(connectionString));
             services.AddTransient<ICompanyRepository, CompanyRepository>(provider =>
                 new CompanyRepository(connectionString));
+            services.AddTransient<IDapperExecutorFactory, DapperExecutorFactory>();
 
             //SignalR connection
             services.AddSignalR();
