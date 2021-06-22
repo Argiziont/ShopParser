@@ -38,12 +38,13 @@ namespace ShopParserApi
                 options.UseSqlServer(connectionString));
 
             //AutoMapper
-
             var mapperConfig = new MapperConfiguration(mc =>
             {
                 mc.AddProfile(new CategoryMappingProfile());
             });
             services.AddSingleton(mapperConfig.CreateMapper());
+
+            mapperConfig.AssertConfigurationIsValid();//Check if map profiles is valid
 
             //Dapper repository wrappers
             services.AddTransient<ICategoryRepository, CategoryRepository>();

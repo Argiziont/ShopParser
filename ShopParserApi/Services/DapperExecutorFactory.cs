@@ -13,7 +13,7 @@ namespace ShopParserApi.Services
         {
             _connectionString = configuration.GetConnectionString("UserDb");
         }
-        public IDapperExecutor<TIn, TOut> CreateDapperExecutor<TIn, TOut>()
+        public IDapperExecutor<TIn, TOut> CreateDapperExecutor<TIn, TOut>() where TOut : class
         {
             return new DapperExecutor<TIn, TOut>(_connectionString);
 

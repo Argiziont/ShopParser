@@ -67,7 +67,7 @@ export class CategoryClient {
         }
     }
 
-    getPaged(page: number | undefined, rowsPerPage: number | undefined): Promise<ResponseCategory[]> {
+    getPaged(page?: number | undefined, rowsPerPage?: number | undefined): Promise<ResponseCategory[]> {
         let url_ = this.baseUrl + "/Category/GetPaged?";
         if (page === null)
             throw new Error("The parameter 'page' cannot be null.");
@@ -175,7 +175,7 @@ export class CategoryClient {
         }
     }
 
-    getNestedByParentId(id: number | undefined): Promise<ResponseCategory[]> {
+    getNestedByParentId(id?: number | undefined): Promise<ResponseCategory[]> {
         let url_ = this.baseUrl + "/Category/GetNestedByParentId?";
         if (id === null)
             throw new Error("The parameter 'id' cannot be null.");
@@ -236,7 +236,7 @@ export class CategoryClient {
         }
     }
 
-    getNestedByParentIdAndCompanyId(id: number | undefined, companyId: number | undefined): Promise<ResponseCategory[]> {
+    getNestedByParentIdAndCompanyId(id?: number | undefined, companyId?: number | undefined): Promise<ResponseCategory[]> {
         let url_ = this.baseUrl + "/Category/GetNestedByParentIdAndCompanyId?";
         if (id === null)
             throw new Error("The parameter 'id' cannot be null.");
@@ -301,7 +301,7 @@ export class CategoryClient {
         }
     }
 
-    getProductCountByCategoryIdAndCompanyId(id: number | undefined, companyId: number | undefined): Promise<number> {
+    getProductCountByCategoryIdAndCompanyId(id?: number | undefined, companyId?: number | undefined): Promise<number> {
         let url_ = this.baseUrl + "/Category/GetProductCountByCategoryIdAndCompanyId?";
         if (id === null)
             throw new Error("The parameter 'id' cannot be null.");
@@ -359,7 +359,7 @@ export class CategoryClient {
         }
     }
 
-    getProductCountByCategoryId(id: number | undefined): Promise<number> {
+    getProductCountByCategoryId(id?: number | undefined): Promise<number> {
         let url_ = this.baseUrl + "/Category/GetProductCountByCategoryId?";
         if (id === null)
             throw new Error("The parameter 'id' cannot be null.");
@@ -424,7 +424,7 @@ export class CompanyClient {
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "https://localhost:5001";
     }
 
-    parseCompanyPageProducts(companyName: string | null | undefined): Promise<ProductData[]> {
+    parseCompanyPageProducts(companyName?: string | null | undefined): Promise<ProductData[]> {
         let url_ = this.baseUrl + "/Company/ParseCompanyPageProducts?";
         if (companyName !== undefined && companyName !== null)
             url_ += "companyName=" + encodeURIComponent("" + companyName) + "&";
@@ -476,7 +476,7 @@ export class CompanyClient {
         }
     }
 
-    addByUrl(companyUrl: string | null | undefined): Promise<ResponseCompany> {
+    addByUrl(companyUrl?: string | null | undefined): Promise<ResponseCompany> {
         let url_ = this.baseUrl + "/Company/AddByUrl?";
         if (companyUrl !== undefined && companyUrl !== null)
             url_ += "companyUrl=" + encodeURIComponent("" + companyUrl) + "&";
@@ -521,7 +521,7 @@ export class CompanyClient {
         }
     }
 
-    getById(id: number | undefined): Promise<ResponseCompany> {
+    getById(id?: number | undefined): Promise<ResponseCompany> {
         let url_ = this.baseUrl + "/Company/GetById?";
         if (id === null)
             throw new Error("The parameter 'id' cannot be null.");
@@ -542,6 +542,51 @@ export class CompanyClient {
     }
 
     protected processGetById(response: Response): Promise<ResponseCompany> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResponseCompany.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status === 500) {
+            return response.text().then((_responseText) => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = Exception.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
+            });
+        } else {
+            return response.text().then((_responseText) => {
+            let resultdefault: any = null;
+            let resultDatadefault = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            resultdefault = ProblemDetails.fromJS(resultDatadefault);
+            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
+            });
+        }
+    }
+
+    getByName(name?: string | null | undefined): Promise<ResponseCompany> {
+        let url_ = this.baseUrl + "/Company/GetByName?";
+        if (name !== undefined && name !== null)
+            url_ += "name=" + encodeURIComponent("" + name) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ = <RequestInit>{
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetByName(_response);
+        });
+    }
+
+    protected processGetByName(response: Response): Promise<ResponseCompany> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -629,7 +674,7 @@ export class ProductClient {
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "https://localhost:5001";
     }
 
-    parseDataInsideProductPage(productUrl: string | null | undefined): Promise<ProductData> {
+    parseDataInsideProductPage(productUrl?: string | null | undefined): Promise<ProductData> {
         let url_ = this.baseUrl + "/Product/GetParsedProductPage?";
         if (productUrl !== undefined && productUrl !== null)
             url_ += "productUrl=" + encodeURIComponent("" + productUrl) + "&";
@@ -667,7 +712,7 @@ export class ProductClient {
         }
     }
 
-    parseAllProductUrlsInsideCompanyPage(companyName: string | null | undefined): Promise<ProductData[]> {
+    parseAllProductUrlsInsideCompanyPage(companyName?: string | null | undefined): Promise<ProductData[]> {
         let url_ = this.baseUrl + "/Product/ParseAllProductUrlsInsideCompanyPage?";
         if (companyName !== undefined && companyName !== null)
             url_ += "companyName=" + encodeURIComponent("" + companyName) + "&";
@@ -719,7 +764,7 @@ export class ProductClient {
         }
     }
 
-    parseSingleProductInsideCompanyPage(productId: string | null | undefined): Promise<ProductData> {
+    parseSingleProductInsideCompanyPage(productId?: string | null | undefined): Promise<ProductData> {
         let url_ = this.baseUrl + "/Product/ParseSingleProductInsideCompanyPage?";
         if (productId !== undefined && productId !== null)
             url_ += "productId=" + encodeURIComponent("" + productId) + "&";
@@ -771,7 +816,7 @@ export class ProductClient {
         }
     }
 
-    getFullProductsById(id: number | undefined): Promise<ProductJson> {
+    getFullProductsById(id?: number | undefined): Promise<ProductJson> {
         let url_ = this.baseUrl + "/Product/GetFullProductsById?";
         if (id === null)
             throw new Error("The parameter 'id' cannot be null.");
@@ -818,7 +863,7 @@ export class ProductClient {
         }
     }
 
-    getProductsByCompanyId(id: number | undefined): Promise<ResponseProduct[]> {
+    getProductsByCompanyId(id?: number | undefined): Promise<ResponseProduct[]> {
         let url_ = this.baseUrl + "/Product/GetProductsByCompanyId?";
         if (id === null)
             throw new Error("The parameter 'id' cannot be null.");
@@ -872,7 +917,7 @@ export class ProductClient {
         }
     }
 
-    getProductsByCategoryId(id: number | undefined): Promise<ResponseProduct[]> {
+    getProductsByCategoryId(id?: number | undefined): Promise<ResponseProduct[]> {
         let url_ = this.baseUrl + "/Product/GetProductsByCategoryId?";
         if (id === null)
             throw new Error("The parameter 'id' cannot be null.");
@@ -933,7 +978,7 @@ export class ProductClient {
         }
     }
 
-    getPagedProductsByCompanyId(id: number | undefined, page: number | undefined, rowsPerPage: number | undefined): Promise<ResponseProduct[]> {
+    getPagedProductsByCompanyId(id?: number | undefined, page?: number | undefined, rowsPerPage?: number | undefined): Promise<ResponseProduct[]> {
         let url_ = this.baseUrl + "/Product/GetPagedProductsByCompanyId?";
         if (id === null)
             throw new Error("The parameter 'id' cannot be null.");
@@ -1002,7 +1047,7 @@ export class ProductClient {
         }
     }
 
-    getPagedProducts(page: number | undefined, rowsPerPage: number | undefined): Promise<ResponseProduct[]> {
+    getPagedProducts(page?: number | undefined, rowsPerPage?: number | undefined): Promise<ResponseProduct[]> {
         let url_ = this.baseUrl + "/Product/GetPagedProducts?";
         if (page === null)
             throw new Error("The parameter 'page' cannot be null.");
@@ -1067,7 +1112,7 @@ export class ProductClient {
         }
     }
 
-    getPagedProductsByCategoryId(id: number | undefined, page: number | undefined, rowsPerPage: number | undefined): Promise<ResponseProduct[]> {
+    getPagedProductsByCategoryId(id?: number | undefined, page?: number | undefined, rowsPerPage?: number | undefined): Promise<ResponseProduct[]> {
         let url_ = this.baseUrl + "/Product/GetPagedProductsByCategoryId?";
         if (id === null)
             throw new Error("The parameter 'id' cannot be null.");
@@ -1136,7 +1181,7 @@ export class ProductClient {
         }
     }
 
-    getPagedProductsByCategoryIdAndCompanyId(categoryId: number | undefined, companyId: number | undefined, page: number | undefined, rowsPerPage: number | undefined): Promise<ResponseProduct[]> {
+    getPagedProductsByCategoryIdAndCompanyId(categoryId?: number | undefined, companyId?: number | undefined, page?: number | undefined, rowsPerPage?: number | undefined): Promise<ResponseProduct[]> {
         let url_ = this.baseUrl + "/Product/GetPagedProductsByCategoryIdAndCompanyId?";
         if (categoryId === null)
             throw new Error("The parameter 'categoryId' cannot be null.");
@@ -1451,7 +1496,7 @@ export class ProductData implements IProductData {
     jsonDataSchema?: string | undefined;
     company?: CompanyData | undefined;
     presence?: PresenceData | undefined;
-    categories?: Category[] | undefined;
+    categories?: CategoryData[] | undefined;
     productPaymentOptions?: ProductPaymentOption[] | undefined;
     productDeliveryOptions?: ProductDeliveryOption[] | undefined;
     productAttribute?: ProductAttribute[] | undefined;
@@ -1485,7 +1530,7 @@ export class ProductData implements IProductData {
             if (Array.isArray(_data["categories"])) {
                 this.categories = [] as any;
                 for (let item of _data["categories"])
-                    this.categories!.push(Category.fromJS(item));
+                    this.categories!.push(CategoryData.fromJS(item));
             }
             if (Array.isArray(_data["productPaymentOptions"])) {
                 this.productPaymentOptions = [] as any;
@@ -1569,7 +1614,7 @@ export interface IProductData {
     jsonDataSchema?: string | undefined;
     company?: CompanyData | undefined;
     presence?: PresenceData | undefined;
-    categories?: Category[] | undefined;
+    categories?: CategoryData[] | undefined;
     productPaymentOptions?: ProductPaymentOption[] | undefined;
     productDeliveryOptions?: ProductDeliveryOption[] | undefined;
     productAttribute?: ProductAttribute[] | undefined;
@@ -1792,14 +1837,14 @@ export interface IPresenceData {
     product?: ProductData | undefined;
 }
 
-export class Category implements ICategory {
+export class CategoryData implements ICategoryData {
     id?: number;
     name?: string | undefined;
     url?: string | undefined;
     products?: ProductData[] | undefined;
-    supCategory?: Category | undefined;
+    supCategoryData?: CategoryData | undefined;
 
-    constructor(data?: ICategory) {
+    constructor(data?: ICategoryData) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1818,13 +1863,13 @@ export class Category implements ICategory {
                 for (let item of _data["products"])
                     this.products!.push(ProductData.fromJS(item));
             }
-            this.supCategory = _data["supCategory"] ? Category.fromJS(_data["supCategory"]) : <any>undefined;
+            this.supCategoryData = _data["supCategoryData"] ? CategoryData.fromJS(_data["supCategoryData"]) : <any>undefined;
         }
     }
 
-    static fromJS(data: any): Category {
+    static fromJS(data: any): CategoryData {
         data = typeof data === 'object' ? data : {};
-        let result = new Category();
+        let result = new CategoryData();
         result.init(data);
         return result;
     }
@@ -1839,17 +1884,17 @@ export class Category implements ICategory {
             for (let item of this.products)
                 data["products"].push(item.toJSON());
         }
-        data["supCategory"] = this.supCategory ? this.supCategory.toJSON() : <any>undefined;
+        data["supCategoryData"] = this.supCategoryData ? this.supCategoryData.toJSON() : <any>undefined;
         return data; 
     }
 }
 
-export interface ICategory {
+export interface ICategoryData {
     id?: number;
     name?: string | undefined;
     url?: string | undefined;
     products?: ProductData[] | undefined;
-    supCategory?: Category | undefined;
+    supCategoryData?: CategoryData | undefined;
 }
 
 export class ProductPaymentOption implements IProductPaymentOption {

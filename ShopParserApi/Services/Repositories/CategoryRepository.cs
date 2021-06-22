@@ -22,13 +22,13 @@ namespace ShopParserApi.Services.Repositories
 
         public async Task<IEnumerable<CategoryData>> GetAll()
         {
-            var executor=_dapperExecutorFactory.CreateDapperExecutor<EmptyInputParams,sp_GetAllCategoriesOutput>();
-            var spService = new sp_GetAllCategories(executor);
+            var executor=_dapperExecutorFactory.CreateDapperExecutor<EmptyInputParams,Sp_GetAllCategoriesOutput>();
+            var spService = new Sp_GetAllCategories(executor);
 
             var executeResult = await spService.Execute();
             try
             {
-                return _mapper.Map<IEnumerable<sp_GetAllCategoriesOutput>, IEnumerable<CategoryData>>(executeResult);
+                return _mapper.Map<IEnumerable<Sp_GetAllCategoriesOutput>, IEnumerable<CategoryData>>(executeResult);
             }
             catch (AutoMapperMappingException autoMapperException)
             {
@@ -44,13 +44,13 @@ namespace ShopParserApi.Services.Repositories
 
         public async Task<IEnumerable<CategoryData>> GetPaged(int page, int rowsPerPage)
         {
-            var executor = _dapperExecutorFactory.CreateDapperExecutor<sp_GetPagedCategoriesInput, sp_GetPagedCategoriesOutput>();
-            var spService = new sp_GetPagedCategories(executor);
+            var executor = _dapperExecutorFactory.CreateDapperExecutor<Sp_GetPagedCategoriesInput, Sp_GetPagedCategoriesOutput>();
+            var spService = new Sp_GetPagedCategories(executor);
 
-            var executeResult = await spService.Execute(new sp_GetPagedCategoriesInput{Page = page, RowsPerPage = rowsPerPage});
+            var executeResult = await spService.Execute(new Sp_GetPagedCategoriesInput{Page = page, RowsPerPage = rowsPerPage});
             try
             {
-                return _mapper.Map<IEnumerable<sp_GetPagedCategoriesOutput>, IEnumerable<CategoryData>>(executeResult);
+                return _mapper.Map<IEnumerable<Sp_GetPagedCategoriesOutput>, IEnumerable<CategoryData>>(executeResult);
             }
             catch (AutoMapperMappingException autoMapperException)
             {
@@ -61,13 +61,13 @@ namespace ShopParserApi.Services.Repositories
 
         public async Task<IEnumerable<CategoryData>> GetNestedByParentId(int categoryId)
         {
-            var executor = _dapperExecutorFactory.CreateDapperExecutor<sp_GetNestedCategoryByParentIdInput, sp_GetNestedCategoryByParentIdOutput>();
-            var spService = new sp_GetNestedCategoryByParentId(executor);
+            var executor = _dapperExecutorFactory.CreateDapperExecutor<Sp_GetNestedCategoryByParentIdInput, Sp_GetNestedCategoryByParentIdOutput>();
+            var spService = new Sp_GetNestedCategoryByParentId(executor);
 
-            var executeResult = await spService.Execute(new sp_GetNestedCategoryByParentIdInput { CategoryId = categoryId});
+            var executeResult = await spService.Execute(new Sp_GetNestedCategoryByParentIdInput { CategoryId = categoryId});
             try
             {
-                return _mapper.Map<IEnumerable<sp_GetNestedCategoryByParentIdOutput>, IEnumerable<CategoryData>>(executeResult);
+                return _mapper.Map<IEnumerable<Sp_GetNestedCategoryByParentIdOutput>, IEnumerable<CategoryData>>(executeResult);
             }
             catch (AutoMapperMappingException autoMapperException)
             {
@@ -78,13 +78,13 @@ namespace ShopParserApi.Services.Repositories
 
         public async Task<IEnumerable<CategoryData>> GetByProductId(int productId)
         {
-            var executor = _dapperExecutorFactory.CreateDapperExecutor<sp_GetCategoriesByProductIdInput, sp_GetCategoriesByProductIdOutput>();
-            var spService = new sp_GetCategoriesByProductId(executor);
+            var executor = _dapperExecutorFactory.CreateDapperExecutor<Sp_GetCategoriesByProductIdInput, Sp_GetCategoriesByProductIdOutput>();
+            var spService = new Sp_GetCategoriesByProductId(executor);
 
-            var executeResult = await spService.Execute(new sp_GetCategoriesByProductIdInput { ProductId = productId});
+            var executeResult = await spService.Execute(new Sp_GetCategoriesByProductIdInput { ProductId = productId});
             try
             {
-                return _mapper.Map<IEnumerable<sp_GetCategoriesByProductIdOutput>, IEnumerable<CategoryData>>(executeResult);
+                return _mapper.Map<IEnumerable<Sp_GetCategoriesByProductIdOutput>, IEnumerable<CategoryData>>(executeResult);
             }
             catch (AutoMapperMappingException autoMapperException)
             {
@@ -95,13 +95,13 @@ namespace ShopParserApi.Services.Repositories
 
         public async Task<IEnumerable<CategoryData>> GetNestedByParentIdAndCompanyId(int categoryId, int companyId)
         {
-            var executor = _dapperExecutorFactory.CreateDapperExecutor<sp_GetNestedCategoryByParentIdAndCompanyIdInput, sp_GetNestedCategoryByParentIdAndCompanyIdOutput>();
-            var spService = new sp_GetNestedCategoryByParentIdAndCompanyId(executor);
+            var executor = _dapperExecutorFactory.CreateDapperExecutor<Sp_GetNestedCategoryByParentIdAndCompanyIdInput, Sp_GetNestedCategoryByParentIdAndCompanyIdOutput>();
+            var spService = new Sp_GetNestedCategoryByParentIdAndCompanyId(executor);
 
-            var executeResult = await spService.Execute(new sp_GetNestedCategoryByParentIdAndCompanyIdInput {CategoryId = categoryId,CompanyId = companyId});
+            var executeResult = await spService.Execute(new Sp_GetNestedCategoryByParentIdAndCompanyIdInput {CategoryId = categoryId,CompanyId = companyId});
             try
             {
-                return _mapper.Map<IEnumerable<sp_GetNestedCategoryByParentIdAndCompanyIdOutput>, IEnumerable<CategoryData>>(executeResult);
+                return _mapper.Map<IEnumerable<Sp_GetNestedCategoryByParentIdAndCompanyIdOutput>, IEnumerable<CategoryData>>(executeResult);
             }
             catch (AutoMapperMappingException autoMapperException)
             {
@@ -112,13 +112,13 @@ namespace ShopParserApi.Services.Repositories
 
         public async Task<CategoryData> GetById(int categoryId)
         {
-            var executor = _dapperExecutorFactory.CreateDapperExecutor<sp_GetCategoryByIdInput, sp_GetCategoryByIdOutput>();
-            var spService = new sp_GetCategoryById(executor);
+            var executor = _dapperExecutorFactory.CreateDapperExecutor<Sp_GetCategoryByIdInput, Sp_GetCategoryByIdOutput>();
+            var spService = new Sp_GetCategoryById(executor);
 
-            var executeResult = await spService.Execute(new sp_GetCategoryByIdInput { CategoryId = categoryId });
+            var executeResult = await spService.Execute(new Sp_GetCategoryByIdInput { CategoryId = categoryId });
             try
             {
-                return _mapper.Map<sp_GetCategoryByIdOutput, CategoryData>(executeResult.FirstOrDefault());
+                return _mapper.Map<Sp_GetCategoryByIdOutput, CategoryData>(executeResult.FirstOrDefault());
             }
             catch (AutoMapperMappingException autoMapperException)
             {

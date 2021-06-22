@@ -1,160 +1,193 @@
-﻿using ShopParserApi.Services.Repositories.Interfaces;
+﻿using Newtonsoft.Json;
+using ShopParserApi.Services.Repositories.Interfaces;
 
 namespace ShopParserApi.Services.GeneratedClientFile
 {
 
-	#region sp_CountProductsWithCategory
-	public class sp_CountProductsWithCategoryOutput
+	#region Sp_CountProductsWithCategory
+	public class Sp_CountProductsWithCategoryOutput
 	{
-		[Newtonsoft.Json.JsonProperty("Result")] public System.Int32 Result { get; set; }
+		[Newtonsoft.Json.JsonProperty("Result", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.Int32 Result { get; set; }
 
 	}
 
-	public class sp_CountProductsWithCategoryInput
-	{
-		[Newtonsoft.Json.JsonProperty("categoryId")] public System.Int32 CategoryId { get; set; }
-
-	}
-
-	public class sp_CountProductsWithCategory
-	{
-		private readonly IDapperExecutor<sp_CountProductsWithCategoryInput, sp_CountProductsWithCategoryOutput> _dapperExecutor;
-		public sp_CountProductsWithCategory(IDapperExecutor<sp_CountProductsWithCategoryInput, sp_CountProductsWithCategoryOutput> dapperExecutor)
-		{
-			this._dapperExecutor = dapperExecutor;
-		}
-		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<sp_CountProductsWithCategoryOutput>> Execute(sp_CountProductsWithCategoryInput request)
-		{
-			return _dapperExecutor.ExecuteAsync("sp_CountProductsWithCategory", request);
-		}
-	}
-
-	#endregion
-
-	#region sp_GetAllCategories
-	public class sp_GetAllCategoriesOutput
-	{
-		[Newtonsoft.Json.JsonProperty("Id")] [System.ComponentModel.DataAnnotations.Required()] public System.Int32 Id { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("Name")] public System.String Name { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("Url")] public System.String Url { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("SupCategoryDataId")] public System.Int32 SupCategoryDataId { get; set; }
-
-	}
-
-
-	public class sp_GetAllCategories
-	{
-		private readonly IDapperExecutor<EmptyInputParams, sp_GetAllCategoriesOutput> _dapperExecutor;
-		public sp_GetAllCategories(IDapperExecutor<EmptyInputParams, sp_GetAllCategoriesOutput> dapperExecutor)
-		{
-			this._dapperExecutor = dapperExecutor;
-		}
-		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<sp_GetAllCategoriesOutput>> Execute()
-		{
-			return _dapperExecutor.ExecuteAsync("sp_GetAllCategories");
-		}
-	}
-
-	#endregion
-
-	#region sp_GetAllProducts
-	public class sp_GetAllProductsOutput
-	{
-		[Newtonsoft.Json.JsonProperty("Id")] [System.ComponentModel.DataAnnotations.Required()] public System.Int32 Id { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("CompanyId")] public System.Int32 CompanyId { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("ExternalId")] public System.String ExternalId { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("Title")] public System.String Title { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("Url")] public System.String Url { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("SyncDate")] [System.ComponentModel.DataAnnotations.Required()] public System.DateTime SyncDate { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("ExpirationDate")] [System.ComponentModel.DataAnnotations.Required()] public System.DateTime ExpirationDate { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("ProductState")] [System.ComponentModel.DataAnnotations.Required()] public System.Int32 ProductState { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("Description")] public System.String Description { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("Price")] public System.String Price { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("KeyWords")] public System.String KeyWords { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("JsonData")] public System.String JsonData { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("JsonDataSchema")] public System.String JsonDataSchema { get; set; }
-
-	}
-
-
-	public class sp_GetAllProducts
-	{
-		private readonly IDapperExecutor<EmptyInputParams, sp_GetAllProductsOutput> _dapperExecutor;
-		public sp_GetAllProducts(IDapperExecutor<EmptyInputParams, sp_GetAllProductsOutput> dapperExecutor)
-		{
-			this._dapperExecutor = dapperExecutor;
-		}
-		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<sp_GetAllProductsOutput>> Execute()
-		{
-			return _dapperExecutor.ExecuteAsync("sp_GetAllProducts");
-		}
-	}
-
-	#endregion
-
-	#region sp_GetNestedCategoryByParentId
-	public class sp_GetNestedCategoryByParentIdOutput
-	{
-		[Newtonsoft.Json.JsonProperty("Id")] [System.ComponentModel.DataAnnotations.Required()] public System.Int32 Id { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("Name")] public System.String Name { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("Url")] public System.String Url { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("SupCategoryDataId")] public System.Int32 SupCategoryDataId { get; set; }
-
-	}
-
-	public class sp_GetNestedCategoryByParentIdInput
+	public class Sp_CountProductsWithCategoryInput
 	{
 		[Newtonsoft.Json.JsonProperty("categoryId")] public System.Int32 CategoryId { get; set; }
 
 	}
 
-	public class sp_GetNestedCategoryByParentId
+	public class Sp_CountProductsWithCategory
 	{
-		private readonly IDapperExecutor<sp_GetNestedCategoryByParentIdInput, sp_GetNestedCategoryByParentIdOutput> _dapperExecutor;
-		public sp_GetNestedCategoryByParentId(IDapperExecutor<sp_GetNestedCategoryByParentIdInput, sp_GetNestedCategoryByParentIdOutput> dapperExecutor)
+		private readonly IDapperExecutor<Sp_CountProductsWithCategoryInput, Sp_CountProductsWithCategoryOutput> _dapperExecutor;
+		public Sp_CountProductsWithCategory(IDapperExecutor<Sp_CountProductsWithCategoryInput, Sp_CountProductsWithCategoryOutput> dapperExecutor)
 		{
 			this._dapperExecutor = dapperExecutor;
 		}
-		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<sp_GetNestedCategoryByParentIdOutput>> Execute(sp_GetNestedCategoryByParentIdInput request)
+		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Sp_CountProductsWithCategoryOutput>> Execute(Sp_CountProductsWithCategoryInput request)
 		{
-			return _dapperExecutor.ExecuteAsync("sp_GetNestedCategoryByParentId", request);
+			return _dapperExecutor.ExecuteAsync("Sp_CountProductsWithCategory", request);
 		}
 	}
 
 	#endregion
 
-	#region sp_GetNestedCategoryByParentIdAndCompanyId
-	public class sp_GetNestedCategoryByParentIdAndCompanyIdOutput
+	#region Sp_GetAllCategories
+	[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.4.4.0 (Newtonsoft.Json v13.0.0.0)")]
+	public partial class Sp_GetAllCategoriesOutput
 	{
-		[Newtonsoft.Json.JsonProperty("Id")] [System.ComponentModel.DataAnnotations.Required()] public System.Int32 Id { get; set; }
+		[Newtonsoft.Json.JsonProperty("Id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public int Id { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("Name")] public System.String Name { get; set; }
+		[Newtonsoft.Json.JsonProperty("Name", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public string Name { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("Url")] public System.String Url { get; set; }
+		[Newtonsoft.Json.JsonProperty("Url", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public string Url { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("SupCategoryDataId")] public System.Int32 SupCategoryDataId { get; set; }
+		[Newtonsoft.Json.JsonProperty("SupCategoryDataId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public int SupCategoryDataId { get; set; }
+
 
 	}
 
-	public class sp_GetNestedCategoryByParentIdAndCompanyIdInput
+	public class Sp_GetAllCategories
+	{
+		private readonly IDapperExecutor<EmptyInputParams, Sp_GetAllCategoriesOutput> _dapperExecutor;
+		public Sp_GetAllCategories(IDapperExecutor<EmptyInputParams, Sp_GetAllCategoriesOutput> dapperExecutor)
+		{
+			this._dapperExecutor = dapperExecutor;
+		}
+		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Sp_GetAllCategoriesOutput>> Execute()
+		{
+			return _dapperExecutor.ExecuteJsonAsync("Sp_GetAllCategories");
+		}
+	}
+
+	#endregion
+
+	#region Sp_GetAllProducts
+	[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.4.4.0 (Newtonsoft.Json v13.0.0.0)")]
+	public partial class Sp_GetAllProductsOutput
+	{
+		[Newtonsoft.Json.JsonProperty("Id", Required = Newtonsoft.Json.Required.Always)]
+		public int Id { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("CompanyId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public int CompanyId { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("ExternalId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public string ExternalId { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("Title", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public string Title { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("Url", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public string Url { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("SyncDate", Required = Newtonsoft.Json.Required.Always)]
+		[System.ComponentModel.DataAnnotations.Required]
+		public System.DateTimeOffset SyncDate { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("ExpirationDate", Required = Newtonsoft.Json.Required.Always)]
+		[System.ComponentModel.DataAnnotations.Required]
+		public System.DateTimeOffset ExpirationDate { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("ProductState", Required = Newtonsoft.Json.Required.Always)]
+		public int ProductState { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("Description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public string Description { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("Price", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public string Price { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("KeyWords", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public string KeyWords { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("JsonData", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public string JsonData { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("JsonDataSchema", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public string JsonDataSchema { get; set; }
+
+
+	}
+
+	public class Sp_GetAllProducts
+	{
+		private readonly IDapperExecutor<EmptyInputParams, Sp_GetAllProductsOutput> _dapperExecutor;
+		public Sp_GetAllProducts(IDapperExecutor<EmptyInputParams, Sp_GetAllProductsOutput> dapperExecutor)
+		{
+			this._dapperExecutor = dapperExecutor;
+		}
+		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Sp_GetAllProductsOutput>> Execute()
+		{
+			return _dapperExecutor.ExecuteJsonAsync("Sp_GetAllProducts");
+		}
+	}
+
+	#endregion
+
+	#region Sp_GetNestedCategoryByParentId
+	[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.4.4.0 (Newtonsoft.Json v13.0.0.0)")]
+	public partial class Sp_GetNestedCategoryByParentIdOutput
+	{
+		[Newtonsoft.Json.JsonProperty("Id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public int Id { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("Name", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public string Name { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("Url", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public string Url { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("SupCategoryDataId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public int SupCategoryDataId { get; set; }
+
+
+	}
+	public class Sp_GetNestedCategoryByParentIdInput
+	{
+		[Newtonsoft.Json.JsonProperty("categoryId")] public System.Int32 CategoryId { get; set; }
+
+	}
+
+	public class Sp_GetNestedCategoryByParentId
+	{
+		private readonly IDapperExecutor<Sp_GetNestedCategoryByParentIdInput, Sp_GetNestedCategoryByParentIdOutput> _dapperExecutor;
+		public Sp_GetNestedCategoryByParentId(IDapperExecutor<Sp_GetNestedCategoryByParentIdInput, Sp_GetNestedCategoryByParentIdOutput> dapperExecutor)
+		{
+			this._dapperExecutor = dapperExecutor;
+		}
+		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Sp_GetNestedCategoryByParentIdOutput>> Execute(Sp_GetNestedCategoryByParentIdInput request)
+		{
+			return _dapperExecutor.ExecuteJsonAsync("Sp_GetNestedCategoryByParentId", request);
+		}
+	}
+
+	#endregion
+
+	#region Sp_GetNestedCategoryByParentIdAndCompanyId
+	[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.4.4.0 (Newtonsoft.Json v13.0.0.0)")]
+	public partial class Sp_GetNestedCategoryByParentIdAndCompanyIdOutput
+	{
+		[Newtonsoft.Json.JsonProperty("Id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public int Id { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("Name", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public string Name { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("Url", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public string Url { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("SupCategoryDataId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public int SupCategoryDataId { get; set; }
+
+
+	}
+	public class Sp_GetNestedCategoryByParentIdAndCompanyIdInput
 	{
 		[Newtonsoft.Json.JsonProperty("categoryId")] public System.Int32 CategoryId { get; set; }
 
@@ -162,35 +195,40 @@ namespace ShopParserApi.Services.GeneratedClientFile
 
 	}
 
-	public class sp_GetNestedCategoryByParentIdAndCompanyId
+	public class Sp_GetNestedCategoryByParentIdAndCompanyId
 	{
-		private readonly IDapperExecutor<sp_GetNestedCategoryByParentIdAndCompanyIdInput, sp_GetNestedCategoryByParentIdAndCompanyIdOutput> _dapperExecutor;
-		public sp_GetNestedCategoryByParentIdAndCompanyId(IDapperExecutor<sp_GetNestedCategoryByParentIdAndCompanyIdInput, sp_GetNestedCategoryByParentIdAndCompanyIdOutput> dapperExecutor)
+		private readonly IDapperExecutor<Sp_GetNestedCategoryByParentIdAndCompanyIdInput, Sp_GetNestedCategoryByParentIdAndCompanyIdOutput> _dapperExecutor;
+		public Sp_GetNestedCategoryByParentIdAndCompanyId(IDapperExecutor<Sp_GetNestedCategoryByParentIdAndCompanyIdInput, Sp_GetNestedCategoryByParentIdAndCompanyIdOutput> dapperExecutor)
 		{
 			this._dapperExecutor = dapperExecutor;
 		}
-		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<sp_GetNestedCategoryByParentIdAndCompanyIdOutput>> Execute(sp_GetNestedCategoryByParentIdAndCompanyIdInput request)
+		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Sp_GetNestedCategoryByParentIdAndCompanyIdOutput>> Execute(Sp_GetNestedCategoryByParentIdAndCompanyIdInput request)
 		{
-			return _dapperExecutor.ExecuteAsync("sp_GetNestedCategoryByParentIdAndCompanyId", request);
+			return _dapperExecutor.ExecuteJsonAsync("Sp_GetNestedCategoryByParentIdAndCompanyId", request);
 		}
 	}
 
 	#endregion
 
-	#region sp_GetPagedCategories
-	public class sp_GetPagedCategoriesOutput
+	#region Sp_GetPagedCategories
+	[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.4.4.0 (Newtonsoft.Json v13.0.0.0)")]
+	public partial class Sp_GetPagedCategoriesOutput
 	{
-		[Newtonsoft.Json.JsonProperty("Id")] [System.ComponentModel.DataAnnotations.Required()] public System.Int32 Id { get; set; }
+		[Newtonsoft.Json.JsonProperty("Id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public int Id { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("Name")] public System.String Name { get; set; }
+		[Newtonsoft.Json.JsonProperty("Name", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public string Name { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("Url")] public System.String Url { get; set; }
+		[Newtonsoft.Json.JsonProperty("Url", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public string Url { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("SupCategoryDataId")] public System.Int32 SupCategoryDataId { get; set; }
+		[Newtonsoft.Json.JsonProperty("SupCategoryDataId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public int SupCategoryDataId { get; set; }
+
 
 	}
-
-	public class sp_GetPagedCategoriesInput
+	public class Sp_GetPagedCategoriesInput
 	{
 		[Newtonsoft.Json.JsonProperty("page")] public System.Int32 Page { get; set; }
 
@@ -198,81 +236,95 @@ namespace ShopParserApi.Services.GeneratedClientFile
 
 	}
 
-	public class sp_GetPagedCategories
+	public class Sp_GetPagedCategories
 	{
-		private readonly IDapperExecutor<sp_GetPagedCategoriesInput, sp_GetPagedCategoriesOutput> _dapperExecutor;
-		public sp_GetPagedCategories(IDapperExecutor<sp_GetPagedCategoriesInput, sp_GetPagedCategoriesOutput> dapperExecutor)
+		private readonly IDapperExecutor<Sp_GetPagedCategoriesInput, Sp_GetPagedCategoriesOutput> _dapperExecutor;
+		public Sp_GetPagedCategories(IDapperExecutor<Sp_GetPagedCategoriesInput, Sp_GetPagedCategoriesOutput> dapperExecutor)
 		{
 			this._dapperExecutor = dapperExecutor;
 		}
-		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<sp_GetPagedCategoriesOutput>> Execute(sp_GetPagedCategoriesInput request)
+		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Sp_GetPagedCategoriesOutput>> Execute(Sp_GetPagedCategoriesInput request)
 		{
-			return _dapperExecutor.ExecuteAsync("sp_GetPagedCategories", request);
+			return _dapperExecutor.ExecuteJsonAsync("Sp_GetPagedCategories", request);
 		}
 	}
 
 	#endregion
 
-	#region sp_GetProductsByCategoryId
-	public class sp_GetProductsByCategoryIdOutput
+	#region Sp_GetProductsByCategoryId
+	public class Sp_GetProductsByCategoryIdOutput
 	{
-		[Newtonsoft.Json.JsonProperty("Id")] [System.ComponentModel.DataAnnotations.Required()] public System.Int32 Id { get; set; }
+		[Newtonsoft.Json.JsonProperty("Id", Required = Newtonsoft.Json.Required.Default)]
+		public System.Int32 Id { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("CompanyId")] public System.Int32 CompanyId { get; set; }
+		[Newtonsoft.Json.JsonProperty("CompanyId", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.Int32 CompanyId { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("ExternalId")] public System.String ExternalId { get; set; }
+		[Newtonsoft.Json.JsonProperty("ExternalId", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String ExternalId { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("Title")] public System.String Title { get; set; }
+		[Newtonsoft.Json.JsonProperty("Title", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String Title { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("Url")] public System.String Url { get; set; }
+		[Newtonsoft.Json.JsonProperty("Url", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String Url { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("SyncDate")] [System.ComponentModel.DataAnnotations.Required()] public System.DateTime SyncDate { get; set; }
+		[Newtonsoft.Json.JsonProperty("SyncDate", Required = Newtonsoft.Json.Required.Default)]
+		public System.DateTime SyncDate { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("ExpirationDate")] [System.ComponentModel.DataAnnotations.Required()] public System.DateTime ExpirationDate { get; set; }
+		[Newtonsoft.Json.JsonProperty("ExpirationDate", Required = Newtonsoft.Json.Required.Default)]
+		public System.DateTime ExpirationDate { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("ProductState")] [System.ComponentModel.DataAnnotations.Required()] public System.Int32 ProductState { get; set; }
+		[Newtonsoft.Json.JsonProperty("ProductState", Required = Newtonsoft.Json.Required.Default)]
+		public System.Int32 ProductState { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("Description")] public System.String Description { get; set; }
+		[Newtonsoft.Json.JsonProperty("Description", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String Description { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("Price")] public System.String Price { get; set; }
+		[Newtonsoft.Json.JsonProperty("Price", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String Price { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("KeyWords")] public System.String KeyWords { get; set; }
+		[Newtonsoft.Json.JsonProperty("KeyWords", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String KeyWords { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("JsonData")] public System.String JsonData { get; set; }
+		[Newtonsoft.Json.JsonProperty("JsonData", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String JsonData { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("JsonDataSchema")] public System.String JsonDataSchema { get; set; }
+		[Newtonsoft.Json.JsonProperty("JsonDataSchema", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String JsonDataSchema { get; set; }
 
 	}
 
-	public class sp_GetProductsByCategoryIdInput
+	public class Sp_GetProductsByCategoryIdInput
 	{
 		[Newtonsoft.Json.JsonProperty("categoryId")] public System.Int32 CategoryId { get; set; }
 
 	}
 
-	public class sp_GetProductsByCategoryId
+	public class Sp_GetProductsByCategoryId
 	{
-		private readonly IDapperExecutor<sp_GetProductsByCategoryIdInput, sp_GetProductsByCategoryIdOutput> _dapperExecutor;
-		public sp_GetProductsByCategoryId(IDapperExecutor<sp_GetProductsByCategoryIdInput, sp_GetProductsByCategoryIdOutput> dapperExecutor)
+		private readonly IDapperExecutor<Sp_GetProductsByCategoryIdInput, Sp_GetProductsByCategoryIdOutput> _dapperExecutor;
+		public Sp_GetProductsByCategoryId(IDapperExecutor<Sp_GetProductsByCategoryIdInput, Sp_GetProductsByCategoryIdOutput> dapperExecutor)
 		{
 			this._dapperExecutor = dapperExecutor;
 		}
-		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<sp_GetProductsByCategoryIdOutput>> Execute(sp_GetProductsByCategoryIdInput request)
+		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Sp_GetProductsByCategoryIdOutput>> Execute(Sp_GetProductsByCategoryIdInput request)
 		{
-			return _dapperExecutor.ExecuteAsync("sp_GetProductsByCategoryId", request);
+			return _dapperExecutor.ExecuteAsync("Sp_GetProductsByCategoryId", request);
 		}
 	}
 
 	#endregion
 
-	#region sp_CountProductsWithCategoryAndCompany
-	public class sp_CountProductsWithCategoryAndCompanyOutput
+	#region Sp_CountProductsWithCategoryAndCompany
+	public class Sp_CountProductsWithCategoryAndCompanyOutput
 	{
-		[Newtonsoft.Json.JsonProperty("Result")] public System.Int32 Result { get; set; }
+		[Newtonsoft.Json.JsonProperty("Result", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.Int32 Result { get; set; }
 
 	}
 
-	public class sp_CountProductsWithCategoryAndCompanyInput
+	public class Sp_CountProductsWithCategoryAndCompanyInput
 	{
 		[Newtonsoft.Json.JsonProperty("categoryId")] public System.Int32 CategoryId { get; set; }
 
@@ -280,179 +332,207 @@ namespace ShopParserApi.Services.GeneratedClientFile
 
 	}
 
-	public class sp_CountProductsWithCategoryAndCompany
+	public class Sp_CountProductsWithCategoryAndCompany
 	{
-		private readonly IDapperExecutor<sp_CountProductsWithCategoryAndCompanyInput, sp_CountProductsWithCategoryAndCompanyOutput> _dapperExecutor;
-		public sp_CountProductsWithCategoryAndCompany(IDapperExecutor<sp_CountProductsWithCategoryAndCompanyInput, sp_CountProductsWithCategoryAndCompanyOutput> dapperExecutor)
+		private readonly IDapperExecutor<Sp_CountProductsWithCategoryAndCompanyInput, Sp_CountProductsWithCategoryAndCompanyOutput> _dapperExecutor;
+		public Sp_CountProductsWithCategoryAndCompany(IDapperExecutor<Sp_CountProductsWithCategoryAndCompanyInput, Sp_CountProductsWithCategoryAndCompanyOutput> dapperExecutor)
 		{
 			this._dapperExecutor = dapperExecutor;
 		}
-		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<sp_CountProductsWithCategoryAndCompanyOutput>> Execute(sp_CountProductsWithCategoryAndCompanyInput request)
+		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Sp_CountProductsWithCategoryAndCompanyOutput>> Execute(Sp_CountProductsWithCategoryAndCompanyInput request)
 		{
-			return _dapperExecutor.ExecuteAsync("sp_CountProductsWithCategoryAndCompany", request);
+			return _dapperExecutor.ExecuteAsync("Sp_CountProductsWithCategoryAndCompany", request);
 		}
 	}
 
 	#endregion
 
-	#region sp_GetCompanyByName
-	public class sp_GetCompanyByNameOutput
+	#region Sp_GetCompanyByName
+	public class Sp_GetCompanyByNameOutput
 	{
-		[Newtonsoft.Json.JsonProperty("Id")] [System.ComponentModel.DataAnnotations.Required()] public System.Int32 Id { get; set; }
+		[Newtonsoft.Json.JsonProperty("Id", Required = Newtonsoft.Json.Required.Default)]
+		public System.Int32 Id { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("SourceId")] public System.Int32 SourceId { get; set; }
+		[Newtonsoft.Json.JsonProperty("SourceId", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.Int32 SourceId { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("ExternalId")] public System.String ExternalId { get; set; }
+		[Newtonsoft.Json.JsonProperty("ExternalId", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String ExternalId { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("Name")] public System.String Name { get; set; }
+		[Newtonsoft.Json.JsonProperty("Name", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String Name { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("Url")] public System.String Url { get; set; }
+		[Newtonsoft.Json.JsonProperty("Url", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String Url { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("SyncDate")] [System.ComponentModel.DataAnnotations.Required()] public System.DateTime SyncDate { get; set; }
+		[Newtonsoft.Json.JsonProperty("SyncDate", Required = Newtonsoft.Json.Required.Default)]
+		public System.DateTime SyncDate { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("JsonData")] public System.String JsonData { get; set; }
+		[Newtonsoft.Json.JsonProperty("JsonData", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String JsonData { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("JsonDataSchema")] public System.String JsonDataSchema { get; set; }
+		[Newtonsoft.Json.JsonProperty("JsonDataSchema", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String JsonDataSchema { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("CompanyState")] [System.ComponentModel.DataAnnotations.Required()] public System.Int32 CompanyState { get; set; }
+		[Newtonsoft.Json.JsonProperty("CompanyState", Required = Newtonsoft.Json.Required.Default)]
+		public System.Int32 CompanyState { get; set; }
 
 	}
 
-	public class sp_GetCompanyByNameInput
+	public class Sp_GetCompanyByNameInput
 	{
 		[Newtonsoft.Json.JsonProperty("companyName")] public System.String CompanyName { get; set; }
 
 	}
 
-	public class sp_GetCompanyByName
+	public class Sp_GetCompanyByName
 	{
-		private readonly IDapperExecutor<sp_GetCompanyByNameInput, sp_GetCompanyByNameOutput> _dapperExecutor;
-		public sp_GetCompanyByName(IDapperExecutor<sp_GetCompanyByNameInput, sp_GetCompanyByNameOutput> dapperExecutor)
+		private readonly IDapperExecutor<Sp_GetCompanyByNameInput, Sp_GetCompanyByNameOutput> _dapperExecutor;
+		public Sp_GetCompanyByName(IDapperExecutor<Sp_GetCompanyByNameInput, Sp_GetCompanyByNameOutput> dapperExecutor)
 		{
 			this._dapperExecutor = dapperExecutor;
 		}
-		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<sp_GetCompanyByNameOutput>> Execute(sp_GetCompanyByNameInput request)
+		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Sp_GetCompanyByNameOutput>> Execute(Sp_GetCompanyByNameInput request)
 		{
-			return _dapperExecutor.ExecuteAsync("sp_GetCompanyByName", request);
+			return _dapperExecutor.ExecuteAsync("Sp_GetCompanyByName", request);
 		}
 	}
 
 	#endregion
 
-	#region sp_GetAllCompanies
-	public class sp_GetAllCompaniesOutput
+	#region Sp_GetAllCompanies
+	public class Sp_GetAllCompaniesOutput
 	{
-		[Newtonsoft.Json.JsonProperty("Id")] [System.ComponentModel.DataAnnotations.Required()] public System.Int32 Id { get; set; }
+		[Newtonsoft.Json.JsonProperty("Id", Required = Newtonsoft.Json.Required.Default)]
+		public System.Int32 Id { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("SourceId")] public System.Int32 SourceId { get; set; }
+		[Newtonsoft.Json.JsonProperty("SourceId", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.Int32 SourceId { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("ExternalId")] public System.String ExternalId { get; set; }
+		[Newtonsoft.Json.JsonProperty("ExternalId", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String ExternalId { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("Name")] public System.String Name { get; set; }
+		[Newtonsoft.Json.JsonProperty("Name", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String Name { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("Url")] public System.String Url { get; set; }
+		[Newtonsoft.Json.JsonProperty("Url", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String Url { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("SyncDate")] [System.ComponentModel.DataAnnotations.Required()] public System.DateTime SyncDate { get; set; }
+		[Newtonsoft.Json.JsonProperty("SyncDate", Required = Newtonsoft.Json.Required.Default)]
+		public System.DateTime SyncDate { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("JsonData")] public System.String JsonData { get; set; }
+		[Newtonsoft.Json.JsonProperty("JsonData", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String JsonData { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("JsonDataSchema")] public System.String JsonDataSchema { get; set; }
+		[Newtonsoft.Json.JsonProperty("JsonDataSchema", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String JsonDataSchema { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("CompanyState")] [System.ComponentModel.DataAnnotations.Required()] public System.Int32 CompanyState { get; set; }
+		[Newtonsoft.Json.JsonProperty("CompanyState", Required = Newtonsoft.Json.Required.Default)]
+		public System.Int32 CompanyState { get; set; }
 
 	}
 
 
-	public class sp_GetAllCompanies
+	public class Sp_GetAllCompanies
 	{
-		private readonly IDapperExecutor<EmptyInputParams, sp_GetAllCompaniesOutput> _dapperExecutor;
-		public sp_GetAllCompanies(IDapperExecutor<EmptyInputParams, sp_GetAllCompaniesOutput> dapperExecutor)
+		private readonly IDapperExecutor<EmptyInputParams, Sp_GetAllCompaniesOutput> _dapperExecutor;
+		public Sp_GetAllCompanies(IDapperExecutor<EmptyInputParams, Sp_GetAllCompaniesOutput> dapperExecutor)
 		{
 			this._dapperExecutor = dapperExecutor;
 		}
-		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<sp_GetAllCompaniesOutput>> Execute()
+		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Sp_GetAllCompaniesOutput>> Execute()
 		{
-			return _dapperExecutor.ExecuteAsync("sp_GetAllCompanies");
+			return _dapperExecutor.ExecuteAsync("Sp_GetAllCompanies");
 		}
 	}
 
 	#endregion
 
-	#region sp_GetCompanyById
-	public class sp_GetCompanyByIdOutput
+	#region Sp_GetCompanyById
+	public class Sp_GetCompanyByIdOutput
 	{
-		[Newtonsoft.Json.JsonProperty("Id")] [System.ComponentModel.DataAnnotations.Required()] public System.Int32 Id { get; set; }
+		[Newtonsoft.Json.JsonProperty("Id", Required = Newtonsoft.Json.Required.Default)]
+		public System.Int32 Id { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("SourceId")] public System.Int32 SourceId { get; set; }
+		[Newtonsoft.Json.JsonProperty("SourceId", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.Int32 SourceId { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("ExternalId")] public System.String ExternalId { get; set; }
+		[Newtonsoft.Json.JsonProperty("ExternalId", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String ExternalId { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("Name")] public System.String Name { get; set; }
+		[Newtonsoft.Json.JsonProperty("Name", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String Name { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("Url")] public System.String Url { get; set; }
+		[Newtonsoft.Json.JsonProperty("Url", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String Url { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("SyncDate")] [System.ComponentModel.DataAnnotations.Required()] public System.DateTime SyncDate { get; set; }
+		[Newtonsoft.Json.JsonProperty("SyncDate", Required = Newtonsoft.Json.Required.Default)]
+		public System.DateTime SyncDate { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("JsonData")] public System.String JsonData { get; set; }
+		[Newtonsoft.Json.JsonProperty("JsonData", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String JsonData { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("JsonDataSchema")] public System.String JsonDataSchema { get; set; }
+		[Newtonsoft.Json.JsonProperty("JsonDataSchema", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String JsonDataSchema { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("CompanyState")] [System.ComponentModel.DataAnnotations.Required()] public System.Int32 CompanyState { get; set; }
+		[Newtonsoft.Json.JsonProperty("CompanyState", Required = Newtonsoft.Json.Required.Default)]
+		public System.Int32 CompanyState { get; set; }
 
 	}
 
-	public class sp_GetCompanyByIdInput
+	public class Sp_GetCompanyByIdInput
 	{
 		[Newtonsoft.Json.JsonProperty("companyId")] public System.Int32 CompanyId { get; set; }
 
 	}
 
-	public class sp_GetCompanyById
+	public class Sp_GetCompanyById
 	{
-		private readonly IDapperExecutor<sp_GetCompanyByIdInput, sp_GetCompanyByIdOutput> _dapperExecutor;
-		public sp_GetCompanyById(IDapperExecutor<sp_GetCompanyByIdInput, sp_GetCompanyByIdOutput> dapperExecutor)
+		private readonly IDapperExecutor<Sp_GetCompanyByIdInput, Sp_GetCompanyByIdOutput> _dapperExecutor;
+		public Sp_GetCompanyById(IDapperExecutor<Sp_GetCompanyByIdInput, Sp_GetCompanyByIdOutput> dapperExecutor)
 		{
 			this._dapperExecutor = dapperExecutor;
 		}
-		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<sp_GetCompanyByIdOutput>> Execute(sp_GetCompanyByIdInput request)
+		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Sp_GetCompanyByIdOutput>> Execute(Sp_GetCompanyByIdInput request)
 		{
-			return _dapperExecutor.ExecuteAsync("sp_GetCompanyById", request);
+			return _dapperExecutor.ExecuteAsync("Sp_GetCompanyById", request);
 		}
 	}
 
 	#endregion
 
-	#region sp_CountProductsWithCompany
-	public class sp_CountProductsWithCompanyOutput
+	#region Sp_CountProductsWithCompany
+	public class Sp_CountProductsWithCompanyOutput
 	{
-		[Newtonsoft.Json.JsonProperty("Result")] public System.Int32 Result { get; set; }
+		[Newtonsoft.Json.JsonProperty("Result", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.Int32 Result { get; set; }
 
 	}
 
-	public class sp_CountProductsWithCompanyInput
+	public class Sp_CountProductsWithCompanyInput
 	{
 		[Newtonsoft.Json.JsonProperty("companyId")] public System.Int32 CompanyId { get; set; }
 
 	}
 
-	public class sp_CountProductsWithCompany
+	public class Sp_CountProductsWithCompany
 	{
-		private readonly IDapperExecutor<sp_CountProductsWithCompanyInput, sp_CountProductsWithCompanyOutput> _dapperExecutor;
-		public sp_CountProductsWithCompany(IDapperExecutor<sp_CountProductsWithCompanyInput, sp_CountProductsWithCompanyOutput> dapperExecutor)
+		private readonly IDapperExecutor<Sp_CountProductsWithCompanyInput, Sp_CountProductsWithCompanyOutput> _dapperExecutor;
+		public Sp_CountProductsWithCompany(IDapperExecutor<Sp_CountProductsWithCompanyInput, Sp_CountProductsWithCompanyOutput> dapperExecutor)
 		{
 			this._dapperExecutor = dapperExecutor;
 		}
-		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<sp_CountProductsWithCompanyOutput>> Execute(sp_CountProductsWithCompanyInput request)
+		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Sp_CountProductsWithCompanyOutput>> Execute(Sp_CountProductsWithCompanyInput request)
 		{
-			return _dapperExecutor.ExecuteAsync("sp_CountProductsWithCompany", request);
+			return _dapperExecutor.ExecuteAsync("Sp_CountProductsWithCompany", request);
 		}
 	}
 
 	#endregion
 
-	#region sp_AddCompany
+	#region Sp_AddCompany
 
-	public class sp_AddCompanyInput
+	public class Sp_AddCompanyInput
 	{
 		[Newtonsoft.Json.JsonProperty("SourceId")] public System.Int32 SourceId { get; set; }
 
@@ -472,76 +552,89 @@ namespace ShopParserApi.Services.GeneratedClientFile
 
 	}
 
-	public class sp_AddCompany
+	public class Sp_AddCompany
 	{
-		private readonly IDapperExecutor<sp_AddCompanyInput> _dapperExecutor;
-		public sp_AddCompany(IDapperExecutor<sp_AddCompanyInput> dapperExecutor)
+		private readonly IDapperExecutor<Sp_AddCompanyInput> _dapperExecutor;
+		public Sp_AddCompany(IDapperExecutor<Sp_AddCompanyInput> dapperExecutor)
 		{
 			this._dapperExecutor = dapperExecutor;
 		}
-		public System.Threading.Tasks.Task Execute(sp_AddCompanyInput request)
+		public System.Threading.Tasks.Task Execute(Sp_AddCompanyInput request)
 		{
-			return _dapperExecutor.ExecuteAsync("sp_AddCompany", request);
+			return _dapperExecutor.ExecuteAsync("Sp_AddCompany", request);
 		}
 	}
 
 	#endregion
 
-	#region sp_GetAllProductsByCompanyId
-	public class sp_GetAllProductsByCompanyIdOutput
+	#region Sp_GetAllProductsByCompanyId
+	public class Sp_GetAllProductsByCompanyIdOutput
 	{
-		[Newtonsoft.Json.JsonProperty("Id")] [System.ComponentModel.DataAnnotations.Required()] public System.Int32 Id { get; set; }
+		[Newtonsoft.Json.JsonProperty("Id", Required = Newtonsoft.Json.Required.Default)]
+		public System.Int32 Id { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("CompanyId")] public System.Int32 CompanyId { get; set; }
+		[Newtonsoft.Json.JsonProperty("CompanyId", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.Int32 CompanyId { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("ExternalId")] public System.String ExternalId { get; set; }
+		[Newtonsoft.Json.JsonProperty("ExternalId", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String ExternalId { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("Title")] public System.String Title { get; set; }
+		[Newtonsoft.Json.JsonProperty("Title", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String Title { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("Url")] public System.String Url { get; set; }
+		[Newtonsoft.Json.JsonProperty("Url", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String Url { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("SyncDate")] [System.ComponentModel.DataAnnotations.Required()] public System.DateTime SyncDate { get; set; }
+		[Newtonsoft.Json.JsonProperty("SyncDate", Required = Newtonsoft.Json.Required.Default)]
+		public System.DateTime SyncDate { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("ExpirationDate")] [System.ComponentModel.DataAnnotations.Required()] public System.DateTime ExpirationDate { get; set; }
+		[Newtonsoft.Json.JsonProperty("ExpirationDate", Required = Newtonsoft.Json.Required.Default)]
+		public System.DateTime ExpirationDate { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("ProductState")] [System.ComponentModel.DataAnnotations.Required()] public System.Int32 ProductState { get; set; }
+		[Newtonsoft.Json.JsonProperty("ProductState", Required = Newtonsoft.Json.Required.Default)]
+		public System.Int32 ProductState { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("Description")] public System.String Description { get; set; }
+		[Newtonsoft.Json.JsonProperty("Description", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String Description { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("Price")] public System.String Price { get; set; }
+		[Newtonsoft.Json.JsonProperty("Price", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String Price { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("KeyWords")] public System.String KeyWords { get; set; }
+		[Newtonsoft.Json.JsonProperty("KeyWords", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String KeyWords { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("JsonData")] public System.String JsonData { get; set; }
+		[Newtonsoft.Json.JsonProperty("JsonData", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String JsonData { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("JsonDataSchema")] public System.String JsonDataSchema { get; set; }
+		[Newtonsoft.Json.JsonProperty("JsonDataSchema", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String JsonDataSchema { get; set; }
 
 	}
 
-	public class sp_GetAllProductsByCompanyIdInput
+	public class Sp_GetAllProductsByCompanyIdInput
 	{
 		[Newtonsoft.Json.JsonProperty("companyId")] public System.Int32 CompanyId { get; set; }
 
 	}
 
-	public class sp_GetAllProductsByCompanyId
+	public class Sp_GetAllProductsByCompanyId
 	{
-		private readonly IDapperExecutor<sp_GetAllProductsByCompanyIdInput, sp_GetAllProductsByCompanyIdOutput> _dapperExecutor;
-		public sp_GetAllProductsByCompanyId(IDapperExecutor<sp_GetAllProductsByCompanyIdInput, sp_GetAllProductsByCompanyIdOutput> dapperExecutor)
+		private readonly IDapperExecutor<Sp_GetAllProductsByCompanyIdInput, Sp_GetAllProductsByCompanyIdOutput> _dapperExecutor;
+		public Sp_GetAllProductsByCompanyId(IDapperExecutor<Sp_GetAllProductsByCompanyIdInput, Sp_GetAllProductsByCompanyIdOutput> dapperExecutor)
 		{
 			this._dapperExecutor = dapperExecutor;
 		}
-		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<sp_GetAllProductsByCompanyIdOutput>> Execute(sp_GetAllProductsByCompanyIdInput request)
+		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Sp_GetAllProductsByCompanyIdOutput>> Execute(Sp_GetAllProductsByCompanyIdInput request)
 		{
-			return _dapperExecutor.ExecuteAsync("sp_GetAllProductsByCompanyId", request);
+			return _dapperExecutor.ExecuteAsync("Sp_GetAllProductsByCompanyId", request);
 		}
 	}
 
 	#endregion
 
-	#region sp_UpdateProduct
+	#region Sp_UpdateProduct
 
-	public class sp_UpdateProductInput
+	public class Sp_UpdateProductInput
 	{
 		[Newtonsoft.Json.JsonProperty("productId")] public System.Int32 ProductId { get; set; }
 
@@ -571,24 +664,24 @@ namespace ShopParserApi.Services.GeneratedClientFile
 
 	}
 
-	public class sp_UpdateProduct
+	public class Sp_UpdateProduct
 	{
-		private readonly IDapperExecutor<sp_UpdateProductInput> _dapperExecutor;
-		public sp_UpdateProduct(IDapperExecutor<sp_UpdateProductInput> dapperExecutor)
+		private readonly IDapperExecutor<Sp_UpdateProductInput> _dapperExecutor;
+		public Sp_UpdateProduct(IDapperExecutor<Sp_UpdateProductInput> dapperExecutor)
 		{
 			this._dapperExecutor = dapperExecutor;
 		}
-		public System.Threading.Tasks.Task Execute(sp_UpdateProductInput request)
+		public System.Threading.Tasks.Task Execute(Sp_UpdateProductInput request)
 		{
-			return _dapperExecutor.ExecuteAsync("sp_UpdateProduct", request);
+			return _dapperExecutor.ExecuteAsync("Sp_UpdateProduct", request);
 		}
 	}
 
 	#endregion
 
-	#region sp_UpdateProductState
+	#region Sp_UpdateProductState
 
-	public class sp_UpdateProductStateInput
+	public class Sp_UpdateProductStateInput
 	{
 		[Newtonsoft.Json.JsonProperty("productId")] public System.Int32 ProductId { get; set; }
 
@@ -596,413 +689,345 @@ namespace ShopParserApi.Services.GeneratedClientFile
 
 	}
 
-	public class sp_UpdateProductState
+	public class Sp_UpdateProductState
 	{
-		private readonly IDapperExecutor<sp_UpdateProductStateInput> _dapperExecutor;
-		public sp_UpdateProductState(IDapperExecutor<sp_UpdateProductStateInput> dapperExecutor)
+		private readonly IDapperExecutor<Sp_UpdateProductStateInput> _dapperExecutor;
+		public Sp_UpdateProductState(IDapperExecutor<Sp_UpdateProductStateInput> dapperExecutor)
 		{
 			this._dapperExecutor = dapperExecutor;
 		}
-		public System.Threading.Tasks.Task Execute(sp_UpdateProductStateInput request)
+		public System.Threading.Tasks.Task Execute(Sp_UpdateProductStateInput request)
 		{
-			return _dapperExecutor.ExecuteAsync("sp_UpdateProductState", request);
+			return _dapperExecutor.ExecuteAsync("Sp_UpdateProductState", request);
 		}
 	}
 
 	#endregion
 
-	#region sp_GetProductById
-	public class sp_GetProductByIdOutput
+	#region Sp_GetProductById
+	public class Sp_GetProductByIdOutput
 	{
-		[Newtonsoft.Json.JsonProperty("Id")] [System.ComponentModel.DataAnnotations.Required()] public System.Int32 Id { get; set; }
+		[Newtonsoft.Json.JsonProperty("Id", Required = Newtonsoft.Json.Required.Default)]
+		public System.Int32 Id { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("CompanyId")] public System.Int32 CompanyId { get; set; }
+		[Newtonsoft.Json.JsonProperty("CompanyId", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.Int32 CompanyId { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("ExternalId")] public System.String ExternalId { get; set; }
+		[Newtonsoft.Json.JsonProperty("ExternalId", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String ExternalId { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("Title")] public System.String Title { get; set; }
+		[Newtonsoft.Json.JsonProperty("Title", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String Title { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("Url")] public System.String Url { get; set; }
+		[Newtonsoft.Json.JsonProperty("Url", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String Url { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("SyncDate")] [System.ComponentModel.DataAnnotations.Required()] public System.DateTime SyncDate { get; set; }
+		[Newtonsoft.Json.JsonProperty("SyncDate", Required = Newtonsoft.Json.Required.Default)]
+		public System.DateTime SyncDate { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("ExpirationDate")] [System.ComponentModel.DataAnnotations.Required()] public System.DateTime ExpirationDate { get; set; }
+		[Newtonsoft.Json.JsonProperty("ExpirationDate", Required = Newtonsoft.Json.Required.Default)]
+		public System.DateTime ExpirationDate { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("ProductState")] [System.ComponentModel.DataAnnotations.Required()] public System.Int32 ProductState { get; set; }
+		[Newtonsoft.Json.JsonProperty("ProductState", Required = Newtonsoft.Json.Required.Default)]
+		public System.Int32 ProductState { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("Description")] public System.String Description { get; set; }
+		[Newtonsoft.Json.JsonProperty("Description", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String Description { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("Price")] public System.String Price { get; set; }
+		[Newtonsoft.Json.JsonProperty("Price", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String Price { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("KeyWords")] public System.String KeyWords { get; set; }
+		[Newtonsoft.Json.JsonProperty("KeyWords", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String KeyWords { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("JsonData")] public System.String JsonData { get; set; }
+		[Newtonsoft.Json.JsonProperty("JsonData", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String JsonData { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("JsonDataSchema")] public System.String JsonDataSchema { get; set; }
+		[Newtonsoft.Json.JsonProperty("JsonDataSchema", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String JsonDataSchema { get; set; }
 
 	}
 
-	public class sp_GetProductByIdInput
+	public class Sp_GetProductByIdInput
 	{
 		[Newtonsoft.Json.JsonProperty("productId")] public System.Int32 ProductId { get; set; }
 
 	}
 
-	public class sp_GetProductById
+	public class Sp_GetProductById
 	{
-		private readonly IDapperExecutor<sp_GetProductByIdInput, sp_GetProductByIdOutput> _dapperExecutor;
-		public sp_GetProductById(IDapperExecutor<sp_GetProductByIdInput, sp_GetProductByIdOutput> dapperExecutor)
+		private readonly IDapperExecutor<Sp_GetProductByIdInput, Sp_GetProductByIdOutput> _dapperExecutor;
+		public Sp_GetProductById(IDapperExecutor<Sp_GetProductByIdInput, Sp_GetProductByIdOutput> dapperExecutor)
 		{
 			this._dapperExecutor = dapperExecutor;
 		}
-		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<sp_GetProductByIdOutput>> Execute(sp_GetProductByIdInput request)
+		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Sp_GetProductByIdOutput>> Execute(Sp_GetProductByIdInput request)
 		{
-			return _dapperExecutor.ExecuteAsync("sp_GetProductById", request);
+			return _dapperExecutor.ExecuteAsync("Sp_GetProductById", request);
 		}
 	}
 
 	#endregion
 
-	#region sp_GetCategoriesByProductId
-	public class sp_GetCategoriesByProductIdOutput
+	#region Sp_GetCategoriesByProductId
+	[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.4.4.0 (Newtonsoft.Json v13.0.0.0)")]
+	public partial class Sp_GetCategoriesByProductIdOutput
 	{
-		[Newtonsoft.Json.JsonProperty("Id")] [System.ComponentModel.DataAnnotations.Required()] public System.Int32 Id { get; set; }
+		[Newtonsoft.Json.JsonProperty("Id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public int Id { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("Name")] public System.String Name { get; set; }
+		[Newtonsoft.Json.JsonProperty("Name", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public string Name { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("Url")] public System.String Url { get; set; }
+		[Newtonsoft.Json.JsonProperty("Url", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public string Url { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("SupCategoryDataId")] public System.Int32 SupCategoryDataId { get; set; }
+		[Newtonsoft.Json.JsonProperty("SupCategoryDataId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public int SupCategoryDataId { get; set; }
+
 
 	}
-
-	public class sp_GetCategoriesByProductIdInput
+	public class Sp_GetCategoriesByProductIdInput
 	{
 		[Newtonsoft.Json.JsonProperty("productId")] public System.Int32 ProductId { get; set; }
 
 	}
 
-	public class sp_GetCategoriesByProductId
+	public class Sp_GetCategoriesByProductId
 	{
-		private readonly IDapperExecutor<sp_GetCategoriesByProductIdInput, sp_GetCategoriesByProductIdOutput> _dapperExecutor;
-		public sp_GetCategoriesByProductId(IDapperExecutor<sp_GetCategoriesByProductIdInput, sp_GetCategoriesByProductIdOutput> dapperExecutor)
+		private readonly IDapperExecutor<Sp_GetCategoriesByProductIdInput, Sp_GetCategoriesByProductIdOutput> _dapperExecutor;
+		public Sp_GetCategoriesByProductId(IDapperExecutor<Sp_GetCategoriesByProductIdInput, Sp_GetCategoriesByProductIdOutput> dapperExecutor)
 		{
 			this._dapperExecutor = dapperExecutor;
 		}
-		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<sp_GetCategoriesByProductIdOutput>> Execute(sp_GetCategoriesByProductIdInput request)
+		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Sp_GetCategoriesByProductIdOutput>> Execute(Sp_GetCategoriesByProductIdInput request)
 		{
-			return _dapperExecutor.ExecuteAsync("sp_GetCategoriesByProductId", request);
+			return _dapperExecutor.ExecuteJsonAsync("Sp_GetCategoriesByProductId", request);
 		}
 	}
 
 	#endregion
 
-	#region sp_GetCategoryById
-	public class sp_GetCategoryByIdOutput
+	#region Sp_GetCategoryById
+	[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.4.4.0 (Newtonsoft.Json v13.0.0.0)")]
+	public partial class Sp_GetCategoryByIdOutput
 	{
-		[Newtonsoft.Json.JsonProperty("Id")] [System.ComponentModel.DataAnnotations.Required()] public System.Int32 Id { get; set; }
+		[Newtonsoft.Json.JsonProperty("Id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public int Id { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("Name")] public System.String Name { get; set; }
+		[Newtonsoft.Json.JsonProperty("Name", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public string Name { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("Url")] public System.String Url { get; set; }
+		[Newtonsoft.Json.JsonProperty("Url", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public string Url { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("SupCategoryDataId")] public System.Int32 SupCategoryDataId { get; set; }
+		[Newtonsoft.Json.JsonProperty("SupCategoryDataId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+		public int SupCategoryDataId { get; set; }
+
 
 	}
-
-	public class sp_GetCategoryByIdInput
+	public class Sp_GetCategoryByIdInput
 	{
 		[Newtonsoft.Json.JsonProperty("categoryId")] public System.Int32 CategoryId { get; set; }
 
 	}
 
-	public class sp_GetCategoryById
+	public class Sp_GetCategoryById
 	{
-		private readonly IDapperExecutor<sp_GetCategoryByIdInput, sp_GetCategoryByIdOutput> _dapperExecutor;
-		public sp_GetCategoryById(IDapperExecutor<sp_GetCategoryByIdInput, sp_GetCategoryByIdOutput> dapperExecutor)
+		private readonly IDapperExecutor<Sp_GetCategoryByIdInput, Sp_GetCategoryByIdOutput> _dapperExecutor;
+		public Sp_GetCategoryById(IDapperExecutor<Sp_GetCategoryByIdInput, Sp_GetCategoryByIdOutput> dapperExecutor)
 		{
 			this._dapperExecutor = dapperExecutor;
 		}
-		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<sp_GetCategoryByIdOutput>> Execute(sp_GetCategoryByIdInput request)
+		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Sp_GetCategoryByIdOutput>> Execute(Sp_GetCategoryByIdInput request)
 		{
-			return _dapperExecutor.ExecuteAsync("sp_GetCategoryById", request);
+			return _dapperExecutor.ExecuteJsonAsync("Sp_GetCategoryById", request);
 		}
 	}
 
 	#endregion
 
-	#region sp_GetSuccessfulProductsByCompanyId
-	public class sp_GetSuccessfulProductsByCompanyIdOutput
+	#region Sp_GetSuccessfulProductsByCompanyId
+	public class Sp_GetSuccessfulProductsByCompanyIdOutput
 	{
-		[Newtonsoft.Json.JsonProperty("Id")] [System.ComponentModel.DataAnnotations.Required()] public System.Int32 Id { get; set; }
+		[Newtonsoft.Json.JsonProperty("Id", Required = Newtonsoft.Json.Required.Default)]
+		public System.Int32 Id { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("CompanyId")] public System.Int32 CompanyId { get; set; }
+		[Newtonsoft.Json.JsonProperty("CompanyId", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.Int32 CompanyId { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("ExternalId")] public System.String ExternalId { get; set; }
+		[Newtonsoft.Json.JsonProperty("ExternalId", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String ExternalId { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("Title")] public System.String Title { get; set; }
+		[Newtonsoft.Json.JsonProperty("Title", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String Title { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("Url")] public System.String Url { get; set; }
+		[Newtonsoft.Json.JsonProperty("Url", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String Url { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("SyncDate")] [System.ComponentModel.DataAnnotations.Required()] public System.DateTime SyncDate { get; set; }
+		[Newtonsoft.Json.JsonProperty("SyncDate", Required = Newtonsoft.Json.Required.Default)]
+		public System.DateTime SyncDate { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("ExpirationDate")] [System.ComponentModel.DataAnnotations.Required()] public System.DateTime ExpirationDate { get; set; }
+		[Newtonsoft.Json.JsonProperty("ExpirationDate", Required = Newtonsoft.Json.Required.Default)]
+		public System.DateTime ExpirationDate { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("ProductState")] [System.ComponentModel.DataAnnotations.Required()] public System.Int32 ProductState { get; set; }
+		[Newtonsoft.Json.JsonProperty("ProductState", Required = Newtonsoft.Json.Required.Default)]
+		public System.Int32 ProductState { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("Description")] public System.String Description { get; set; }
+		[Newtonsoft.Json.JsonProperty("Description", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String Description { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("Price")] public System.String Price { get; set; }
+		[Newtonsoft.Json.JsonProperty("Price", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String Price { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("KeyWords")] public System.String KeyWords { get; set; }
+		[Newtonsoft.Json.JsonProperty("KeyWords", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String KeyWords { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("JsonData")] public System.String JsonData { get; set; }
+		[Newtonsoft.Json.JsonProperty("JsonData", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String JsonData { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("JsonDataSchema")] public System.String JsonDataSchema { get; set; }
+		[Newtonsoft.Json.JsonProperty("JsonDataSchema", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String JsonDataSchema { get; set; }
 
 	}
 
-	public class sp_GetSuccessfulProductsByCompanyIdInput
+	public class Sp_GetSuccessfulProductsByCompanyIdInput
 	{
 		[Newtonsoft.Json.JsonProperty("companyId")] public System.Int32 CompanyId { get; set; }
 
 	}
 
-	public class sp_GetSuccessfulProductsByCompanyId
+	public class Sp_GetSuccessfulProductsByCompanyId
 	{
-		private readonly IDapperExecutor<sp_GetSuccessfulProductsByCompanyIdInput, sp_GetSuccessfulProductsByCompanyIdOutput> _dapperExecutor;
-		public sp_GetSuccessfulProductsByCompanyId(IDapperExecutor<sp_GetSuccessfulProductsByCompanyIdInput, sp_GetSuccessfulProductsByCompanyIdOutput> dapperExecutor)
+		private readonly IDapperExecutor<Sp_GetSuccessfulProductsByCompanyIdInput, Sp_GetSuccessfulProductsByCompanyIdOutput> _dapperExecutor;
+		public Sp_GetSuccessfulProductsByCompanyId(IDapperExecutor<Sp_GetSuccessfulProductsByCompanyIdInput, Sp_GetSuccessfulProductsByCompanyIdOutput> dapperExecutor)
 		{
 			this._dapperExecutor = dapperExecutor;
 		}
-		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<sp_GetSuccessfulProductsByCompanyIdOutput>> Execute(sp_GetSuccessfulProductsByCompanyIdInput request)
+		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Sp_GetSuccessfulProductsByCompanyIdOutput>> Execute(Sp_GetSuccessfulProductsByCompanyIdInput request)
 		{
-			return _dapperExecutor.ExecuteAsync("sp_GetSuccessfulProductsByCompanyId", request);
+			return _dapperExecutor.ExecuteAsync("Sp_GetSuccessfulProductsByCompanyId", request);
 		}
 	}
 
 	#endregion
 
-	#region sp_GetStoredProcedureDefinition
-	public class sp_GetStoredProcedureDefinitionOutput
+	#region Sp_GetStoredProcedureDefinition
+	public class Sp_GetStoredProcedureDefinitionOutput
 	{
-		[Newtonsoft.Json.JsonProperty("object_id")] [System.ComponentModel.DataAnnotations.Required()] public System.Int32 object_id { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("definition")] public System.String definition { get; set; }
+		[Newtonsoft.Json.JsonProperty("definition", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String definition { get; set; }
 
 	}
 
-	public class sp_GetStoredProcedureDefinitionInput
+	public class Sp_GetStoredProcedureDefinitionInput
 	{
 		[Newtonsoft.Json.JsonProperty("spName")] public System.String SpName { get; set; }
 
 	}
 
-	public class sp_GetStoredProcedureDefinition
+	public class Sp_GetStoredProcedureDefinition
 	{
-		private readonly IDapperExecutor<sp_GetStoredProcedureDefinitionInput, sp_GetStoredProcedureDefinitionOutput> _dapperExecutor;
-		public sp_GetStoredProcedureDefinition(IDapperExecutor<sp_GetStoredProcedureDefinitionInput, sp_GetStoredProcedureDefinitionOutput> dapperExecutor)
+		private readonly IDapperExecutor<Sp_GetStoredProcedureDefinitionInput, Sp_GetStoredProcedureDefinitionOutput> _dapperExecutor;
+		public Sp_GetStoredProcedureDefinition(IDapperExecutor<Sp_GetStoredProcedureDefinitionInput, Sp_GetStoredProcedureDefinitionOutput> dapperExecutor)
 		{
 			this._dapperExecutor = dapperExecutor;
 		}
-		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<sp_GetStoredProcedureDefinitionOutput>> Execute(sp_GetStoredProcedureDefinitionInput request)
+		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Sp_GetStoredProcedureDefinitionOutput>> Execute(Sp_GetStoredProcedureDefinitionInput request)
 		{
-			return _dapperExecutor.ExecuteAsync("sp_GetStoredProcedureDefinition", request);
+			return _dapperExecutor.ExecuteAsync("Sp_GetStoredProcedureDefinition", request);
 		}
 	}
 
 	#endregion
 
-	#region sp_GetStoredProcedureParameters
-	public class sp_GetStoredProcedureParametersOutput
+	#region Sp_GetStoredProcedureParameters
+	public class Sp_GetStoredProcedureParametersOutput
 	{
-		[Newtonsoft.Json.JsonProperty("system_type_name")] public System.String system_type_name { get; set; }
+		[Newtonsoft.Json.JsonProperty("object_id", Required = Newtonsoft.Json.Required.Default)]
+		public System.Int32 object_id { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("is_nullable")] public System.Boolean is_nullable { get; set; }
+		[Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String name { get; set; }
 
-		[Newtonsoft.Json.JsonProperty("name")] public System.String name { get; set; }
+		[Newtonsoft.Json.JsonProperty("parameter_id", Required = Newtonsoft.Json.Required.Default)]
+		public System.Int32 parameter_id { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("system_type_id", Required = Newtonsoft.Json.Required.Default)]
+		public System.Byte system_type_id { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("user_type_id", Required = Newtonsoft.Json.Required.Default)]
+		public System.Int32 user_type_id { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("max_length", Required = Newtonsoft.Json.Required.Default)]
+		public System.Int16 max_length { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("precision", Required = Newtonsoft.Json.Required.Default)]
+		public System.Byte precision { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("scale", Required = Newtonsoft.Json.Required.Default)]
+		public System.Byte scale { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("is_output", Required = Newtonsoft.Json.Required.Default)]
+		public System.Boolean is_output { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("is_cursor_ref", Required = Newtonsoft.Json.Required.Default)]
+		public System.Boolean is_cursor_ref { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("has_default_value", Required = Newtonsoft.Json.Required.Default)]
+		public System.Boolean has_default_value { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("is_xml_document", Required = Newtonsoft.Json.Required.Default)]
+		public System.Boolean is_xml_document { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("default_value", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.Object default_value { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("xml_collection_id", Required = Newtonsoft.Json.Required.Default)]
+		public System.Int32 xml_collection_id { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("is_readonly", Required = Newtonsoft.Json.Required.Default)]
+		public System.Boolean is_readonly { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("is_nullable", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.Boolean is_nullable { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("encryption_type", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.Int32 encryption_type { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("encryption_type_desc", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String encryption_type_desc { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("encryption_algorithm_name", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String encryption_algorithm_name { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("column_encryption_key_id", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.Int32 column_encryption_key_id { get; set; }
+
+		[Newtonsoft.Json.JsonProperty("column_encryption_key_database_name", Required = Newtonsoft.Json.Required.DisallowNull)]
+		public System.String column_encryption_key_database_name { get; set; }
 
 	}
 
-	public class sp_GetStoredProcedureParametersInput
+	public class Sp_GetStoredProcedureParametersInput
 	{
 		[Newtonsoft.Json.JsonProperty("spName")] public System.String SpName { get; set; }
 
 	}
 
-	public class sp_GetStoredProcedureParameters
+	public class Sp_GetStoredProcedureParameters
 	{
-		private readonly IDapperExecutor<sp_GetStoredProcedureParametersInput, sp_GetStoredProcedureParametersOutput> _dapperExecutor;
-		public sp_GetStoredProcedureParameters(IDapperExecutor<sp_GetStoredProcedureParametersInput, sp_GetStoredProcedureParametersOutput> dapperExecutor)
+		private readonly IDapperExecutor<Sp_GetStoredProcedureParametersInput, Sp_GetStoredProcedureParametersOutput> _dapperExecutor;
+		public Sp_GetStoredProcedureParameters(IDapperExecutor<Sp_GetStoredProcedureParametersInput, Sp_GetStoredProcedureParametersOutput> dapperExecutor)
 		{
 			this._dapperExecutor = dapperExecutor;
 		}
-		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<sp_GetStoredProcedureParametersOutput>> Execute(sp_GetStoredProcedureParametersInput request)
+		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Sp_GetStoredProcedureParametersOutput>> Execute(Sp_GetStoredProcedureParametersInput request)
 		{
-			return _dapperExecutor.ExecuteAsync("sp_GetStoredProcedureParameters", request);
+			return _dapperExecutor.ExecuteAsync("Sp_GetStoredProcedureParameters", request);
 		}
 	}
 
 	#endregion
 
-	#region sp_GetStoredProcedureOutputParameters
-	public class sp_GetStoredProcedureOutputParametersOutput
-	{
-		public System.Int32 sp_GetStoredProcedureOutputParametersResult { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("is_hidden")] public System.Boolean is_hidden { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("column_ordinal")] public System.Int32 column_ordinal { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("name")] public System.String name { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("is_nullable")] public System.Boolean is_nullable { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("system_type_id")] public System.Int32 system_type_id { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("system_type_name")] public System.String system_type_name { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("max_length")] public System.Int16 max_length { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("precision")] public System.Byte precision { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("scale")] public System.Byte scale { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("collation_name")] public System.String collation_name { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("user_type_id")] public System.Int32 user_type_id { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("user_type_database")] public System.String user_type_database { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("user_type_schema")] public System.String user_type_schema { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("user_type_name")] public System.String user_type_name { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("assembly_qualified_type_name")] public System.String assembly_qualified_type_name { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("xml_collection_id")] public System.Int32 xml_collection_id { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("xml_collection_database")] public System.String xml_collection_database { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("xml_collection_schema")] public System.String xml_collection_schema { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("xml_collection_name")] public System.String xml_collection_name { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("is_xml_document")] public System.Boolean is_xml_document { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("is_case_sensitive")] public System.Boolean is_case_sensitive { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("is_fixed_length_clr_type")] public System.Boolean is_fixed_length_clr_type { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("source_server")] public System.String source_server { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("source_database")] public System.String source_database { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("source_schema")] public System.String source_schema { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("source_table")] public System.String source_table { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("source_column")] public System.String source_column { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("is_identity_column")] public System.Boolean is_identity_column { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("is_part_of_unique_key")] public System.Boolean is_part_of_unique_key { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("is_updateable")] public System.Boolean is_updateable { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("is_computed_column")] public System.Boolean is_computed_column { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("is_sparse_column_set")] public System.Boolean is_sparse_column_set { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("ordinal_in_order_by_list")] public System.Int16 ordinal_in_order_by_list { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("order_by_is_descending")] public System.Boolean order_by_is_descending { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("order_by_list_length")] public System.Int16 order_by_list_length { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("error_number")] public System.Int32 error_number { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("error_severity")] public System.Int32 error_severity { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("error_state")] public System.Int32 error_state { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("error_message")] public System.String error_message { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("error_type")] public System.Int32 error_type { get; set; }
-
-		[Newtonsoft.Json.JsonProperty("error_type_desc")] public System.String error_type_desc { get; set; }
-
-	}
-
-	public class sp_GetStoredProcedureOutputParametersInput
-	{
-		[Newtonsoft.Json.JsonProperty("spName")] public System.String SpName { get; set; }
-
-	}
-
-	public class sp_GetStoredProcedureOutputParameters
-	{
-		private readonly IDapperExecutor<sp_GetStoredProcedureOutputParametersInput, sp_GetStoredProcedureOutputParametersOutput> _dapperExecutor;
-		public sp_GetStoredProcedureOutputParameters(IDapperExecutor<sp_GetStoredProcedureOutputParametersInput, sp_GetStoredProcedureOutputParametersOutput> dapperExecutor)
-		{
-			this._dapperExecutor = dapperExecutor;
-		}
-		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<sp_GetStoredProcedureOutputParametersOutput>> Execute(sp_GetStoredProcedureOutputParametersInput request)
-		{
-			return _dapperExecutor.ExecuteAsync("sp_GetStoredProcedureOutputParameters", request);
-		}
-	}
-
-	#endregion
-
-	#region sp_GetStoredProcedureJsonData
-	public class sp_GetStoredProcedureJsonDataOutput
-	{
-		[Newtonsoft.Json.JsonProperty("JSON_F52E2B61-18A1-11d1-B105-00805F49916B")] public System.String JSON_F52E2B61_18A1_11d1_B105_00805F49916B { get; set; }
-
-	}
-
-	public class sp_GetStoredProcedureJsonDataInput
-	{
-		[Newtonsoft.Json.JsonProperty("spName")] public System.String SpName { get; set; }
-
-	}
-
-	public class sp_GetStoredProcedureJsonData
-	{
-		private readonly IDapperExecutor<sp_GetStoredProcedureJsonDataInput, sp_GetStoredProcedureJsonDataOutput> _dapperExecutor;
-		public sp_GetStoredProcedureJsonData(IDapperExecutor<sp_GetStoredProcedureJsonDataInput, sp_GetStoredProcedureJsonDataOutput> dapperExecutor)
-		{
-			this._dapperExecutor = dapperExecutor;
-		}
-		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<sp_GetStoredProcedureJsonDataOutput>> Execute(sp_GetStoredProcedureJsonDataInput request)
-		{
-			return _dapperExecutor.ExecuteAsync("sp_GetStoredProcedureJsonData", request);
-		}
-	}
-
-	#endregion
-
-	#region sp_GetStoredProcedures
-	public class sp_GetStoredProceduresOutput
-	{
-		[Newtonsoft.Json.JsonProperty("JSON_F52E2B61-18A1-11d1-B105-00805F49916B")] public System.String JSON_F52E2B61_18A1_11d1_B105_00805F49916B { get; set; }
-
-	}
-
-
-	public class sp_GetStoredProcedures
-	{
-		private readonly IDapperExecutor<EmptyInputParams, sp_GetStoredProceduresOutput> _dapperExecutor;
-		public sp_GetStoredProcedures(IDapperExecutor<EmptyInputParams, sp_GetStoredProceduresOutput> dapperExecutor)
-		{
-			this._dapperExecutor = dapperExecutor;
-		}
-		public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<sp_GetStoredProceduresOutput>> Execute()
-		{
-			return _dapperExecutor.ExecuteAsync("sp_GetStoredProcedures");
-		}
-	}
-
-	#endregion
 }
