@@ -5,15 +5,18 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using ShopParserApi.Models;
 using ShopParserApi.Models.Hubs;
 using ShopParserApi.Services;
 using ShopParserApi.Services.GeneratedClientFile;
+using ShopParserApi.Services.GraphQlServices;
+using ShopParserApi.Services.GraphQlServices.GeneratedService;
 using ShopParserApi.Services.Interfaces;
 using ShopParserApi.Services.MapperService;
 using ShopParserApi.Services.Repositories;
 using ShopParserApi.Services.Repositories.Interfaces;
 using ShopParserApi.Services.TimedHostedServices.BackgroundWorkItems;
+using CompanyData = ShopParserApi.Models.CompanyData;
+using ProductData = ShopParserApi.Models.ProductData;
 
 namespace ShopParserApi
 {
@@ -77,6 +80,17 @@ namespace ShopParserApi
                 return new BackgroundCompaniesQueue(queueCapacity);
             });
 
+            services.AddHttpClient<CategoryClient>();
+            services.AddHttpClient<ProductClient>();
+            services.AddHttpClient<CompanyClient>();
+
+            services
+                .AddRouting()
+                .AddGraphQLServer()
+                //.AddDefaultTransactionScopeHandler()
+                .AddQueryType<CategoryQueryService>()
+                .AddMutationType<CategoryMutationService>();
+
             //Background workers for parsing data
             //services.AddHostedService<BackgroundProductControllerWorker>();
             //services.AddHostedService<BackgroundCompanyControllerWorker>();
@@ -114,6 +128,7 @@ namespace ShopParserApi
             {
                 endpoints.MapControllers();
                 endpoints.MapHub<ApiHub>("/hubs/DataFetchHub");
+                endpoints.MapGraphQL();
             });
         }
     }

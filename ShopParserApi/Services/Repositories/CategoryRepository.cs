@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using ShopParserApi.Models;
+using ShopParserApi.Services.Dapper_Services.Interfaces;
 using ShopParserApi.Services.GeneratedClientFile;
 using ShopParserApi.Services.Interfaces;
 using ShopParserApi.Services.Repositories.Interfaces;
@@ -24,6 +25,7 @@ namespace ShopParserApi.Services.Repositories
         {
             var executor=_dapperExecutorFactory.CreateDapperExecutor<EmptyInputParams,Sp_GetAllCategoriesOutput>();
             var spService = new Sp_GetAllCategories(executor);
+
 
             var executeResult = await spService.Execute();
             try
