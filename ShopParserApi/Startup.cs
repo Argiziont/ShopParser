@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ShopParserApi.Models.Hubs;
 using ShopParserApi.Services;
-using ShopParserApi.Services.GeneratedClientFile;
 using ShopParserApi.Services.GraphQlServices;
 using ShopParserApi.Services.GraphQlServices.GeneratedService;
 using ShopParserApi.Services.Interfaces;

@@ -57,7 +57,7 @@ export const CompaniesPage: React.FC = () => {
   useEffect(() => {
     let isMounted = true;
     setIsCompanysLodaing(true);
-    UserActions.GetAllCompanys().then((companyList) => {
+    UserActions.GetAllCompanies().then((companyList) => {
       if (isMounted) {
         setCompanyList(companyList);
         setIsCompanysLodaing(false);
@@ -110,7 +110,6 @@ export const CompaniesPage: React.FC = () => {
         </Grid>
         <Grid container direction="column" spacing={3}>
           <Switch>
-          
             <Route path={`${path}/:companyId`}>
               <CategoriesSupPage
                 categorySelectIds={categorySelectIds}
@@ -119,13 +118,12 @@ export const CompaniesPage: React.FC = () => {
                 setNestedCategoryList={setNestedCategoryList}
               />
             </Route>
-
-            </Switch>
-            <Switch>
+          </Switch>
+          <Switch>
             <Route path={`${path}/:companyId/:categoryId`}>
               <ProductSubPage />
             </Route>
-            </Switch>
+          </Switch>
         </Grid>
       </div>
     </React.Fragment>
