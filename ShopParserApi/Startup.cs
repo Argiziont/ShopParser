@@ -1,4 +1,5 @@
 using AutoMapper;
+using HotChocolate.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -86,9 +87,10 @@ namespace ShopParserApi
             services
                 .AddRouting()
                 .AddGraphQLServer()
-                //.AddDefaultTransactionScopeHandler()
-                .AddQueryType<CategoryQueryService>()
-                .AddMutationType<CategoryMutationService>();
+                .AddQueryType(t => t.Name(nameof(QueryService)))
+                .AddType<CategoryQueryType>()
+                .AddType<CompanyQueryType>()
+                .AddType<ProductQueryType>();
 
             //Background workers for parsing data
             //services.AddHostedService<BackgroundProductControllerWorker>();
@@ -127,7 +129,10 @@ namespace ShopParserApi
             {
                 endpoints.MapControllers();
                 endpoints.MapHub<ApiHub>("/hubs/DataFetchHub");
-                endpoints.MapGraphQL();
+                endpoints.MapGraphQL().WithOptions(new GraphQLServerOptions
+                {
+                    AllowedGetOperations = AllowedGetOperations.QueryAndMutation
+                });
             });
         }
     }

@@ -1,6 +1,6 @@
 ﻿namespace ShopParserApi.Services.GraphQlServices
 {
-    public class CategoryMutationService
+    public class QueryService
     {
         
     }

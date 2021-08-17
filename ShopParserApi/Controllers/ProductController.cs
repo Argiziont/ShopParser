@@ -200,6 +200,38 @@ namespace ShopParserApi.Controllers
         }
 
         [HttpGet]
+        [Route("GetAll")]
+        [ProducesResponseType(typeof(IEnumerable<ResponseProduct>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> GetAllProductsAsync()
+        {
+            try
+            {
+                var productList = await _productRepository.GetAll();
+
+                _logger.LogInformation(
+                    "GetAll method inside ProductController was called successfully");
+                return Ok(productList.Select(p => new ResponseProduct
+                {
+                    Description = p.Description,
+                    ExternalId = p.ExternalId,
+                    Id = p.Id,
+                    Url = p.Url,
+                    SyncDate = p.SyncDate,
+                    Price = p.Price,
+                    Title = p.Title
+                }));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, e);
+            }
+        }
+
+
+        [HttpGet]
         [Route("GetProductsByCategoryId")]
         [ProducesResponseType(typeof(IEnumerable<ResponseProduct>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
@@ -404,6 +436,51 @@ namespace ShopParserApi.Controllers
                                                                         companyId) //Take products which owned by current company and was parsed successfully
                     .OrderBy(p => p.Id) //Order by internal DB categoryId
                     .Skip(page * rowsPerPage).Take(rowsPerPage); //Take products by page
+
+
+                _logger.LogInformation(
+                    "GetPagedProductsByCategoryIdAndCompanyId method inside ProductController was called successfully");
+                return Ok(productSource.Select(p => new ResponseProduct
+                {
+                    Description = p.Description,
+                    ExternalId = p.ExternalId,
+                    Id = p.Id,
+                    Url = p.Url,
+                    SyncDate = p.SyncDate,
+                    Price = p.Price,
+                    Title = p.Title
+                }));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, e);
+            }
+        }
+
+        [HttpGet]
+        [Route("GetProductsByCategoryIdAndCompanyId")]
+        [ProducesResponseType(typeof(IEnumerable<ResponseProduct>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> GetProductsByCategoryIdAndCompanyIdAsync(int categoryId, int companyId)
+        {
+            try
+            {
+                var currentCategory = await _dbContext.Categories.Include(c => c.Products)
+                    .FirstOrDefaultAsync(c => c.Id == categoryId);
+
+                if (currentCategory == null)
+                {
+                    _logger.LogWarning(
+                        "GetPagedProductsByCategoryIdAndCompanyId method inside ProductController returned NotFound");
+                    return NotFound();
+                }
+
+                var productSource = currentCategory.Products.Where(p => p.ProductState == ProductState.Success &&
+                                                                        p.CompanyId ==
+                                                                        companyId);
 
 
                 _logger.LogInformation(

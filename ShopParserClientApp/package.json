@@ -13,10 +13,11 @@
     "@types/node": "^12.20.13",
     "@types/react": "^17.0.6",
     "@types/react-dom": "^17.0.5",
+    "graphql": "^15.5.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "4.0.3",
+    "react-scripts": "^1.1.5",
     "typescript": "^4.2.4",
     "web-vitals": "^1.1.2"
   },
@@ -24,7 +25,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "generate": "npm run gql:gen",
+    "gql:gen": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 graphql-codegen --config codegen.yml"
   },
   "eslintConfig": {
     "extends": [
@@ -45,8 +48,14 @@
     ]
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "2.0.1",
+    "@graphql-codegen/introspection": "2.0.0",
+    "@graphql-codegen/typescript": "^2.0.0",
+    "@graphql-codegen/typescript-operations": "2.0.1",
+    "@graphql-codegen/typescript-react-apollo": "3.0.0",
     "@microsoft/signalr": "^5.0.6",
     "@types/node": "9.6.7",
-    "@types/react-router-dom": "^5.1.7"
+    "@types/react-router-dom": "^5.1.7",
+    "cross-env": "^7.0.3"
   }
 }

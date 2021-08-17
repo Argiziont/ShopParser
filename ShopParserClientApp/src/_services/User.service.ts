@@ -10,16 +10,16 @@ import {
 } from "./";
 import { CategoryApi, ProductApi } from "./Helpers/WebApis";
 export const UserService = {
-  GetAllCompanies,
-  GetProductById,
-  GetProductByCategoryIdAndPage,
-  GetByParentIdAndCompanyId,
-  GetByParentId,
-  GetProductByCategoryIdAndCompanyIdAndPage,
-  GetProductsCountByCategoryIdAndCompanyId,
-  GetProductsCountByCategoryId,
-  GetProductByPage,
-  GetProductsCount
+  GetAllCompanies, //Comanies get
+  GetByParentIdAndCompanyId,//Category get categoryId id 
+  GetByParentId,//Category get categoryId 
+  GetProductByPage,//Products get Page
+  GetProductById, //Products get id
+  GetProductByCategoryIdAndPage,//Products get categoryId page 
+  GetProductByCategoryIdAndCompanyIdAndPage,//Products get categoryId companyId Page
+  GetProductsCountByCategoryIdAndCompanyId, //Productscount get categoryId companyId
+  GetProductsCountByCategoryId,//Productscount get categoryId
+  GetProductsCount//Productscount get
 };
 
 async function GetAllCompanies(): Promise<ResponseCompany[]> {

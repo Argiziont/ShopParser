@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Data.SqlClient;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using ShopParserApi.Models;
+using ShopParserApi.Services.Dapper_Services.Extensions;
 using ShopParserApi.Services.Repositories.Interfaces;
 
 namespace ShopParserApi.Services.Repositories
@@ -20,10 +24,11 @@ namespace ShopParserApi.Services.Repositories
 
         public async Task<IEnumerable<ProductData>> GetAll()
         {
-            await using var connection = new SqlConnection(_connectionString);
-
-            return await connection.QueryAsync<ProductData>("sp_GetAllProducts",
+            await using SqlConnection connection = new SqlConnection(_connectionString);
+            var jsonQuery = connection.QueryJson<ProductData>("sp_GetAllProducts",
                 commandType: CommandType.StoredProcedure);
+            //var test= JsonConvert.DeserializeObject<ProductData>(jsonQuery);
+            return jsonQuery;
         }
 
         public async Task<IEnumerable<ProductData>> GetByCategoryId(int categoryId)

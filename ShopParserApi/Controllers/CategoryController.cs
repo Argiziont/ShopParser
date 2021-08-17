@@ -28,6 +28,72 @@ namespace ShopParserApi.Controllers
             _productRepository = productRepository;
         }
 
+        #region Obsolete Requests
+
+        //[HttpGet]
+        //[Route("GetPaged")]
+        //[ProducesResponseType(typeof(IEnumerable<ResponseCategory>), StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
+        //[ProducesDefaultResponseType]
+        //public async Task<IActionResult> GetPagedAsync(int page, int rowsPerPage)
+        //{
+        //    try
+        //    {
+        //        var categoriesList = await _categoryRepository.GetPaged(page, rowsPerPage);
+
+        //        _logger.LogInformation("GetPagedAsync method inside CategoryController was called successfully");
+
+        //        var response = categoriesList.Select(c => new ResponseCategory
+        //        {
+        //            Id = c.Id,
+        //            Href = c.Url,
+        //            Name = c.Name
+        //        }).ToList();
+
+        //        foreach (var responseCategory in response)
+        //        {
+        //            var productsCount = await _productRepository.GetCountByCategoryId(responseCategory.Id);
+        //            responseCategory.ProductsCount = productsCount.ToString();
+        //        }
+
+        //        return Ok(response);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        _logger.LogError(e.Message);
+        //        return StatusCode(StatusCodes.Status500InternalServerError, e);
+        //    }
+        //}
+
+        //[HttpGet]
+        //[Route("GetAllNested")]
+        //[ProducesResponseType(typeof(ResponseNestedCategory), StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
+        //[ProducesResponseType(StatusCodes.Status404NotFound)]
+        //[ProducesDefaultResponseType]
+        //public async Task<IActionResult> GetAllNestedAsync()
+        //{
+        //    try
+        //    {
+        //        var currentCategory = await _categoryRepository.GetAll();
+        //        var topLevelCategory = currentCategory.FirstOrDefault(cat => cat.SupCategoryData == null);
+
+        //        if (topLevelCategory == null)
+        //            return NotFound();
+
+        //        var reversedCategory = await ReverseCategoryListRecursive(topLevelCategory);
+        //        _logger.LogInformation("GetAllNestedAsync method inside CategoryController was called successfully");
+
+        //        return Ok(reversedCategory);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        _logger.LogError(e.Message);
+        //        return StatusCode(StatusCodes.Status500InternalServerError, e);
+        //    }
+        //}
+        #endregion
+
         [HttpGet]
         [Route("GetAll")]
         [ProducesResponseType(typeof(IEnumerable<ResponseCategory>), StatusCodes.Status200OK)]
@@ -55,69 +121,6 @@ namespace ShopParserApi.Controllers
                 }
 
                 return Ok(response);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e.Message);
-                return StatusCode(StatusCodes.Status500InternalServerError, e);
-            }
-        }
-
-        [HttpGet]
-        [Route("GetPaged")]
-        [ProducesResponseType(typeof(IEnumerable<ResponseCategory>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
-        [ProducesDefaultResponseType]
-        public async Task<IActionResult> GetPagedAsync(int page, int rowsPerPage)
-        {
-            try
-            {
-                var categoriesList = await _categoryRepository.GetPaged(page, rowsPerPage);
-
-                _logger.LogInformation("GetPagedAsync method inside CategoryController was called successfully");
-
-                var response = categoriesList.Select(c => new ResponseCategory
-                {
-                    Id = c.Id,
-                    Href = c.Url,
-                    Name = c.Name
-                }).ToList();
-
-                foreach (var responseCategory in response)
-                {
-                    var productsCount = await _productRepository.GetCountByCategoryId(responseCategory.Id);
-                    responseCategory.ProductsCount = productsCount.ToString();
-                }
-
-                return Ok(response);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e.Message);
-                return StatusCode(StatusCodes.Status500InternalServerError, e);
-            }
-        }
-
-        [HttpGet]
-        [Route("GetAllNested")]
-        [ProducesResponseType(typeof(ResponseNestedCategory), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesDefaultResponseType]
-        public async Task<IActionResult> GetAllNestedAsync()
-        {
-            try
-            {
-                var currentCategory = await _categoryRepository.GetAll();
-                var topLevelCategory = currentCategory.FirstOrDefault(cat => cat.SupCategoryData == null);
-
-                if (topLevelCategory == null)
-                    return NotFound();
-
-                var reversedCategory = await ReverseCategoryListRecursive(topLevelCategory);
-                _logger.LogInformation("GetAllNestedAsync method inside CategoryController was called successfully");
-
-                return Ok(reversedCategory);
             }
             catch (Exception e)
             {
