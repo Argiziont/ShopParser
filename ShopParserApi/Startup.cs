@@ -87,6 +87,8 @@ namespace ShopParserApi
             services
                 .AddRouting()
                 .AddGraphQLServer()
+                .AddInMemorySubscriptions()
+                .AddSubscriptionType<SubscriptionObjectType>()
                 .AddQueryType(t => t.Name(nameof(QueryService)))
                 .AddType<CategoryQueryType>()
                 .AddType<CompanyQueryType>()
@@ -113,6 +115,7 @@ namespace ShopParserApi
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
+            app.UseWebSockets();
             app.UseRouting();
 
             // global cors policy

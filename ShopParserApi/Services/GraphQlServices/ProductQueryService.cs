@@ -1,8 +1,11 @@
-﻿using HotChocolate;
+﻿using System;
+using HotChocolate;
 using ShopParserApi.Services.GraphQlServices.GeneratedService;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
+using HotChocolate.Subscriptions;
 using HotChocolate.Types;
 
 namespace ShopParserApi.Services.GraphQlServices
@@ -28,11 +31,13 @@ namespace ShopParserApi.Services.GraphQlServices
             return await service.GetAllProductsAsync(cancellationToken);
         }
         public async Task<GeneratedService.ProductJson> GetProductAsync(
-            [Service] ProductClient service, CancellationToken cancellationToken, int id)
+            [Service] ITopicEventSender eventSender,[Service] ProductClient service, CancellationToken cancellationToken, int id)
         {
-           
-            return await service.GetFullProductsByIdAsync(id,cancellationToken);
+            ProductJson product = await service.GetFullProductsByIdAsync(id, cancellationToken);
+            await eventSender.SendAsync(nameof(SubscriptionObjectType.SubscribeProductGetDate), product, cancellationToken);
+            return product;
         }
+
     }
     public class ProductQueryType : ObjectTypeExtension<ProductQueryService>
     {

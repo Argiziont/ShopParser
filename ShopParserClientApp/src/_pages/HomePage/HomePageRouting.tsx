@@ -31,7 +31,7 @@ export const HomePageRouting: React.FC = () => {
   const classes = useStyles()
 
   return (
-    <Grid item xs={3} container justify="center" direction="row">
+    <Grid item xs={3} container justifyContent="center" direction="row">
       <Grid item>
         {MenuPages.map((pageName,i) => <NavLink
           key={i}

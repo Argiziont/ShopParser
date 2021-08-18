@@ -48,7 +48,7 @@ export const HomePage: React.FC = () => {
       <Grid
         container
         spacing={3}
-        justify="flex-start"
+        justifyContent="flex-start"
         direction="row"
         alignItems="flex-start"
         className={classes.rootBox}
@@ -59,10 +59,10 @@ export const HomePage: React.FC = () => {
           xs={9}
           spacing={3}
           container
-          justify="center"
+          justifyContent="center"
           direction="row"
         >
-          <Grid item container spacing={3} direction="column" justify="center">
+          <Grid item container spacing={3} direction="column" justifyContent="center">
             <Grid item container spacing={3}>
               <Switch>
                 <Route exact path={path}></Route>

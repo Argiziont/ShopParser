@@ -136,12 +136,12 @@ export const ProductSubPage: React.FC = () => {
       item
       container
       spacing={3}
-      justify="center"
+      justifyContent="center"
       alignItems="center"
       direction="column"
     >
       {numberOfProductsInTotal?(numberOfProductsInTotal > itemNumber && productBlockPagination):<></>}
-      <Grid item container spacing={3} justify="flex-start" direction="row">
+      <Grid item container spacing={3} justifyContent="flex-start" direction="row">
         {!productsListIsLoading &&
           productsList &&
           productsList.map((product, i) => (

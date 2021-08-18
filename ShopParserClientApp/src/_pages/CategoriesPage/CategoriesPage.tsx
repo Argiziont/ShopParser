@@ -9,6 +9,9 @@ import {
 } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { Route, Switch, useHistory, useRouteMatch } from "react-router-dom";
+//import { useLazyQuery } from '@apollo/client';
+
+
 import { IResponseCategory, UserActions } from "../../_actions";
 import { BootstrapInput } from "../../_components";
 import { ProductSubPage } from "./ProductSubPage";
@@ -46,6 +49,9 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({
   setCategorySelectIds,
   setNestedCategoryList,
 }) => {
+  //const [getCategoryByParentId, { loading: categoryLoading, data: categoryData }] = useLazyQuery<ResponseCompany[]>(GET_CATEGORIES_BY_PARENT_ID);
+
+
   const classes = useStyles();
 
   const history = useHistory();
@@ -58,7 +64,9 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({
     let isMounted = true;
     if (isMounted) {
       setNestedCategoryListIsLoading(true);
-
+      // if (isMounted) {
+      //   getCategoryByParentId({ variables: { categoryId: 'bulldog' } })
+      // }
       UserActions.GetCategoryByParentId(1).then((categoryList) => {
         if (isMounted) {
           if (categoryList) {

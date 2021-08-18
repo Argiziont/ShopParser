@@ -1,3 +1,4 @@
+import { NetworkStatus, useQuery, useSubscription } from "@apollo/client";
 import {
   CircularProgress,
   Grid,
@@ -5,13 +6,16 @@ import {
   Typography,
 } from "@material-ui/core";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link, Route, Switch, useRouteMatch } from "react-router-dom";
 import {
+  GET_All_COMPANIES,
+  GET_PRODUCT_INFO_SUB,
   IResponseCategory,
-  IResponseCompany,
-  UserActions,
 } from "../../_actions";
+import {
+  ResponseCompany,
+} from "../../_actions/GraphqlTypes";
 import { CategoriesSupPage } from "./CategoriesSupPage";
 import { ProductSubPage } from "./ProductSubPage";
 
@@ -43,38 +47,26 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
+interface ResponseCompanyData {
+  companies: ResponseCompany[];
+};
+
 export const CompaniesPage: React.FC = () => {
   const classes = useStyles();
   const { url, path } = useRouteMatch();
 
-  const [companyList, setCompanyList] = useState<IResponseCompany[]>();
-  const [isCompaniesLodaing, setIsCompanysLodaing] = useState<boolean>(false);
-
+  const { loading:isCompaniesLodaing, error, data:companyList, networkStatus } = useQuery<ResponseCompanyData,ResponseCompany>(GET_All_COMPANIES);
   const [categorySelectIds, setCategorySelectIds] = useState<number[]>([]);
   const [nestedCategoryList, setNestedCategoryList] =
     useState<IResponseCategory[][]>();
 
-  useEffect(() => {
-    let isMounted = true;
-    setIsCompanysLodaing(true);
-    UserActions.GetAllCompanies().then((companyList) => {
-      if (isMounted) {
-        setCompanyList(companyList);
-        setIsCompanysLodaing(false);
-      }
-    });
-    return () => {
-      isMounted = false;
-    }; // use effect cleanup to set flag false, if unmounted
-  }, []);
+  SubToProducts();
+  if (networkStatus === NetworkStatus.refetch || isCompaniesLodaing || error) return <CircularProgress color="inherit" />;
 
-  return isCompaniesLodaing ? (
-    <CircularProgress color="inherit" />
-  ) : (
-    <React.Fragment>
+  return <React.Fragment>
       <div className={classes.gridListRoot}>
         <Grid container spacing={3}>
-          {companyList?.map((company, i) => (
+        {companyList?.companies?.map((company, i) => (
             <Grid item xs={3} key={i}>
               <div className={classes.companyItem}>
                 <Link
@@ -127,5 +119,10 @@ export const CompaniesPage: React.FC = () => {
         </Grid>
       </div>
     </React.Fragment>
-  );
+  ;
 };
+
+function SubToProducts() {
+  const { data, loading } = useSubscription(GET_PRODUCT_INFO_SUB);
+  if(!loading) console.table(data);
+}
