@@ -34,7 +34,9 @@ namespace ShopParserApi.Services.GraphQlServices
             [Service] ITopicEventSender eventSender,[Service] ProductClient service, CancellationToken cancellationToken, int id)
         {
             ProductJson product = await service.GetFullProductsByIdAsync(id, cancellationToken);
+
             await eventSender.SendAsync(nameof(SubscriptionObjectType.SubscribeProductGetDate), product, cancellationToken);
+
             return product;
         }
 

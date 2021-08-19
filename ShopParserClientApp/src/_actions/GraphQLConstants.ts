@@ -1,4 +1,5 @@
 import { gql } from '@apollo/client';
+import { generateQueryOp } from '../generated';
 
 export const GET_CATEGORIES_BY_PARENT_ID = gql`
 query Categories($companyId: Int!){
@@ -32,3 +33,14 @@ subscription{
   }
 }
 `;
+
+export const GetAllCompanies=() => generateQueryOp({
+  companies:{
+    id:true,
+    externalId:true,
+    productCount:true,
+    name:true,
+    url:true,
+    syncDate:true
+  },
+})

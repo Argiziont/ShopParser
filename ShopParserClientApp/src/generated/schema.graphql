@@ -1,0 +1,223 @@
+schema {
+  query: QueryService
+  subscription: SubscriptionObjectType
+}
+
+"""
+The `@defer` directive may be provided for fragment spreads and inline fragments to inform the executor to delay the execution of the current fragment to indicate deprioritization of the current fragment. A query with `@defer` directive will cause the request to potentially return multiple responses, where non-deferred data is delivered in the initial response and data deferred is delivered in a subsequent response. `@include` and `@skip` take precedence over `@defer`.
+"""
+directive @defer(
+  """
+  If this argument label has a value other than null, it will be passed on to the result of this defer directive. This label is intended to give client applications a way to identify to which fragment a deferred result belongs to.
+  """
+  label: String
+
+  """Deferred when true."""
+  if: Boolean
+) on FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+"""
+The `@stream` directive may be provided for a field of `List` type so that the backend can leverage technology such as asynchronous iterators to provide a partial list in the initial response, and additional list items in subsequent responses. `@include` and `@skip` take precedence over `@stream`.
+"""
+directive @stream(
+  """
+  If this argument label has a value other than null, it will be passed on to the result of this stream directive. This label is intended to give client applications a way to identify to which fragment a streamed result belongs to.
+  """
+  label: String
+
+  """The initial elements that shall be send down to the consumer."""
+  initialCount: Int!
+
+  """Streamed when true."""
+  if: Boolean!
+) on FIELD
+
+type QueryService {
+  categories(id: Int, companyId: Int): [ResponseCategory]
+  companies: [ResponseCompany]
+  products(skip: Int, take: Int, companyId: Int, categoryId: Int): ResponseProductCollectionSegment
+  product(id: Int!): ProductJson
+}
+
+type ResponseProductCollectionSegment {
+  items: [ResponseProduct]
+
+  """Information to aid in pagination."""
+  pageInfo: CollectionSegmentInfo!
+  totalCount: Int!
+}
+
+type ResponseProduct {
+  id: Int!
+  externalId: String
+  title: String
+  url: String
+  syncDate: DateTime!
+  description: String
+  price: String
+}
+
+"""Information about the offset pagination."""
+type CollectionSegmentInfo {
+  """
+  Indicates whether more items exist following the set defined by the clients arguments.
+  """
+  hasNextPage: Boolean!
+
+  """
+  Indicates whether more items exist prior the set defined by the clients arguments.
+  """
+  hasPreviousPage: Boolean!
+}
+
+type SubscriptionObjectType {
+  subscribeProductGetDate: ProductJson
+}
+
+type ResponseCategory {
+  id: Int!
+  name: String
+  href: String
+  productsCount: String
+}
+
+type ResponseCompany {
+  id: Int!
+  externalId: String
+  productCount: Int!
+  name: String
+  url: String
+  syncDate: DateTime!
+}
+
+type ProductJson {
+  title: String
+  externalId: String
+  url: String
+  currency: String
+  keyWords: String
+  description: String
+  price: String
+  priceUsd: String
+  scuCode: String
+  fullPrice: String
+  isDiscounted: Boolean!
+  discountPercent: Int
+  presence: PresenceData
+  optPrice: String
+  imageUrls: [String]
+  syncDate: DateTime!
+  expirationDate: DateTime!
+  jsonCategory: String
+  stringCategory: String
+  jsonCategorySchema: String
+  productAttribute: [ProductAttribute]
+  productPaymentOptions: [ProductPaymentOption]
+  productDeliveryOptions: [ProductDeliveryOption]
+}
+
+"""The `DateTime` scalar represents an ISO-8601 compliant date time type."""
+scalar DateTime
+
+type PresenceData {
+  presenceSureAvailable: Boolean!
+  orderAvailable: Boolean!
+  available: Boolean!
+  title: String
+  ending: Boolean!
+  waiting: Boolean!
+  id: Int!
+  productId: Int!
+  product: ProductData
+}
+
+type ProductAttribute {
+  id: Int!
+  productId: Int
+  externalId: Int!
+  attributeName: String
+  attributeGroup: String
+  attributeValues: String
+  product: ProductData
+}
+
+type ProductPaymentOption {
+  id: Int!
+  productId: Int
+  externalId: Int!
+  optionName: String
+  optionsComment: String
+  product: ProductData
+}
+
+type ProductDeliveryOption {
+  id: Int!
+  productId: Int
+  externalId: Int!
+  optionName: String
+  optionsComment: String
+  product: ProductData
+}
+
+type ProductData {
+  id: Int!
+  companyId: Int
+  externalId: String
+  title: String
+  url: String
+  syncDate: DateTime!
+  expirationDate: DateTime!
+  productState: ProductState!
+  description: String
+  price: String
+  keyWords: String
+  jsonData: String
+  jsonDataSchema: String
+  company: CompanyData
+  presence: PresenceData
+  categories: [CategoryData]
+  productPaymentOptions: [ProductPaymentOption]
+  productDeliveryOptions: [ProductDeliveryOption]
+  productAttribute: [ProductAttribute]
+}
+
+enum ProductState {
+  IDLE
+  SUCCESS
+  FAILED
+}
+
+type CompanyData {
+  id: Int!
+  sourceId: Int
+  externalId: String
+  name: String
+  url: String
+  syncDate: DateTime!
+  companyState: CompanyState!
+  jsonData: String
+  jsonDataSchema: String
+  products: [ProductData]
+  source: CompanySource
+}
+
+type CategoryData {
+  id: Int!
+  name: String
+  url: String
+  products: [ProductData]
+  supCategoryData: CategoryData
+}
+
+enum CompanyState {
+  IDLE
+  PROCESSING
+  SUCCESS
+  FAILED
+}
+
+type CompanySource {
+  id: Int!
+  name: String
+  companies: [CompanyData]
+}

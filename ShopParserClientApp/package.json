@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.4.8",
+    "@genql/runtime": "^2.6.0",
     "@material-ui/core": "^4.11.4",
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.58",
@@ -17,6 +18,7 @@
     "graphql": "^15.5.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-query": "^3.19.6",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
     "subscriptions-transport-ws": "^0.9.19",
@@ -27,7 +29,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "generateGQLCode": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 genql --endpoint https://localhost:5001/graphql/ --output ./generated"
   },
   "eslintConfig": {
     "extends": [
@@ -48,8 +51,10 @@
     ]
   },
   "devDependencies": {
+    "@genql/cli": "^2.6.0",
     "@microsoft/signalr": "^5.0.6",
     "@types/node": "9.6.7",
-    "@types/react-router-dom": "^5.1.7"
+    "@types/react-router-dom": "^5.1.7",
+    "cross-env": "^7.0.3"
   }
 }

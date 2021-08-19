@@ -1,4 +1,4 @@
-import { NetworkStatus, useQuery, useSubscription } from "@apollo/client";
+import { gql, NetworkStatus, useQuery, useSubscription } from "@apollo/client";
 import {
   CircularProgress,
   Grid,
@@ -9,6 +9,7 @@ import {
 import React, { useState } from "react";
 import { Link, Route, Switch, useRouteMatch } from "react-router-dom";
 import {
+  GetAllCompanies,
   GET_All_COMPANIES,
   GET_PRODUCT_INFO_SUB,
   IResponseCategory,
@@ -54,8 +55,10 @@ interface ResponseCompanyData {
 export const CompaniesPage: React.FC = () => {
   const classes = useStyles();
   const { url, path } = useRouteMatch();
+  const { query, variables } = GetAllCompanies();
 
-  const { loading:isCompaniesLodaing, error, data:companyList, networkStatus } = useQuery<ResponseCompanyData,ResponseCompany>(GET_All_COMPANIES);
+
+  const { loading:isCompaniesLodaing, error, data:companyList, networkStatus } = useQuery<ResponseCompanyData,ResponseCompany>(gql(query));
   const [categorySelectIds, setCategorySelectIds] = useState<number[]>([]);
   const [nestedCategoryList, setNestedCategoryList] =
     useState<IResponseCategory[][]>();
