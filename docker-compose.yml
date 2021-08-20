@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  shopparserapi:
+    image: ${DOCKER_REGISTRY-}shopparserapi
+    build:
+      context: .
+      dockerfile: ShopParserApi/Dockerfile

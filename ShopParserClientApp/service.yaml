@@ -1,0 +1,11 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: shopparserclientapp-service
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 80
+  selector:
+    app: shopparserclientapp-pod

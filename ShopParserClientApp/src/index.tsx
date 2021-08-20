@@ -11,16 +11,17 @@ import {
 } from "@apollo/client";
 import { WebSocketLink } from '@apollo/client/link/ws';
 import { getMainDefinition } from '@apollo/client/utilities';
+import { ApiUri } from './_services/Helpers/ApiUrl';
 
 
 const wsLink = new WebSocketLink({
-  uri: 'wss://localhost:5001/graphql',
+  uri: 'wss://'+ApiUri+'/graphql',
   options: {
     reconnect: true
   }
 });
 const httpLink = new HttpLink({
-  uri: 'https://localhost:5001/graphql/'
+  uri: 'https://'+ApiUri+'/graphql/'
 });
 const splitLink = split(
   ({ query }) => {

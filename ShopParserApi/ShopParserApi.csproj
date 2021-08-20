@@ -5,6 +5,7 @@
     <UserSecretsId>9d1285c1-a3bd-464c-a242-a689d664571d</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <IncludeOpenAPIAnalyzers>true</IncludeOpenAPIAnalyzers>
+    <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
 
   <ItemGroup>
