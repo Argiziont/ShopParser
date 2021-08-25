@@ -49,8 +49,18 @@ namespace ShopParserApi
 
             mapperConfig.AssertConfigurationIsValid();//Check if map profiles is valid
 
+            // Register the RedisCache service
+            services.AddMemoryCache();
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = "localhost:6379";
+            });
+
             //Dapper repository wrappers
             services.AddTransient<ICategoryRepository, CategoryRepository>();
+            services.Decorate<ICategoryRepository, CategoryRepositoryCacher>();
+
+
             services.AddTransient<IProductRepository, ProductRepository>(provider =>
                 new ProductRepository(connectionString));
             services.AddTransient<ICompanyRepository, CompanyRepository>(provider =>

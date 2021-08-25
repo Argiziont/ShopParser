@@ -1,11 +1,11 @@
-kind: Service
 apiVersion: v1
+kind: Service
 metadata:
   name: shopparserapi-service
 spec:
-  type: LoadBalancer
-  ports:
-    - port: 5000
-      targetPort: 80
   selector:
     app: shopparserapi-pod
+  ports:
+  - port: 49153
+    targetPort: 80
+  type: "LoadBalancer"

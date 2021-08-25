@@ -1,3 +1,31 @@
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: shopparserapi-deployment
+#   labels:
+#     app: shopparserapi-pod
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       service: shopparserapi-service
+#   template:
+#     metadata:
+#       labels:
+#         app: shopparserapi-pod
+#         service: shopparserapi-service
+#     spec:
+#       containers:
+#         - name: shopparserapi-constainer
+#           image: argiziont/shopparserapi:latest
+#           imagePullPolicy: IfNotPresent
+#           ports:
+#             - containerPort: 80
+#               protocol: TCP
+#           env:
+#             - name: ASPNETCORE_URLS
+#               value: http://+:80
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -12,9 +40,17 @@ spec:
         app: shopparserapi-pod
     spec:
       containers:
-        - name: shopparserapi-constainer
-          image: argiziont/shopparserapi:latest
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 80
-      # restartPolicy: Always
+      - name: shopparserapi-container
+        image: argiziont/shopparserapi:latest
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80
+        # Environment variable section
+        env:
+        - name: "ASPNETCORE_ENVIRONMENT"
+          value: "Development"
+          
+

@@ -1,14 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using ShopParserApi.Models;
 using ShopParserApi.Models.ResponseModels;
-using ShopParserApi.Services;
 using ShopParserApi.Services.Repositories.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace ShopParserApi.Controllers
 {
@@ -20,7 +22,7 @@ namespace ShopParserApi.Controllers
         private readonly ILogger<CategoryController> _logger;
         private readonly IProductRepository _productRepository;
 
-        public CategoryController(ApplicationDb dbContext, ILogger<CategoryController> logger,
+        public CategoryController(ILogger<CategoryController> logger,
             ICategoryRepository categoryRepository, IProductRepository productRepository)
         {
             _logger = logger;
@@ -101,6 +103,7 @@ namespace ShopParserApi.Controllers
         [ProducesDefaultResponseType]
         public async Task<IActionResult> GetAllAsync()
         {
+
             try
             {
                 var categoriesList = await _categoryRepository.GetAll();
@@ -114,9 +117,9 @@ namespace ShopParserApi.Controllers
                     Name = c.Name
                 }).ToList();
 
-                foreach (var responseCategory in response)
+                foreach (ResponseCategory responseCategory in response)
                 {
-                    var productsCount = await _productRepository.GetCountByCategoryId(responseCategory.Id);
+                    int productsCount = await _productRepository.GetCountByCategoryId(responseCategory.Id);
                     responseCategory.ProductsCount = productsCount.ToString();
                 }
 
@@ -146,10 +149,6 @@ namespace ShopParserApi.Controllers
                 if (!categoryDataArray.Any())
                     return Ok(new List<ResponseCategory>());
 
-
-                _logger.LogInformation(
-                    "GetNestedByParentIdAsync method inside CategoryController was called successfully");
-
                 var response = categoryDataArray.Select(c => new ResponseCategory
                 {
                     Id = c.Id,
@@ -157,13 +156,14 @@ namespace ShopParserApi.Controllers
                     Name = c.Name
                 }).ToList();
 
-                foreach (var responseCategory in response)
+                foreach (ResponseCategory responseCategory in response)
                 {
-                    var productsCount = await _productRepository.GetCountByCategoryId(responseCategory.Id);
+                    int productsCount = await _productRepository.GetCountByCategoryId(responseCategory.Id);
                     responseCategory.ProductsCount = productsCount.ToString();
                 }
 
                 return Ok(response);
+
             }
             catch (Exception e)
             {
@@ -198,9 +198,9 @@ namespace ShopParserApi.Controllers
                     Name = c.Name
                 }).ToList();
 
-                foreach (var responseCategory in response)
+                foreach (ResponseCategory responseCategory in response)
                 {
-                    var productsCount = await _productRepository.GetCountByCategoryId(responseCategory.Id);
+                    int productsCount = await _productRepository.GetCountByCategoryId(responseCategory.Id);
                     responseCategory.ProductsCount = productsCount.ToString();
                 }
 
@@ -223,7 +223,7 @@ namespace ShopParserApi.Controllers
         {
             try
             {
-                var productCount = await _productRepository.GetCountByCategoryIdAndCompanyId(id, companyId);
+                int productCount = await _productRepository.GetCountByCategoryIdAndCompanyId(id, companyId);
 
                 _logger.LogInformation(
                     "GetNestedByParentIdAsync method inside CategoryController was called successfully");
@@ -249,7 +249,7 @@ namespace ShopParserApi.Controllers
             {
                 try
                 {
-                    var productCount = await _productRepository.GetCountByCategoryId(id);
+                    int productCount = await _productRepository.GetCountByCategoryId(id);
 
 
                     _logger.LogInformation(
@@ -273,7 +273,7 @@ namespace ShopParserApi.Controllers
         private async Task<ResponseNestedCategory> ReverseCategoryListRecursive(CategoryData mainCategoryData)
         {
             var subCategory = await _categoryRepository.GetNestedByParentId(mainCategoryData.Id);
-            var productCount = await _productRepository.GetCountByCategoryId(mainCategoryData.Id);
+            int productCount = await _productRepository.GetCountByCategoryId(mainCategoryData.Id);
 
             var subCategoryList = subCategory.Select(cat => ReverseCategoryListRecursive(cat).Result).ToList();
             return new ResponseNestedCategory

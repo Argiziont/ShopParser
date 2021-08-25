@@ -7,5 +7,5 @@ spec:
   ports:
     - port: 8080
       targetPort: 80
-  selector:
+  selector: 
     app: shopparserclientapp-pod

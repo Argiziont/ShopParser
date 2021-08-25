@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.Extensions.Caching.Distributed;
 using ShopParserApi.Models;
 using ShopParserApi.Services.Dapper_Services.Interfaces;
 using ShopParserApi.Services.GeneratedClientFile;
@@ -14,6 +15,7 @@ namespace ShopParserApi.Services.Repositories
     {
         private readonly IDapperExecutorFactory _dapperExecutorFactory;
         private readonly IMapper _mapper;
+
 
         public CategoryRepository(IDapperExecutorFactory dapperExecutorFactory, IMapper mapper)
         {
